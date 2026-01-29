@@ -4,6 +4,8 @@
 
 package com.mycompany.quanlythuvien;
 
+import GUI.Login;
+
 /**
  *
  * @author Admin
@@ -11,6 +13,8 @@ package com.mycompany.quanlythuvien;
 public class QuanLyThuVien {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        Login Loginframe = new Login();
+        Loginframe.setVisible(true);
+        Loginframe.setLocationRelativeTo(null);
     }
 }
