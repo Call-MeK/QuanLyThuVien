@@ -25,7 +25,7 @@ public class DocGiaDAO {
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
+            while (rs.next()) {
                 DocGiaDTO dg = new DocGiaDTO(
                         rs.getString("MaDocGia"),
                         rs.getString("NgayDangKi"),
@@ -69,7 +69,7 @@ public class DocGiaDAO {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, maDocGia);
             ResultSet rs = ps.executeQuery();
-            if(rs.next()){
+            while (rs.next()){
                 dg = new DocGiaDTO(
                         rs.getString("MaDocGia"),
                         rs.getString("NgayDangKi"),
