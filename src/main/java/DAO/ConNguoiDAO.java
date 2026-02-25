@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * @author Admin
  */
 public class ConNguoiDAO {
-    public ArrayList<ConNguoiDTO> getALL() {
+    public ArrayList<ConNguoiDTO> getAll() {
         ArrayList<ConNguoiDTO> danhsach = new ArrayList<>();
         Connection conn = DatabaseConnection.getConnection();
         String stmt = "SELECT * FROM CONNGUOI";

@@ -27,7 +27,7 @@ public class XuPhatDAO {
                 XuPhatDTO xp = new XuPhatDTO(
                         rs.getString("MaXP"),
                         rs.getString("LyDo"),
-                        rs.getFloat("SoTien"),
+                        (float) rs.getDouble("SoTien"),
                         rs.getString("MaPM"),
                         rs.getString("MaNQL"),
                         rs.getString("MaCuonSach"));
@@ -87,7 +87,7 @@ public class XuPhatDAO {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, xp.getMaXP());
             stmt.setString(2, xp.getLyDo());
-            stmt.setFloat(3, xp.getSoTien());
+            stmt.setDouble(3, xp.getSoTien());
             stmt.setString(4, xp.getMaPM());
             stmt.setString(5, xp.getMaNQL());
             stmt.setString(6, xp.getMaCuonSach());
@@ -112,7 +112,7 @@ public class XuPhatDAO {
         try {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, xp.getLyDo());
-            stmt.setFloat(2, xp.getSoTien());
+            stmt.setDouble(2, xp.getSoTien());
             stmt.setString(3, xp.getMaPM());
             stmt.setString(4, xp.getMaNQL());
             stmt.setString(5, xp.getMaCuonSach());
