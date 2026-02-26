@@ -22,7 +22,6 @@ public class TheLoaiDAO {
         ArrayList<TheLoaiDTO> danhSach = new ArrayList<>();
         Connection conn = DatabaseConnection.getConnection();
         String sql = "SELECT * FROM THELOAI";
-
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();

@@ -8,6 +8,7 @@ import DTO.DocGiaDTO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 /**
@@ -25,7 +26,7 @@ public class DocGiaDAO {
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
+            while (rs.next()) {
                 DocGiaDTO dg = new DocGiaDTO(
                         rs.getString("MaDocGia"),
                         rs.getString("NgayDangKi"),
@@ -58,7 +59,8 @@ public class DocGiaDAO {
         }
         return null;
     }
-    public DocGiaDTO getById(String maDocGia){
+
+    public DocGiaDTO getById(String maDocGia) {
         DocGiaDTO dg = null;
         Connection conn = DatabaseConnection.getConnection();
         String sql = "SELECT dg.MaDocGia, dg.NgayDangKi, dg.LoaiDocGia, dg.IsDeleted, dg.NgayXoa, "
@@ -69,7 +71,7 @@ public class DocGiaDAO {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, maDocGia);
             ResultSet rs = ps.executeQuery();
-            if(rs.next()){
+            while (rs.next()) {
                 dg = new DocGiaDTO(
                         rs.getString("MaDocGia"),
                         rs.getString("NgayDangKi"),
@@ -101,9 +103,10 @@ public class DocGiaDAO {
         }
         return null;
     }
-    public boolean add(DocGiaDTO docgia){
+
+    public boolean add(DocGiaDTO docgia) {
         Connection conn = DatabaseConnection.getConnection();
-        String sql = "INSERT INTO DOCGIA (MaDocGia, NgayDangKi, LoaiDocGia, IsDeleted, NgayXoa, MaNguoi) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO DOCGIA (MaDocGia, NgayDangKi, LoaiDocGia, IsDeleted, NgayXoa) VALUES (?, ?, ?, ?, ?)";
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, docgia.getMaDocGia());
@@ -111,7 +114,6 @@ public class DocGiaDAO {
             ps.setString(3, docgia.getLoaiDocGia());
             ps.setBoolean(4, docgia.getIsDeleted());
             ps.setString(5, docgia.getNgayXoa());
-            ps.setString(6, docgia.getMaNguoi());
             int result = ps.executeUpdate();
             ps.close();
             return result > 0;
@@ -126,17 +128,17 @@ public class DocGiaDAO {
         }
         return false;
     }
-    public boolean update(DocGiaDTO docgia){
+
+    public boolean update(DocGiaDTO docgia) {
         Connection conn = DatabaseConnection.getConnection();
-        String sql = "UPDATE DOCGIA SET NgayDangKi = ?, LoaiDocGia = ?, IsDeleted = ?, NgayXoa = ?, MaNguoi = ? WHERE MaDocGia = ?";
+        String sql = "UPDATE DOCGIA SET NgayDangKi = ?, LoaiDocGia = ?, IsDeleted = ?, NgayXoa = ? WHERE MaDocGia = ?";
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, docgia.getNgayDangKi());
             ps.setString(2, docgia.getLoaiDocGia());
             ps.setBoolean(3, docgia.getIsDeleted());
             ps.setString(4, docgia.getNgayXoa());
-            ps.setString(5, docgia.getMaNguoi());
-            ps.setString(6, docgia.getMaDocGia());
+            ps.setString(5, docgia.getMaDocGia());
             int result = ps.executeUpdate();
             ps.close();
             return result > 0;
@@ -149,9 +151,10 @@ public class DocGiaDAO {
                 e.printStackTrace();
             }
         }
-        return false;   
+        return false;
     }
-    public boolean delete(String maDocGia){
+
+    public boolean delete(String maDocGia) {
         Connection conn = DatabaseConnection.getConnection();
         String sql = "DELETE FROM DOCGIA WHERE MaDocGia = ?";
         try {
@@ -171,13 +174,14 @@ public class DocGiaDAO {
         }
         return false;
     }
-    public boolean softdelete(String maDocGia){
+
+    public boolean softdelete(String maDocGia) {
         Connection conn = DatabaseConnection.getConnection();
         String sql = "UPDATE DOCGIA SET IsDeleted = ?, NgayXoa = ? WHERE MaDocGia = ?";
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setBoolean(1, true);
-            ps.setString(2, new java.util.Date().toString());
+            ps.setDate(2, java.sql.Date.valueOf(LocalDate.now()));
             ps.setString(3, maDocGia);
             int result = ps.executeUpdate();
             ps.close();

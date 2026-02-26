@@ -4,7 +4,7 @@
  */
 package DAO;
 
-import DTO.ConNguoiDTO;
+import DTO.NguoiQuanLyDTO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,17 +14,22 @@ import java.util.ArrayList;
  *
  * @author Admin
  */
-public class ConNguoiDAO {
-    public ArrayList<ConNguoiDTO> getAll() {
-        ArrayList<ConNguoiDTO> danhsach = new ArrayList<>();
+public class NguoiQuanLyDAO {
+    public ArrayList<NguoiQuanLyDTO> getAll() {
+        ArrayList<NguoiQuanLyDTO> list = new ArrayList<>();
         Connection conn = DatabaseConnection.getConnection();
-        String stmt = "SELECT * FROM CONNGUOI";
+        String sql = "SELECT nql.MaNQL, nql.VaiTro, nql.IsDeleted, " +
+                "cn.MaNguoi, cn.HoTen, cn.NgaySinh, cn.TenDangNhap, cn.MatKhau, cn.GioiTinh, " +
+                "cn.DiaChi, cn.SoDienThoai, cn.Email, cn.TrangThai " +
+                "FROM NGUOIQUANLY nql JOIN CONNGUOI cn ON nql.MaNQL = cn.MaNguoi";
         try {
-            PreparedStatement ps = conn.prepareStatement(stmt);
-            ResultSet rs = ps.executeQuery();
-
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                ConNguoiDTO connguoi = new ConNguoiDTO(
+                NguoiQuanLyDTO nql = new NguoiQuanLyDTO(
+                        rs.getString("MaNQL"),
+                        rs.getString("VaiTro"),
+                        rs.getBoolean("IsDeleted"),
                         rs.getString("MaNguoi"),
                         rs.getString("HoTen"),
                         rs.getString("NgaySinh"),
@@ -35,11 +40,11 @@ public class ConNguoiDAO {
                         rs.getString("SoDienThoai"),
                         rs.getString("Email"),
                         rs.getString("TrangThai"));
-                danhsach.add(connguoi);
+                list.add(nql);
             }
             rs.close();
-            ps.close();
-            return danhsach;
+            stmt.close();
+            return list;
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -52,16 +57,22 @@ public class ConNguoiDAO {
         return null;
     }
 
-    public ConNguoiDTO getByID(String MaNguoi) {
-        ConNguoiDTO nguoi = null;
+    public NguoiQuanLyDTO getById(String MaNguoiQuanLy) {
         Connection conn = DatabaseConnection.getConnection();
-        String sql = "SELECT * FROM CONNGUOI WHERE MaNguoi = ?";
+        String sql = "SELECT nql.MaNQL, nql.VaiTro, nql.IsDeleted, " +
+                "cn.MaNguoi, cn.HoTen, cn.NgaySinh, cn.TenDangNhap, cn.MatKhau, cn.GioiTinh, " +
+                "cn.DiaChi, cn.SoDienThoai, cn.Email, cn.TrangThai " +
+                "FROM NGUOIQUANLY nql JOIN CONNGUOI cn ON nql.MaNQL = cn.MaNguoi " +
+                "WHERE nql.MaNQL = ?";
         try {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, MaNguoi);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                nguoi = new ConNguoiDTO(
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, MaNguoiQuanLy);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                NguoiQuanLyDTO nql = new NguoiQuanLyDTO(
+                        rs.getString("MaNQL"),
+                        rs.getString("VaiTro"),
+                        rs.getBoolean("IsDeleted"),
                         rs.getString("MaNguoi"),
                         rs.getString("HoTen"),
                         rs.getString("NgaySinh"),
@@ -72,10 +83,11 @@ public class ConNguoiDAO {
                         rs.getString("SoDienThoai"),
                         rs.getString("Email"),
                         rs.getString("TrangThai"));
+                return nql;
             }
             rs.close();
-            ps.close();
-            return nguoi;
+            stmt.close();
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -88,23 +100,16 @@ public class ConNguoiDAO {
         return null;
     }
 
-    public boolean add(ConNguoiDTO connguoi) {
+    public boolean add(NguoiQuanLyDTO nql) {
         Connection conn = DatabaseConnection.getConnection();
-        String sql = "INSERT INTO CONNGUOI (MaNguoi, HoTen, NgaySinh, TenDangNhap, MatKhau, GioiTinh, DiaChi, SoDienThoai, Email, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO NGUOIQUANLY (MaNQL, VaiTro, IsDeleted) VALUES (?, ?, ?)";
         try {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, connguoi.getMaNguoi());
-            ps.setString(2, connguoi.getHoTen());
-            ps.setString(3, connguoi.getNgaySinh());
-            ps.setString(4, connguoi.getTenDangNhap());
-            ps.setString(5, connguoi.getMatKhau());
-            ps.setString(6, connguoi.getGioiTinh());
-            ps.setString(7, connguoi.getDiaChi());
-            ps.setString(8, connguoi.getSoDienThoai());
-            ps.setString(9, connguoi.getEmail());
-            ps.setString(10, connguoi.getTrangThai());
-            int result = ps.executeUpdate();
-            ps.close();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, nql.getMaNQL());
+            stmt.setString(2, nql.getVaiTro());
+            stmt.setBoolean(3, nql.getIsDeleted());
+            int result = stmt.executeUpdate();
+            stmt.close();
             return result > 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,23 +123,16 @@ public class ConNguoiDAO {
         return false;
     }
 
-    public boolean update(ConNguoiDTO connguoi) {
+    public boolean update(NguoiQuanLyDTO nql) {
         Connection conn = DatabaseConnection.getConnection();
-        String sql = "UPDATE CONNGUOI SET HoTen = ?, NgaySinh = ?, TenDangNhap = ?, MatKhau = ?, GioiTinh = ?, DiaChi = ?, SoDienThoai = ?, Email = ?, TrangThai = ? WHERE MaNguoi = ?";
+        String sql = "UPDATE NGUOIQUANLY SET VaiTro = ?, IsDeleted = ? WHERE MaNQL = ?";
         try {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, connguoi.getHoTen());
-            ps.setString(2, connguoi.getNgaySinh());
-            ps.setString(3, connguoi.getTenDangNhap());
-            ps.setString(4, connguoi.getMatKhau());
-            ps.setString(5, connguoi.getGioiTinh());
-            ps.setString(6, connguoi.getDiaChi());
-            ps.setString(7, connguoi.getSoDienThoai());
-            ps.setString(8, connguoi.getEmail());
-            ps.setString(9, connguoi.getTrangThai());
-            ps.setString(10, connguoi.getMaNguoi());
-            int result = ps.executeUpdate();
-            ps.close();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, nql.getVaiTro());
+            stmt.setBoolean(2, nql.getIsDeleted());
+            stmt.setString(3, nql.getMaNQL());
+            int result = stmt.executeUpdate();
+            stmt.close();
             return result > 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -148,14 +146,15 @@ public class ConNguoiDAO {
         return false;
     }
 
-    public boolean delete(String MaNguoi) {
+    public boolean softdelete(String MaNQL) {
         Connection conn = DatabaseConnection.getConnection();
-        String sql = "DELETE FROM CONNGUOI WHERE MaNguoi = ?";
+        String sql = "UPDATE NGUOIQUANLY SET IsDeleted = ? WHERE MaNQL = ?";
         try {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, MaNguoi);
-            int result = ps.executeUpdate();
-            ps.close();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setBoolean(1, true);
+            stmt.setString(2, MaNQL);
+            int result = stmt.executeUpdate();
+            stmt.close();
             return result > 0;
         } catch (Exception e) {
             e.printStackTrace();
