@@ -29,6 +29,9 @@ public class SachCopyDTO {
         this.MaKeSach = MaKeSach;
     }
 
+    public SachCopyDTO() {
+    }
+
     public String getMaVach() {
         return MaVach;
     }

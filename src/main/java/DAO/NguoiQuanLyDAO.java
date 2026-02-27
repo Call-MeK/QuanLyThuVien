@@ -103,16 +103,37 @@ public class NguoiQuanLyDAO {
     public boolean add(NguoiQuanLyDTO nql) {
         Connection conn = DatabaseConnection.getConnection();
         String sql = "INSERT INTO NGUOIQUANLY (MaNQL, VaiTro, IsDeleted) VALUES (?, ?, ?)";
+        String sql2 = "INSERT INTO CONNGUOI (MaNguoi, HoTen, NgaySinh, TenDangNhap, MatKhau, GioiTinh, DiaChi, SoDienThoai, Email, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try {
+            conn.setAutoCommit(false);
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, nql.getMaNQL());
             stmt.setString(2, nql.getVaiTro());
             stmt.setBoolean(3, nql.getIsDeleted());
+            PreparedStatement stmt2 = conn.prepareStatement(sql2);
+            stmt2.setString(1, nql.getMaNguoi());
+            stmt2.setString(2, nql.getHoTen());
+            stmt2.setString(3, nql.getNgaySinh());
+            stmt2.setString(4, nql.getTenDangNhap());
+            stmt2.setString(5, nql.getMatKhau());
+            stmt2.setString(6, nql.getGioiTinh());
+            stmt2.setString(7, nql.getDiaChi());
+            stmt2.setString(8, nql.getSoDienThoai());
+            stmt2.setString(9, nql.getEmail());
+            stmt2.setString(10, nql.getTrangThai());
             int result = stmt.executeUpdate();
+            int result2 = stmt2.executeUpdate();
+            conn.commit();
             stmt.close();
-            return result > 0;
+            stmt2.close();
+            return result > 0 && result2 > 0;
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                conn.rollback();
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
         } finally {
             try {
                 conn.close();
@@ -126,16 +147,37 @@ public class NguoiQuanLyDAO {
     public boolean update(NguoiQuanLyDTO nql) {
         Connection conn = DatabaseConnection.getConnection();
         String sql = "UPDATE NGUOIQUANLY SET VaiTro = ?, IsDeleted = ? WHERE MaNQL = ?";
+        String sql2 = "UPDATE CONNGUOI SET HoTen = ?, NgaySinh = ?, TenDangNhap = ?, MatKhau = ?, GioiTinh = ?, DiaChi = ?, SoDienThoai = ?, Email = ?, TrangThai = ? WHERE MaNguoi = ?";
         try {
+            conn.setAutoCommit(false);
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, nql.getVaiTro());
             stmt.setBoolean(2, nql.getIsDeleted());
             stmt.setString(3, nql.getMaNQL());
+            PreparedStatement stmt2 = conn.prepareStatement(sql2);
+            stmt2.setString(1, nql.getMaNguoi());
+            stmt2.setString(2, nql.getHoTen());
+            stmt2.setString(3, nql.getNgaySinh());
+            stmt2.setString(4, nql.getTenDangNhap());
+            stmt2.setString(5, nql.getMatKhau());
+            stmt2.setString(6, nql.getGioiTinh());
+            stmt2.setString(7, nql.getDiaChi());
+            stmt2.setString(8, nql.getSoDienThoai());
+            stmt2.setString(9, nql.getEmail());
+            stmt2.setString(10, nql.getTrangThai());
             int result = stmt.executeUpdate();
+            int result2 = stmt2.executeUpdate();
+            conn.commit();
             stmt.close();
-            return result > 0;
+            stmt2.close();
+            return result > 0 && result2 > 0;
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                conn.rollback();
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
         } finally {
             try {
                 conn.close();

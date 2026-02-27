@@ -107,18 +107,39 @@ public class DocGiaDAO {
     public boolean add(DocGiaDTO docgia) {
         Connection conn = DatabaseConnection.getConnection();
         String sql = "INSERT INTO DOCGIA (MaDocGia, NgayDangKi, LoaiDocGia, IsDeleted, NgayXoa) VALUES (?, ?, ?, ?, ?)";
+        String sql2 = "INSERT INTO CONNGUOI (MaNguoi, HoTen, NgaySinh, TenDangNhap, MatKhau, GioiTinh, DiaChi, SoDienThoai, Email, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try {
+            conn.setAutoCommit(false);
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, docgia.getMaDocGia());
             ps.setString(2, docgia.getNgayDangKi());
             ps.setString(3, docgia.getLoaiDocGia());
             ps.setBoolean(4, docgia.getIsDeleted());
             ps.setString(5, docgia.getNgayXoa());
+            PreparedStatement ps2 = conn.prepareStatement(sql2);
+            ps2.setString(1, docgia.getMaNguoi());
+            ps2.setString(2, docgia.getHoTen());
+            ps2.setString(3, docgia.getNgaySinh());
+            ps2.setString(4, docgia.getTenDangNhap());
+            ps2.setString(5, docgia.getMatKhau());
+            ps2.setString(6, docgia.getGioiTinh());
+            ps2.setString(7, docgia.getDiaChi());
+            ps2.setString(8, docgia.getSoDienThoai());
+            ps2.setString(9, docgia.getEmail());
+            ps2.setString(10, docgia.getTrangThai());
             int result = ps.executeUpdate();
+            int result2 = ps2.executeUpdate();
+            conn.commit();
             ps.close();
-            return result > 0;
+            ps2.close();
+            return result > 0 && result2 > 0;
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                conn.rollback();
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
         } finally {
             try {
                 conn.close();
@@ -132,18 +153,39 @@ public class DocGiaDAO {
     public boolean update(DocGiaDTO docgia) {
         Connection conn = DatabaseConnection.getConnection();
         String sql = "UPDATE DOCGIA SET NgayDangKi = ?, LoaiDocGia = ?, IsDeleted = ?, NgayXoa = ? WHERE MaDocGia = ?";
+        String sql2 = "UPDATE CONNGUOI SET HoTen = ?, NgaySinh = ?, TenDangNhap = ?, MatKhau = ?, GioiTinh = ?, DiaChi = ?, SoDienThoai = ?, Email = ?, TrangThai = ? WHERE MaNguoi = ?";
         try {
+            conn.setAutoCommit(false);
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, docgia.getNgayDangKi());
             ps.setString(2, docgia.getLoaiDocGia());
             ps.setBoolean(3, docgia.getIsDeleted());
             ps.setString(4, docgia.getNgayXoa());
             ps.setString(5, docgia.getMaDocGia());
+            PreparedStatement ps2 = conn.prepareStatement(sql2);
+            ps2.setString(1, docgia.getMaNguoi());
+            ps2.setString(2, docgia.getHoTen());
+            ps2.setString(3, docgia.getNgaySinh());
+            ps2.setString(4, docgia.getTenDangNhap());
+            ps2.setString(5, docgia.getMatKhau());
+            ps2.setString(6, docgia.getGioiTinh());
+            ps2.setString(7, docgia.getDiaChi());
+            ps2.setString(8, docgia.getSoDienThoai());
+            ps2.setString(9, docgia.getEmail());
+            ps2.setString(10, docgia.getTrangThai());
             int result = ps.executeUpdate();
+            int result2 = ps2.executeUpdate();
+            conn.commit();
             ps.close();
-            return result > 0;
+            ps2.close();
+            return result > 0 && result2 > 0;
         } catch (Exception e) {
             e.printStackTrace();
+            try {
+                conn.rollback();
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
         } finally {
             try {
                 conn.close();
@@ -157,13 +199,25 @@ public class DocGiaDAO {
     public boolean delete(String maDocGia) {
         Connection conn = DatabaseConnection.getConnection();
         String sql = "DELETE FROM DOCGIA WHERE MaDocGia = ?";
+        String sql2 = "DELETE FROM CONNGUOI WHERE MaNguoi = ?";
         try {
+            conn.setAutoCommit(false);
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, maDocGia);
+            PreparedStatement ps2 = conn.prepareStatement(sql2);
+            ps2.setString(1, maDocGia);
             int result = ps.executeUpdate();
+            int result2 = ps2.executeUpdate();
+            conn.commit();
             ps.close();
-            return result > 0;
+            ps2.close();
+            return result > 0 && result2 > 0;
         } catch (Exception e) {
+            try {
+                conn.rollback();
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
             e.printStackTrace();
         } finally {
             try {
