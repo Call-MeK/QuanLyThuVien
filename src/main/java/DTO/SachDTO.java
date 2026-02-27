@@ -17,6 +17,9 @@ public class SachDTO {
     private String MaNXB;
     private int NamXB;
     private String NgonNgu;
+
+    public SachDTO() {
+    }
     private Float GiaBia;
     private Boolean isDeleted;
     

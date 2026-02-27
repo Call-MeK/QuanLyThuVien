@@ -1,7 +1,6 @@
 package DAO;
 
-import model.SachHong;
-import utils.DBConnection;
+import DTO.SachHongDTO;
 
 import java.sql.*;
 import java.util.*;
@@ -9,22 +8,22 @@ import java.util.*;
 public class SachHongDAO {
 
     // 🔹 Lấy tất cả
-    public List<SachHong> getAll() {
-        List<SachHong> list = new ArrayList<>();
+    public List<SachHongDTO> getAll() {
+        List<SachHongDTO> list = new ArrayList<>();
         String sql = "SELECT * FROM SACHHONG";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                SachHong sh = new SachHong();
-                sh.setMaSachHong(rs.getInt("MaSachHong"));
-                sh.setTenSachHong(rs.getString("TenSachHong"));
-                sh.setMaVach(rs.getString("MaVach"));
-                sh.setSoLuong(rs.getInt("SoLuong"));
-                sh.setNgayGhiNhan(rs.getDate("NgayGhiNhan"));
-                sh.setLyDo(rs.getString("LyDo"));
+                SachHongDTO sh = new SachHongDTO(
+                        rs.getInt("MaSachHong"),
+                        rs.getString("TenSachHong"),
+                        rs.getString("MaVach"),
+                        rs.getInt("SoLuong"),
+                        rs.getString("NgayGhiNhan"),
+                        rs.getString("LyDo"));
                 list.add(sh);
             }
 
@@ -36,17 +35,17 @@ public class SachHongDAO {
     }
 
     // 🔹 Thêm
-    public boolean insert(SachHong sh) {
-        String sql = "INSERT INTO SACHHONG VALUES (?, ?, ?, ?, ?, ?)";
+    public boolean insert(SachHongDTO sh) {
+        String sql = "INSERT INTO SACHHONG (MaSachHong, TenSachHong, MaVach, SoLuong, NgayGhiNhan, LyDo) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, sh.getMaSachHong());
             ps.setString(2, sh.getTenSachHong());
             ps.setString(3, sh.getMaVach());
             ps.setInt(4, sh.getSoLuong());
-            ps.setDate(5, new java.sql.Date(sh.getNgayGhiNhan().getTime()));
+            ps.setString(5, sh.getNgayGhiNhan());
             ps.setString(6, sh.getLyDo());
 
             return ps.executeUpdate() > 0;
@@ -59,16 +58,16 @@ public class SachHongDAO {
     }
 
     // 🔹 Cập nhật
-    public boolean update(SachHong sh) {
+    public boolean update(SachHongDTO sh) {
         String sql = "UPDATE SACHHONG SET TenSachHong=?, MaVach=?, SoLuong=?, NgayGhiNhan=?, LyDo=? WHERE MaSachHong=?";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, sh.getTenSachHong());
             ps.setString(2, sh.getMaVach());
             ps.setInt(3, sh.getSoLuong());
-            ps.setDate(4, new java.sql.Date(sh.getNgayGhiNhan().getTime()));
+            ps.setString(4, sh.getNgayGhiNhan());
             ps.setString(5, sh.getLyDo());
             ps.setInt(6, sh.getMaSachHong());
 
@@ -85,8 +84,8 @@ public class SachHongDAO {
     public boolean delete(int maSachHong) {
         String sql = "DELETE FROM SACHHONG WHERE MaSachHong=?";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, maSachHong);
             return ps.executeUpdate() > 0;
@@ -99,23 +98,23 @@ public class SachHongDAO {
     }
 
     // 🔹 Tìm theo ID
-    public SachHong findById(int maSachHong) {
+    public SachHongDTO findById(int maSachHong) {
         String sql = "SELECT * FROM SACHHONG WHERE MaSachHong=?";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, maSachHong);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                SachHong sh = new SachHong();
-                sh.setMaSachHong(rs.getInt("MaSachHong"));
-                sh.setTenSachHong(rs.getString("TenSachHong"));
-                sh.setMaVach(rs.getString("MaVach"));
-                sh.setSoLuong(rs.getInt("SoLuong"));
-                sh.setNgayGhiNhan(rs.getDate("NgayGhiNhan"));
-                sh.setLyDo(rs.getString("LyDo"));
+                SachHongDTO sh = new SachHongDTO(
+                        rs.getInt("MaSachHong"),
+                        rs.getString("TenSachHong"),
+                        rs.getString("MaVach"),
+                        rs.getInt("SoLuong"),
+                        rs.getString("NgayGhiNhan"),
+                        rs.getString("LyDo"));
                 return sh;
             }
 
@@ -125,32 +124,33 @@ public class SachHongDAO {
 
         return null;
     }
-    public List<SachHong> searchByName(String keyword) {
-    List<SachHong> list = new ArrayList<>();
-    String sql = "SELECT * FROM SACHHONG WHERE TenSachHong LIKE ?";
 
-    try (Connection conn = DBConnection.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
+    public List<SachHongDTO> searchByName(String keyword) {
+        List<SachHongDTO> list = new ArrayList<>();
+        String sql = "SELECT * FROM SACHHONG WHERE TenSachHong LIKE ?";
 
-        ps.setString(1, "%" + keyword + "%");
-        ResultSet rs = ps.executeQuery();
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        while (rs.next()) {
-            SachHong sh = new SachHong();
-            sh.setMaSachHong(rs.getInt("MaSachHong"));
-            sh.setTenSachHong(rs.getString("TenSachHong"));
-            sh.setMaVach(rs.getString("MaVach"));
-            sh.setSoLuong(rs.getInt("SoLuong"));
-            sh.setNgayGhiNhan(rs.getDate("NgayGhiNhan"));
-            sh.setLyDo(rs.getString("LyDo"));
-            list.add(sh);
+            ps.setString(1, "%" + keyword + "%");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                SachHongDTO sh = new SachHongDTO(
+                        rs.getInt("MaSachHong"),
+                        rs.getString("TenSachHong"),
+                        rs.getString("MaVach"),
+                        rs.getInt("SoLuong"),
+                        rs.getString("NgayGhiNhan"),
+                        rs.getString("LyDo"));
+                list.add(sh);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-    } catch (Exception e) {
-        e.printStackTrace();
+        return list;
     }
-
-    return list;
-}
 
 }

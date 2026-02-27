@@ -35,19 +35,5 @@ public class DatabaseConnection {
             e.printStackTrace();
         }
             return connection;
-    }
-    public static void closeConnection()
-    {
-        try {
-           if(connection != null || !connection.isClosed())
-           {
-               connection.close();
-               System.out.println("Da dong ket noi Database");
-           }
-               
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-        
+    }   
 }
