@@ -6,18 +6,14 @@ import java.util.ArrayList;
 
 public class ChiTietPhieuPhatDAO {
 
-    String url = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyThuVien";
-    String user = "sa";
-    String pass = "12345"; // đổi nếu khác
-
     // 1. Thêm chi tiết phiếu phạt
     public boolean add(ChiTietPhieuPhatDTO ct) {
         String sql = "INSERT INTO CHITIETPHIEUPHAT "
                 + "(MaCTPP, MaPP, MaCuonSach, LyDo, SoTien) "
                 + "VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, ct.getMaCTPP());
             ps.setString(2, ct.getMaPP());
@@ -38,9 +34,9 @@ public class ChiTietPhieuPhatDAO {
         ArrayList<ChiTietPhieuPhatDTO> list = new ArrayList<>();
         String sql = "SELECT * FROM CHITIETPHIEUPHAT";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
-             Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                Statement st = conn.createStatement();
+                ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
                 ChiTietPhieuPhatDTO ct = new ChiTietPhieuPhatDTO(
@@ -48,8 +44,7 @@ public class ChiTietPhieuPhatDAO {
                         rs.getString("MaPP"),
                         rs.getString("MaCuonSach"),
                         rs.getString("LyDo"),
-                        rs.getString("SoTien")
-                );
+                        rs.getString("SoTien"));
                 list.add(ct);
             }
 
@@ -64,8 +59,8 @@ public class ChiTietPhieuPhatDAO {
         ArrayList<ChiTietPhieuPhatDTO> list = new ArrayList<>();
         String sql = "SELECT * FROM CHITIETPHIEUPHAT WHERE MaPP = ?";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, maPP);
             ResultSet rs = ps.executeQuery();
@@ -76,8 +71,7 @@ public class ChiTietPhieuPhatDAO {
                         rs.getString("MaPP"),
                         rs.getString("MaCuonSach"),
                         rs.getString("LyDo"),
-                        rs.getString("SoTien")
-                );
+                        rs.getString("SoTien"));
                 list.add(ct);
             }
 
@@ -93,8 +87,8 @@ public class ChiTietPhieuPhatDAO {
                 + "SET MaPP=?, MaCuonSach=?, LyDo=?, SoTien=? "
                 + "WHERE MaCTPP=?";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, ct.getMaPP());
             ps.setString(2, ct.getMaCuonSach());
@@ -114,8 +108,8 @@ public class ChiTietPhieuPhatDAO {
     public boolean delete(String maCTPP) {
         String sql = "DELETE FROM CHITIETPHIEUPHAT WHERE MaCTPP=?";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, maCTPP);
             return ps.executeUpdate() > 0;

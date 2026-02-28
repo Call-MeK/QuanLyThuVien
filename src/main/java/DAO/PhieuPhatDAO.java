@@ -6,16 +6,12 @@ import java.util.ArrayList;
 
 public class PhieuPhatDAO {
 
-    String url = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyThuVien";
-    String user = "sa";
-    String pass = "12345"; // đổi nếu khác
-
     // 1. Thêm phiếu phạt
     public boolean add(PhieuPhatDTO pp) {
         String sql = "INSERT INTO PHIEUPHAT (MaPP, MaPM, MaNQL, NgayLap, TongTien) VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, pp.getMaPP());
             ps.setString(2, pp.getMaPM());
@@ -36,9 +32,9 @@ public class PhieuPhatDAO {
         ArrayList<PhieuPhatDTO> list = new ArrayList<>();
         String sql = "SELECT * FROM PHIEUPHAT";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
-             Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                Statement st = conn.createStatement();
+                ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
                 PhieuPhatDTO pp = new PhieuPhatDTO(
@@ -46,8 +42,7 @@ public class PhieuPhatDAO {
                         rs.getString("MaPM"),
                         rs.getString("MaNQL"),
                         rs.getString("NgayLap"),
-                        rs.getString("TongTien")
-                );
+                        rs.getString("TongTien"));
                 list.add(pp);
             }
 
@@ -61,8 +56,8 @@ public class PhieuPhatDAO {
     public PhieuPhatDTO getById(String maPP) {
         String sql = "SELECT * FROM PHIEUPHAT WHERE MaPP = ?";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, maPP);
             ResultSet rs = ps.executeQuery();
@@ -73,8 +68,7 @@ public class PhieuPhatDAO {
                         rs.getString("MaPM"),
                         rs.getString("MaNQL"),
                         rs.getString("NgayLap"),
-                        rs.getString("TongTien")
-                );
+                        rs.getString("TongTien"));
             }
 
         } catch (Exception e) {
@@ -87,8 +81,8 @@ public class PhieuPhatDAO {
     public boolean update(PhieuPhatDTO pp) {
         String sql = "UPDATE PHIEUPHAT SET MaPM=?, MaNQL=?, NgayLap=?, TongTien=? WHERE MaPP=?";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, pp.getMaPM());
             ps.setString(2, pp.getMaNQL());
@@ -108,8 +102,8 @@ public class PhieuPhatDAO {
     public boolean delete(String maPP) {
         String sql = "DELETE FROM PHIEUPHAT WHERE MaPP=?";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, maPP);
             return ps.executeUpdate() > 0;
