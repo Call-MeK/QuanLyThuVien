@@ -6,9 +6,9 @@ import java.util.ArrayList;
 
 public class PhieuPhatDAO {
 
-    // 1. Thêm phiếu phạt
+    // 1. Thêm phiếu phạt (Đã thêm TrangThai = 1 mặc định)
     public boolean add(PhieuPhatDTO pp) {
-        String sql = "INSERT INTO PHIEUPHAT (MaPP, MaPM, MaNQL, NgayLap, TongTien) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO PHIEUPHAT (MaPP, MaPM, MaNQL, NgayLap, TongTien, TrangThai) VALUES (?, ?, ?, ?, ?, 1)";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -27,10 +27,11 @@ public class PhieuPhatDAO {
         return false;
     }
 
-    // 2. Lấy tất cả phiếu phạt
+    // 2. Lấy tất cả phiếu phạt CHƯA BỊ XÓA (TrangThai = 1)
     public ArrayList<PhieuPhatDTO> getAll() {
         ArrayList<PhieuPhatDTO> list = new ArrayList<>();
-        String sql = "SELECT * FROM PHIEUPHAT";
+        // Đã sửa SQL ở đây
+        String sql = "SELECT * FROM PHIEUPHAT WHERE TrangThai = 1";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 Statement st = conn.createStatement();
@@ -52,9 +53,10 @@ public class PhieuPhatDAO {
         return list;
     }
 
-    // 3. Tìm theo mã
+    // 3. Tìm theo mã (Cũng phải kiểm tra xem mã đó chưa bị xóa)
     public PhieuPhatDTO getById(String maPP) {
-        String sql = "SELECT * FROM PHIEUPHAT WHERE MaPP = ?";
+        // Đã sửa SQL ở đây
+        String sql = "SELECT * FROM PHIEUPHAT WHERE MaPP = ? AND TrangThai = 1";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -98,9 +100,9 @@ public class PhieuPhatDAO {
         return false;
     }
 
-    // 5. Xoá
+    // 5. Xoá Mềm (Cập nhật TrangThai = 0)
     public boolean delete(String maPP) {
-        String sql = "DELETE FROM PHIEUPHAT WHERE MaPP=?";
+        String sql = "UPDATE PHIEUPHAT SET TrangThai = 0 WHERE MaPP=?";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
