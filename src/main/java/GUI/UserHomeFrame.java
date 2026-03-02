@@ -9,7 +9,7 @@ import java.awt.event.MouseEvent;
 
 public class UserHomeFrame extends JFrame {
     
-    // Các panel chính của chương trình
+    // Các thành phần chính của giao diện
     private JPanel sidebarPanel;
     private JPanel mainContentPanel;
     private CardLayout cardLayout;
@@ -18,14 +18,14 @@ public class UserHomeFrame extends JFrame {
     private String tenFont = "Segoe UI"; 
     
     public UserHomeFrame() {
-        // Cài đặt các thông số cơ bản cho Cửa sổ (JFrame)
+        // Cài đặt cơ bản cho Cửa sổ (JFrame)
         setTitle("Hệ thống Quản lý Thư viện - Dành cho Độc giả");
         setSize(1000, 700); 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null); // Hiển thị ra giữa màn hình
         setLayout(new BorderLayout()); 
         
-        // Gọi hàm khởi tạo các thành phần giao diện
+        // Gọi hàm khởi tạo các thành phần
         initComponents();
     }
     
@@ -35,30 +35,30 @@ public class UserHomeFrame extends JFrame {
         // ==========================================
         sidebarPanel = new JPanel();
         sidebarPanel.setLayout(new BorderLayout()); 
-        sidebarPanel.setBackground(new Color(30, 41, 59)); // Màu xanh đậm
+        sidebarPanel.setBackground(new Color(30, 41, 59)); // Màu nền menu
         sidebarPanel.setPreferredSize(new Dimension(240, 0));
         
-        // Panel chứa các nút bấm
+        // Panel chứa các nút bấm menu
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(new GridLayout(6, 1, 0, 5)); 
         menuPanel.setBackground(new Color(30, 41, 59));
         menuPanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0)); 
         
-        // Nhãn tiêu đề Menu
+        // Tiêu đề Menu
         JLabel logoLabel = new JLabel(" MENU ĐỘC GIẢ", SwingConstants.CENTER);
         logoLabel.setFont(new Font(tenFont, Font.BOLD, 15)); 
         logoLabel.setForeground(new Color(148, 163, 184)); 
         logoLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0)); 
         menuPanel.add(logoLabel);
         
-        // Khởi tạo các nút bấm
-        JButton btnTrangChu = createMenuButton("🏠 Trang Chủ");
-        JButton btnTimSach = createMenuButton("🔍 Tìm Sách");
-        JButton btnSachDangMuon = createMenuButton("📚 Sách Đang Mượn");
-        JButton btnThongTin = createMenuButton("👤 Thông Tin Cá Nhân");
-        JButton btnDangXuat = createMenuButton("🚪 Đăng Xuất");
+        // Tạo các nút bấm
+        JButton btnTrangChu = createMenuButton("Trang Chủ");
+        JButton btnTimSach = createMenuButton("Tìm Sách");
+        JButton btnSachDangMuon = createMenuButton("Sách Đang Mượn");
+        JButton btnThongTin = createMenuButton("Thông Tin Cá Nhân");
+        JButton btnDangXuat = createMenuButton("Đăng Xuất");
 
-        btnDangXuat.setForeground(new Color(248, 113, 113)); // Đổi màu đỏ cho nút đăng xuất
+        btnDangXuat.setForeground(new Color(248, 113, 113)); // Màu đỏ cho nút đăng xuất
         
         // Thêm nút vào menuPanel
         menuPanel.add(btnTrangChu);
@@ -67,7 +67,6 @@ public class UserHomeFrame extends JFrame {
         menuPanel.add(btnThongTin);
         menuPanel.add(btnDangXuat);
         
-        // Đặt menuPanel lên phía trên cùng của sidebar
         sidebarPanel.add(menuPanel, BorderLayout.NORTH);
         
         // ==========================================
@@ -78,23 +77,20 @@ public class UserHomeFrame extends JFrame {
         mainContentPanel.setLayout(cardLayout);
         mainContentPanel.setBackground(new Color(248, 250, 252)); 
         
-        // TẠO CÁC TRANG (PANEL) CHO TỪNG CHỨC NĂNG
+        // GỌI CÁC HÀM TẠO GIAO DIỆN CHỨC NĂNG
         JPanel panelTrangChu = createHomePanel(); 
-        
-        // ---> ĐÃ SỬA: Gọi hàm createSearchPanel() thay vì trang trống
         JPanel panelTimSach = createSearchPanel(); 
-        
-        JPanel panelSachDangMuon = createPlaceholderPanel("Giao diện Sách đang mượn");
+        JPanel panelSachDangMuon = createBorrowedBooksPanel(); 
         JPanel panelThongTin = createPlaceholderPanel("Giao diện Thông tin cá nhân");
         
-        // Thêm các Panel vào CardLayout và đặt tên định danh cho chúng
+        // Đưa các giao diện vào CardLayout
         mainContentPanel.add(panelTrangChu, "TrangChu");
         mainContentPanel.add(panelTimSach, "TimSach");
         mainContentPanel.add(panelSachDangMuon, "SachDangMuon");
         mainContentPanel.add(panelThongTin, "ThongTin");
         
         // ==========================================
-        // 3. BẮT SỰ KIỆN KHI CLICK VÀO CÁC NÚT
+        // 3. BẮT SỰ KIỆN CHUYỂN TRANG
         // ==========================================
         btnTrangChu.addActionListener(new ActionListener() {
             @Override
@@ -127,7 +123,7 @@ public class UserHomeFrame extends JFrame {
         btnDangXuat.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int confirm = JOptionPane.showConfirmDialog(UserHomeFrame.this, "Bạn có chắc chắn muốn đăng xuất?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+                int confirm = JOptionPane.showConfirmDialog(UserHomeFrame.this, "Bạn có muốn đăng xuất không?", "Xác nhận", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     JOptionPane.showMessageDialog(UserHomeFrame.this, "Đăng xuất thành công!");
                     dispose(); 
@@ -135,268 +131,219 @@ public class UserHomeFrame extends JFrame {
             }
         });
         
-        // ==========================================
-        // 4. LẮP RÁP VÀO GIAO DIỆN CHÍNH
-        // ==========================================
+        // Lắp ráp menu và nội dung vào cửa sổ chính
         add(sidebarPanel, BorderLayout.WEST); 
         add(mainContentPanel, BorderLayout.CENTER); 
     }
     
     // ==========================================
-    // CÁC HÀM HỖ TRỢ TẠO GIAO DIỆN
+    // CÁC HÀM TẠO GIAO DIỆN CHỨC NĂNG
     // ==========================================
     
-    // Hàm tạo Panel Trang chủ (Giao diện chính giữa)
+    // 1. TẠO TRANG CHỦ
     private JPanel createHomePanel() {
-        JPanel homePanel = new JPanel();
-        homePanel.setLayout(new BorderLayout(0, 20));
-        homePanel.setBackground(new Color(248, 250, 252)); 
-        homePanel.setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30));
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout(0, 20));
+        panel.setBackground(new Color(248, 250, 252)); 
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // --- PHẦN TOP: Tiêu đề ---
-        JLabel lblPageTitle = new JLabel("Thư Viện Online");
-        lblPageTitle.setFont(new Font(tenFont, Font.BOLD, 28));
-        lblPageTitle.setForeground(new Color(15, 23, 42)); 
-        homePanel.add(lblPageTitle, BorderLayout.NORTH);
+        JLabel title = new JLabel("Thư Viện Online", SwingConstants.LEFT);
+        title.setFont(new Font(tenFont, Font.BOLD, 26));
+        title.setForeground(new Color(15, 23, 42)); 
+        panel.add(title, BorderLayout.NORTH);
 
-        // --- PHẦN MAIN: Chứa Banner và Sách ---
-        JPanel mainAreaPanel = new JPanel();
-        mainAreaPanel.setLayout(new BorderLayout(0, 25));
-        mainAreaPanel.setBackground(new Color(248, 250, 252));
+        JPanel centerPanel = new JPanel(new BorderLayout(0, 20));
+        centerPanel.setBackground(new Color(248, 250, 252));
 
-        // 1. Khu vực chèn ảnh Banner quảng cáo
-        JLabel lblBannerImage = new JLabel("[ Vị Trí Chèn Ảnh Banner Thư Viện ]", SwingConstants.CENTER);
-        lblBannerImage.setOpaque(true);
-        lblBannerImage.setBackground(new Color(226, 232, 240)); 
-        lblBannerImage.setForeground(new Color(100, 116, 139));
-        lblBannerImage.setFont(new Font(tenFont, Font.ITALIC, 16));
-        lblBannerImage.setPreferredSize(new Dimension(0, 180)); 
-        mainAreaPanel.add(lblBannerImage, BorderLayout.NORTH);
+        // Khung để chèn ảnh banner
+        JLabel banner = new JLabel("[ Chỗ chèn ảnh Banner ]", SwingConstants.CENTER);
+        banner.setOpaque(true);
+        banner.setBackground(new Color(226, 232, 240)); 
+        banner.setPreferredSize(new Dimension(0, 150)); 
+        centerPanel.add(banner, BorderLayout.NORTH);
 
-        // 2. Khu vực chứa sách gợi ý
-        JPanel hotBooksContainer = new JPanel();
-        hotBooksContainer.setLayout(new BorderLayout(0, 15));
-        hotBooksContainer.setBackground(new Color(248, 250, 252));
+        // Khung sách gợi ý
+        JPanel booksArea = new JPanel(new BorderLayout(0, 10));
+        booksArea.setBackground(new Color(248, 250, 252));
+        
+        JLabel subtitle = new JLabel("Sách Gợi Ý Cho Bạn");
+        subtitle.setFont(new Font(tenFont, Font.BOLD, 18));
+        booksArea.add(subtitle, BorderLayout.NORTH);
 
-        JLabel lblHotBooksTitle = new JLabel("Gợi ý cho bạn");
-        lblHotBooksTitle.setFont(new Font(tenFont, Font.BOLD, 18));
-        lblHotBooksTitle.setForeground(new Color(51, 65, 85));
-        hotBooksContainer.add(lblHotBooksTitle, BorderLayout.NORTH);
+        JPanel booksList = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 5));
+        booksList.setBackground(new Color(248, 250, 252));
 
-        JPanel booksListPanel = new JPanel();
-        booksListPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 5));
-        booksListPanel.setBackground(new Color(248, 250, 252));
+        booksList.add(createBookCard("Đắc Nhân Tâm", "Dale Carnegie", "Kỹ năng"));
+        booksList.add(createBookCard("Nhà Giả Kim", "Paulo Coelho", "Tiểu thuyết"));
+        booksList.add(createBookCard("Sapiens", "Yuval Noah Harari", "Lịch sử"));
+        booksList.add(createBookCard("Tuổi Trẻ Đáng Giá...", "Rosie Nguyễn", "Tự lực"));
 
-        booksListPanel.add(createBookCard("Đắc Nhân Tâm", "Dale Carnegie", "Kỹ năng sống"));
-        booksListPanel.add(createBookCard("Nhà Giả Kim", "Paulo Coelho", "Tiểu thuyết"));
-        booksListPanel.add(createBookCard("Sapiens", "Yuval Noah Harari", "Lịch sử"));
-        booksListPanel.add(createBookCard("Tuổi Trẻ Đáng Giá...", "Rosie Nguyễn", "Tự lực"));
-        booksListPanel.add(createBookCard("Harry Potter", "J.K. Rowling", "Fantasy"));
+        JScrollPane scroll = new JScrollPane(booksList);
+        scroll.setBorder(null); 
+        booksArea.add(scroll, BorderLayout.CENTER);
 
-        JScrollPane scrollPane = new JScrollPane(booksListPanel);
-        scrollPane.setBackground(new Color(248, 250, 252));
-        scrollPane.getViewport().setBackground(new Color(248, 250, 252)); 
-        scrollPane.setBorder(BorderFactory.createEmptyBorder()); 
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED); 
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER); 
-        scrollPane.getHorizontalScrollBar().setUnitIncrement(16); 
+        centerPanel.add(booksArea, BorderLayout.CENTER);
+        panel.add(centerPanel, BorderLayout.CENTER);
 
-        hotBooksContainer.add(scrollPane, BorderLayout.CENTER);
-        mainAreaPanel.add(hotBooksContainer, BorderLayout.CENTER);
-        homePanel.add(mainAreaPanel, BorderLayout.CENTER);
-
-        return homePanel;
+        return panel;
     }
 
-    // Hàm tạo giao diện Tìm Sách
+    // 2. TẠO TRANG TÌM SÁCH
     private JPanel createSearchPanel() {
-        JPanel searchPanel = new JPanel();
-        searchPanel.setLayout(new BorderLayout(0, 20));
-        searchPanel.setBackground(new Color(248, 250, 252)); 
-        searchPanel.setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30));
+        JPanel panel = new JPanel(new BorderLayout(0, 15));
+        panel.setBackground(new Color(248, 250, 252)); 
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // ==========================================
-        // PHẦN TRÊN: TIÊU ĐỀ VÀ THANH TÌM KIẾM
-        // ==========================================
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new BorderLayout(0, 15));
+        JPanel topPanel = new JPanel(new BorderLayout(0, 10));
         topPanel.setBackground(new Color(248, 250, 252));
 
-        JLabel lblPageTitle = new JLabel("Tìm Kiếm Sách");
-        lblPageTitle.setFont(new Font(tenFont, Font.BOLD, 28));
-        lblPageTitle.setForeground(new Color(15, 23, 42)); 
-        topPanel.add(lblPageTitle, BorderLayout.NORTH);
+        JLabel title = new JLabel("Tìm Kiếm Sách");
+        title.setFont(new Font(tenFont, Font.BOLD, 26));
+        topPanel.add(title, BorderLayout.NORTH);
 
-        JPanel filterPanel = new JPanel();
-        filterPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 0));
-        filterPanel.setBackground(new Color(248, 250, 252));
-
-        JLabel lblKeyword = new JLabel("Từ khóa:");
-        lblKeyword.setFont(new Font(tenFont, Font.PLAIN, 14));
-
-        JTextField txtSearch = new JTextField(25);
-        txtSearch.setFont(new Font(tenFont, Font.PLAIN, 14));
-        txtSearch.setPreferredSize(new Dimension(txtSearch.getPreferredSize().width, 30));
-
-        String[] criteria = {"Tên sách", "Tác giả", "Thể loại"};
-        JComboBox<String> cbCriteria = new JComboBox<>(criteria);
-        cbCriteria.setFont(new Font(tenFont, Font.PLAIN, 14));
-        cbCriteria.setPreferredSize(new Dimension(120, 30));
-        cbCriteria.setBackground(Color.WHITE);
-
-        JButton btnSearch = new JButton("Tìm kiếm");
-        btnSearch.setFont(new Font(tenFont, Font.BOLD, 13));
-        btnSearch.setBackground(new Color(14, 165, 233)); 
+        JPanel searchBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        searchBar.setBackground(new Color(248, 250, 252));
+        
+        searchBar.add(new JLabel("Từ khóa:"));
+        JTextField txtSearch = new JTextField(20);
+        searchBar.add(txtSearch);
+        
+        JComboBox<String> cbType = new JComboBox<>(new String[]{"Tên sách", "Tác giả", "Thể loại"});
+        searchBar.add(cbType);
+        
+        JButton btnSearch = new JButton("Tìm");
+        btnSearch.setBackground(new Color(14, 165, 233));
         btnSearch.setForeground(Color.WHITE);
-        btnSearch.setFocusPainted(false);
-        btnSearch.setPreferredSize(new Dimension(100, 30));
+        searchBar.add(btnSearch);
 
-        filterPanel.add(lblKeyword);
-        filterPanel.add(txtSearch);
-        filterPanel.add(cbCriteria);
-        filterPanel.add(btnSearch);
+        topPanel.add(searchBar, BorderLayout.CENTER);
+        panel.add(topPanel, BorderLayout.NORTH);
 
-        topPanel.add(filterPanel, BorderLayout.CENTER);
-
-        // ==========================================
-        // PHẦN GIỮA: BẢNG KẾT QUẢ TÌM KIẾM (JTABLE)
-        // ==========================================
-        String[] columnNames = {"Mã Sách", "Tên Sách", "Tác Giả", "Thể Loại", "Số Lượng", "Trạng Thái"};
-        
-        javax.swing.table.DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(columnNames, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; 
-            }
+        // Bảng dữ liệu sách
+        String[] cols = {"Mã Sách", "Tên Sách", "Tác Giả", "Thể Loại", "Số Lượng", "Trạng Thái"};
+        Object[][] data = {
+            {"B01", "Lập trình Java", "Nhiều tác giả", "Giáo trình", "5", "Sẵn sàng"},
+            {"B02", "Cấu trúc dữ liệu", "Nguyễn Văn A", "Giáo trình", "0", "Hết sách"}
         };
-
-        JTable table = new JTable(tableModel);
-        table.setFont(new Font(tenFont, Font.PLAIN, 14));
-        table.setRowHeight(30); 
-        table.setSelectionBackground(new Color(226, 232, 240)); 
-        table.setSelectionForeground(Color.BLACK);
         
-        table.getTableHeader().setFont(new Font(tenFont, Font.BOLD, 14));
-        table.getTableHeader().setBackground(new Color(241, 245, 249));
-        table.getTableHeader().setPreferredSize(new Dimension(100, 35));
+        JTable table = new JTable(data, cols);
+        table.setRowHeight(25);
+        JScrollPane scroll = new JScrollPane(table);
+        panel.add(scroll, BorderLayout.CENTER);
 
-        tableModel.addRow(new Object[]{"B001", "Đắc Nhân Tâm", "Dale Carnegie", "Kỹ năng sống", 5, "Sẵn sàng"});
-        tableModel.addRow(new Object[]{"B002", "Nhà Giả Kim", "Paulo Coelho", "Tiểu thuyết", 2, "Sẵn sàng"});
-        tableModel.addRow(new Object[]{"B003", "Sapiens", "Yuval Noah Harari", "Lịch sử", 0, "Đã mượn hết"});
-        tableModel.addRow(new Object[]{"B004", "Tuổi Trẻ Đáng Giá Bao Nhiêu", "Rosie Nguyễn", "Tự lực", 10, "Sẵn sàng"});
-        tableModel.addRow(new Object[]{"B005", "Dế Mèn Phiêu Lưu Ký", "Tô Hoài", "Văn học VN", 3, "Sẵn sàng"});
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.getViewport().setBackground(Color.WHITE);
-
-        // ==========================================
-        // PHẦN DƯỚI: NÚT CHỨC NĂNG
-        // ==========================================
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        // Nút mượn sách
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.setBackground(new Color(248, 250, 252));
-
-        JButton btnBorrow = new JButton("Đăng Ký Mượn Sách");
-        btnBorrow.setFont(new Font(tenFont, Font.BOLD, 14));
-        btnBorrow.setBackground(new Color(34, 197, 94)); 
+        JButton btnBorrow = new JButton("Mượn Sách Đã Chọn");
+        btnBorrow.setBackground(new Color(34, 197, 94));
         btnBorrow.setForeground(Color.WHITE);
-        btnBorrow.setFocusPainted(false);
-        btnBorrow.setPreferredSize(new Dimension(180, 40));
-
         bottomPanel.add(btnBorrow);
+        
+        panel.add(bottomPanel, BorderLayout.SOUTH);
 
-        searchPanel.add(topPanel, BorderLayout.NORTH);
-        searchPanel.add(scrollPane, BorderLayout.CENTER);
-        searchPanel.add(bottomPanel, BorderLayout.SOUTH);
-
-        // ==========================================
-        // BẮT SỰ KIỆN CHO CÁC NÚT (Trong Tìm Sách)
-        // ==========================================
-        btnSearch.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String keyword = txtSearch.getText();
-                String type = cbCriteria.getSelectedItem().toString();
-                JOptionPane.showMessageDialog(searchPanel, "Đang tìm sách: " + keyword + "\nTheo tiêu chí: " + type);
-            }
-        });
-
+        // Sự kiện mượn sách cơ bản
         btnBorrow.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int selectedRow = table.getSelectedRow();
-                if (selectedRow == -1) {
-                    JOptionPane.showMessageDialog(searchPanel, "Vui lòng chọn một quyển sách để mượn!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                int row = table.getSelectedRow();
+                if(row == -1) {
+                    JOptionPane.showMessageDialog(panel, "Vui lòng chọn 1 sách trong bảng!");
                 } else {
-                    String bookName = tableModel.getValueAt(selectedRow, 1).toString();
-                    String status = tableModel.getValueAt(selectedRow, 5).toString();
-                    
-                    if (status.equals("Đã mượn hết")) {
-                        JOptionPane.showMessageDialog(searchPanel, "Sách này hiện đã được mượn hết, vui lòng chọn sách khác!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(panel, "Đã gửi yêu cầu mượn sách thành công!");
+                }
+            }
+        });
+
+        return panel;
+    }
+
+    // 3. TẠO TRANG SÁCH ĐANG MƯỢN
+    private JPanel createBorrowedBooksPanel() {
+        JPanel panel = new JPanel(new BorderLayout(0, 15));
+        panel.setBackground(new Color(248, 250, 252)); 
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JLabel title = new JLabel("Sách Đang Mượn");
+        title.setFont(new Font(tenFont, Font.BOLD, 26));
+        panel.add(title, BorderLayout.NORTH);
+
+        // Bảng hiển thị
+        String[] cols = {"Mã Phiếu", "Tên Sách", "Ngày Mượn", "Hạn Trả", "Trạng Thái"};
+        Object[][] data = {
+            {"PM01", "Toán rời rạc", "01/03/2026", "15/03/2026", "Còn hạn"},
+            {"PM02", "Clean Code", "10/01/2026", "24/01/2026", "Quá hạn"}
+        };
+        
+        JTable table = new JTable(data, cols);
+        table.setRowHeight(25);
+        JScrollPane scroll = new JScrollPane(table);
+        panel.add(scroll, BorderLayout.CENTER);
+
+        // Nút gia hạn
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottomPanel.setBackground(new Color(248, 250, 252));
+        JButton btnRenew = new JButton("Gia Hạn Sách");
+        btnRenew.setBackground(new Color(245, 158, 11));
+        btnRenew.setForeground(Color.WHITE);
+        bottomPanel.add(btnRenew);
+        
+        panel.add(bottomPanel, BorderLayout.SOUTH);
+
+        // Sự kiện gia hạn cơ bản
+        btnRenew.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = table.getSelectedRow();
+                if(row == -1) {
+                    JOptionPane.showMessageDialog(panel, "Vui lòng chọn 1 cuốn sách!");
+                } else {
+                    String status = table.getValueAt(row, 4).toString();
+                    if(status.equals("Quá hạn")) {
+                        JOptionPane.showMessageDialog(panel, "Sách đã quá hạn, không thể gia hạn!");
                     } else {
-                        JOptionPane.showMessageDialog(searchPanel, "Bạn đã đăng ký mượn quyển: " + bookName, "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(panel, "Gia hạn thêm 7 ngày thành công!");
                     }
                 }
             }
         });
 
-        return searchPanel;
+        return panel;
     }
 
-    // Hàm tạo ra 1 Thẻ sách
+    // ==========================================
+    // CÁC HÀM TIỆN ÍCH DÙNG CHUNG
+    // ==========================================
+
+    // Hàm tạo Thẻ sách nhỏ gọn
     private JPanel createBookCard(String title, String author, String category) {
-        JPanel card = new JPanel();
-        card.setLayout(new BorderLayout(0, 10));
+        JPanel card = new JPanel(new BorderLayout(0, 5));
         card.setBackground(Color.WHITE);
-        card.setPreferredSize(new Dimension(180, 260)); 
-        
-        card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
-                BorderFactory.createEmptyBorder(12, 12, 12, 12)
-        ));
+        card.setPreferredSize(new Dimension(160, 220)); 
+        card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
-        JLabel lblCover = new JLabel("[Ảnh]", SwingConstants.CENTER);
-        lblCover.setOpaque(true);
-        lblCover.setBackground(new Color(241, 245, 249));
-        lblCover.setForeground(new Color(148, 163, 184));
-        lblCover.setPreferredSize(new Dimension(100, 140)); 
+        JLabel cover = new JLabel("Hình Ảnh", SwingConstants.CENTER);
+        cover.setOpaque(true);
+        cover.setBackground(new Color(230, 230, 230));
+        cover.setPreferredSize(new Dimension(100, 120)); 
 
-        JPanel infoPanel = new JPanel();
-        infoPanel.setLayout(new GridLayout(3, 1, 0, 3));
-        infoPanel.setBackground(Color.WHITE);
-        
-        JLabel lblTitle = new JLabel(title, SwingConstants.LEFT); 
-        lblTitle.setFont(new Font(tenFont, Font.BOLD, 14));
-        lblTitle.setForeground(new Color(15, 23, 42));
-        
-        JLabel lblAuthor = new JLabel(author, SwingConstants.LEFT);
-        lblAuthor.setFont(new Font(tenFont, Font.PLAIN, 12));
-        lblAuthor.setForeground(new Color(100, 116, 139));
+        JPanel info = new JPanel(new GridLayout(3, 1));
+        info.setBackground(Color.WHITE);
+        info.add(new JLabel(" " + title));
+        info.add(new JLabel(" " + author));
+        info.add(new JLabel(" " + category));
 
-        JLabel lblCategory = new JLabel(category, SwingConstants.LEFT);
-        lblCategory.setFont(new Font(tenFont, Font.ITALIC, 11));
-        lblCategory.setForeground(new Color(56, 189, 248)); 
+        JButton btn = new JButton("Chi Tiết");
+        btn.setBackground(new Color(14, 165, 233));
+        btn.setForeground(Color.WHITE);
 
-        infoPanel.add(lblTitle);
-        infoPanel.add(lblAuthor);
-        infoPanel.add(lblCategory);
-
-        JButton btnView = new JButton("Xem Ngay");
-        btnView.setFont(new Font(tenFont, Font.BOLD, 12));
-        btnView.setBackground(new Color(14, 165, 233)); 
-        btnView.setForeground(Color.WHITE);
-        btnView.setFocusPainted(false);
-        btnView.setBorder(BorderFactory.createEmptyBorder(6, 0, 6, 0));
-        btnView.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        card.add(lblCover, BorderLayout.NORTH);
-        card.add(infoPanel, BorderLayout.CENTER);
-        card.add(btnView, BorderLayout.SOUTH);
+        card.add(cover, BorderLayout.NORTH);
+        card.add(info, BorderLayout.CENTER);
+        card.add(btn, BorderLayout.SOUTH);
 
         return card;
     }
 
-    // Hàm thiết kế hình thức cho các Nút ở Menu bên trái
+    // Hàm tạo Nút Menu bên trái
     private JButton createMenuButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font(tenFont, Font.PLAIN, 14)); 
@@ -405,9 +352,8 @@ public class UserHomeFrame extends JFrame {
         button.setFocusPainted(false); 
         button.setBorderPainted(false); 
         button.setHorizontalAlignment(SwingConstants.LEFT); 
-        button.setBorder(BorderFactory.createEmptyBorder(12, 25, 12, 25)); 
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR)); 
         
+        // Hiệu ứng chuột trỏ vào nút
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent evt) {
@@ -421,28 +367,20 @@ public class UserHomeFrame extends JFrame {
         return button;
     }
     
-    // Hàm tạo 1 Panel trống
+    // Hàm tạo trang trống
     private JPanel createPlaceholderPanel(String text) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-        panel.setBackground(new Color(248, 250, 252)); 
-        
+        JPanel panel = new JPanel(new BorderLayout());
         JLabel label = new JLabel(text, SwingConstants.CENTER);
         label.setFont(new Font(tenFont, Font.PLAIN, 20)); 
-        label.setForeground(new Color(148, 163, 184)); 
         panel.add(label, BorderLayout.CENTER);
-        
         return panel;
     }
 
-    // Hàm Main để chạy thử Form
+    // ==========================================
+    // HÀM MAIN CHẠY CHƯƠNG TRÌNH
+    // ==========================================
     public static void main(String args[]) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
+        // Chạy giao diện
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
