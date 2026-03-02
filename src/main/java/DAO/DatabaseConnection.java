@@ -19,7 +19,7 @@ public class DatabaseConnection {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             String URL = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyThuVien;trustServerCertificate=true";
             String UserName="sa";
-            String Password="sa";
+            String Password="12345";
             
             if(connection==null|| connection.isClosed()){
                 connection = DriverManager.getConnection(URL,UserName,Password);   

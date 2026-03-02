@@ -6,11 +6,11 @@ import java.util.ArrayList;
 
 public class ChiTietPhieuPhatDAO {
 
-    // 1. Thêm chi tiết phiếu phạt
+    // 1. Thêm chi tiết (Mặc định TrangThai = 1)
     public boolean add(ChiTietPhieuPhatDTO ct) {
         String sql = "INSERT INTO CHITIETPHIEUPHAT "
-                + "(MaCTPP, MaPP, MaCuonSach, LyDo, SoTien) "
-                + "VALUES (?, ?, ?, ?, ?)";
+                + "(MaCTPP, MaPP, MaCuonSach, LyDo, SoTien, TrangThai) "
+                + "VALUES (?, ?, ?, ?, ?, 1)";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -29,10 +29,10 @@ public class ChiTietPhieuPhatDAO {
         return false;
     }
 
-    // 2. Lấy tất cả chi tiết
+    // 2. Lấy tất cả chi tiết CHƯA BỊ XÓA
     public ArrayList<ChiTietPhieuPhatDTO> getAll() {
         ArrayList<ChiTietPhieuPhatDTO> list = new ArrayList<>();
-        String sql = "SELECT * FROM CHITIETPHIEUPHAT";
+        String sql = "SELECT * FROM CHITIETPHIEUPHAT WHERE TrangThai = 1";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 Statement st = conn.createStatement();
@@ -54,10 +54,10 @@ public class ChiTietPhieuPhatDAO {
         return list;
     }
 
-    // 3. Lấy theo MaPP
+    // 3. Lấy theo MaPP (Chỉ lấy chi tiết chưa bị xóa)
     public ArrayList<ChiTietPhieuPhatDTO> getByMaPP(String maPP) {
         ArrayList<ChiTietPhieuPhatDTO> list = new ArrayList<>();
-        String sql = "SELECT * FROM CHITIETPHIEUPHAT WHERE MaPP = ?";
+        String sql = "SELECT * FROM CHITIETPHIEUPHAT WHERE MaPP = ? AND TrangThai = 1";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -104,9 +104,9 @@ public class ChiTietPhieuPhatDAO {
         return false;
     }
 
-    // 5. Xoá
+    // 5. Xoá mềm (Đổi TrangThai = 0)
     public boolean delete(String maCTPP) {
-        String sql = "DELETE FROM CHITIETPHIEUPHAT WHERE MaCTPP=?";
+        String sql = "UPDATE CHITIETPHIEUPHAT SET TrangThai = 0 WHERE MaCTPP=?";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
