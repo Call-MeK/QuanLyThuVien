@@ -41,6 +41,7 @@ public class TrangChuUserGUI extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         pnContent = new javax.swing.JPanel();
         pnTrangchu = new javax.swing.JPanel();
+        lichSuPanel1 = new GUI.LichSuPanel();
         pnTimsach = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -167,6 +168,8 @@ public class TrangChuUserGUI extends javax.swing.JFrame {
 
         pnTrangchu.setBackground(new java.awt.Color(255, 255, 255));
         pnTrangchu.setLayout(new java.awt.BorderLayout());
+        pnTrangchu.add(lichSuPanel1, java.awt.BorderLayout.CENTER);
+
         pnContent.add(pnTrangchu, "Trangchu");
 
         pnTimsach.setBackground(new java.awt.Color(255, 255, 255));
@@ -333,6 +336,7 @@ public class TrangChuUserGUI extends javax.swing.JFrame {
     private javax.swing.JTable jTable1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
+    private GUI.LichSuPanel lichSuPanel1;
     private javax.swing.JPanel pnContent;
     private javax.swing.JPanel pnMenu;
     private javax.swing.JPanel pnTimsach;
