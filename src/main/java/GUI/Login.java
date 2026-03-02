@@ -87,7 +87,7 @@ public class Login extends javax.swing.JFrame {
 
         jTextField2.addActionListener(this::jTextField2ActionPerformed);
 
-        jLabel5.setText("Nếu bạn quên mật khẩu? Kệ mẹ bạn");
+        jLabel5.setText("Nếu bạn quên mật khẩu? Hãy liên hệ Admin");
 
         jButton1.setBackground(new java.awt.Color(204, 204, 204));
         jButton1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
