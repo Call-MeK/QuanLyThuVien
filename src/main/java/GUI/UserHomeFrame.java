@@ -1,4 +1,4 @@
-package library.ui;
+package GUI;
 
 import javax.swing.*;
 import java.awt.*;
@@ -80,11 +80,11 @@ public class UserHomeFrame extends JFrame {
         
         // TẠO CÁC TRANG (PANEL) CHO TỪNG CHỨC NĂNG
         JPanel panelTrangChu = createHomePanel(); 
+        
+        // ---> ĐÃ SỬA: Gọi hàm createSearchPanel() thay vì trang trống
         JPanel panelTimSach = createSearchPanel(); 
         
-        // ---> ĐÃ SỬA: Gọi hàm createBorrowedBooksPanel() cho trang Sách Đang Mượn
-        JPanel panelSachDangMuon = createBorrowedBooksPanel(); 
-        
+        JPanel panelSachDangMuon = createPlaceholderPanel("Giao diện Sách đang mượn");
         JPanel panelThongTin = createPlaceholderPanel("Giao diện Thông tin cá nhân");
         
         // Thêm các Panel vào CardLayout và đặt tên định danh cho chúng
@@ -143,25 +143,28 @@ public class UserHomeFrame extends JFrame {
     }
     
     // ==========================================
-    // CÁC HÀM HỖ TRỢ TẠO GIAO DIỆN CHÍNH
+    // CÁC HÀM HỖ TRỢ TẠO GIAO DIỆN
     // ==========================================
     
-    // 1. GIAO DIỆN TRANG CHỦ
+    // Hàm tạo Panel Trang chủ (Giao diện chính giữa)
     private JPanel createHomePanel() {
         JPanel homePanel = new JPanel();
         homePanel.setLayout(new BorderLayout(0, 20));
         homePanel.setBackground(new Color(248, 250, 252)); 
         homePanel.setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30));
 
+        // --- PHẦN TOP: Tiêu đề ---
         JLabel lblPageTitle = new JLabel("Thư Viện Online");
         lblPageTitle.setFont(new Font(tenFont, Font.BOLD, 28));
         lblPageTitle.setForeground(new Color(15, 23, 42)); 
         homePanel.add(lblPageTitle, BorderLayout.NORTH);
 
+        // --- PHẦN MAIN: Chứa Banner và Sách ---
         JPanel mainAreaPanel = new JPanel();
         mainAreaPanel.setLayout(new BorderLayout(0, 25));
         mainAreaPanel.setBackground(new Color(248, 250, 252));
 
+        // 1. Khu vực chèn ảnh Banner quảng cáo
         JLabel lblBannerImage = new JLabel("[ Vị Trí Chèn Ảnh Banner Thư Viện ]", SwingConstants.CENTER);
         lblBannerImage.setOpaque(true);
         lblBannerImage.setBackground(new Color(226, 232, 240)); 
@@ -170,6 +173,7 @@ public class UserHomeFrame extends JFrame {
         lblBannerImage.setPreferredSize(new Dimension(0, 180)); 
         mainAreaPanel.add(lblBannerImage, BorderLayout.NORTH);
 
+        // 2. Khu vực chứa sách gợi ý
         JPanel hotBooksContainer = new JPanel();
         hotBooksContainer.setLayout(new BorderLayout(0, 15));
         hotBooksContainer.setBackground(new Color(248, 250, 252));
@@ -204,13 +208,16 @@ public class UserHomeFrame extends JFrame {
         return homePanel;
     }
 
-    // 2. GIAO DIỆN TÌM SÁCH
+    // Hàm tạo giao diện Tìm Sách
     private JPanel createSearchPanel() {
         JPanel searchPanel = new JPanel();
         searchPanel.setLayout(new BorderLayout(0, 20));
         searchPanel.setBackground(new Color(248, 250, 252)); 
         searchPanel.setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30));
 
+        // ==========================================
+        // PHẦN TRÊN: TIÊU ĐỀ VÀ THANH TÌM KIẾM
+        // ==========================================
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BorderLayout(0, 15));
         topPanel.setBackground(new Color(248, 250, 252));
@@ -251,6 +258,9 @@ public class UserHomeFrame extends JFrame {
 
         topPanel.add(filterPanel, BorderLayout.CENTER);
 
+        // ==========================================
+        // PHẦN GIỮA: BẢNG KẾT QUẢ TÌM KIẾM (JTABLE)
+        // ==========================================
         String[] columnNames = {"Mã Sách", "Tên Sách", "Tác Giả", "Thể Loại", "Số Lượng", "Trạng Thái"};
         
         javax.swing.table.DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(columnNames, 0) {
@@ -274,10 +284,14 @@ public class UserHomeFrame extends JFrame {
         tableModel.addRow(new Object[]{"B002", "Nhà Giả Kim", "Paulo Coelho", "Tiểu thuyết", 2, "Sẵn sàng"});
         tableModel.addRow(new Object[]{"B003", "Sapiens", "Yuval Noah Harari", "Lịch sử", 0, "Đã mượn hết"});
         tableModel.addRow(new Object[]{"B004", "Tuổi Trẻ Đáng Giá Bao Nhiêu", "Rosie Nguyễn", "Tự lực", 10, "Sẵn sàng"});
+        tableModel.addRow(new Object[]{"B005", "Dế Mèn Phiêu Lưu Ký", "Tô Hoài", "Văn học VN", 3, "Sẵn sàng"});
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.getViewport().setBackground(Color.WHITE);
 
+        // ==========================================
+        // PHẦN DƯỚI: NÚT CHỨC NĂNG
+        // ==========================================
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         bottomPanel.setBackground(new Color(248, 250, 252));
@@ -295,10 +309,15 @@ public class UserHomeFrame extends JFrame {
         searchPanel.add(scrollPane, BorderLayout.CENTER);
         searchPanel.add(bottomPanel, BorderLayout.SOUTH);
 
+        // ==========================================
+        // BẮT SỰ KIỆN CHO CÁC NÚT (Trong Tìm Sách)
+        // ==========================================
         btnSearch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(searchPanel, "Chức năng tìm kiếm đang được kết nối với CSDL.");
+                String keyword = txtSearch.getText();
+                String type = cbCriteria.getSelectedItem().toString();
+                JOptionPane.showMessageDialog(searchPanel, "Đang tìm sách: " + keyword + "\nTheo tiêu chí: " + type);
             }
         });
 
@@ -324,115 +343,7 @@ public class UserHomeFrame extends JFrame {
         return searchPanel;
     }
 
-    // 3. GIAO DIỆN SÁCH ĐANG MƯỢN (MỚI THÊM)
-    private JPanel createBorrowedBooksPanel() {
-        JPanel borrowedPanel = new JPanel();
-        borrowedPanel.setLayout(new BorderLayout(0, 20));
-        borrowedPanel.setBackground(new Color(248, 250, 252)); 
-        borrowedPanel.setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30));
-
-        // ==========================================
-        // PHẦN TRÊN: TIÊU ĐỀ
-        // ==========================================
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new BorderLayout(0, 10));
-        topPanel.setBackground(new Color(248, 250, 252));
-
-        JLabel lblPageTitle = new JLabel("Sách Đang Mượn");
-        lblPageTitle.setFont(new Font(tenFont, Font.BOLD, 28));
-        lblPageTitle.setForeground(new Color(15, 23, 42)); 
-        topPanel.add(lblPageTitle, BorderLayout.NORTH);
-        
-        // Dòng mô tả ngắn
-        JLabel lblDesc = new JLabel("Danh sách các quyển sách bạn đang giữ. Vui lòng chú ý hạn trả để không bị phạt.");
-        lblDesc.setFont(new Font(tenFont, Font.ITALIC, 14));
-        lblDesc.setForeground(new Color(100, 116, 139));
-        topPanel.add(lblDesc, BorderLayout.CENTER);
-
-        // ==========================================
-        // PHẦN GIỮA: BẢNG JTABLE
-        // ==========================================
-        String[] columnNames = {"Mã Phiếu Mượn", "Tên Sách", "Ngày Mượn", "Hạn Trả", "Tình Trạng"};
-        
-        javax.swing.table.DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(columnNames, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; 
-            }
-        };
-
-        JTable table = new JTable(tableModel);
-        table.setFont(new Font(tenFont, Font.PLAIN, 14));
-        table.setRowHeight(30); 
-        table.setSelectionBackground(new Color(226, 232, 240)); 
-        table.setSelectionForeground(Color.BLACK);
-        
-        table.getTableHeader().setFont(new Font(tenFont, Font.BOLD, 14));
-        table.getTableHeader().setBackground(new Color(241, 245, 249));
-        table.getTableHeader().setPreferredSize(new Dimension(100, 35));
-
-        // Dữ liệu giả định (Mock Data)
-        tableModel.addRow(new Object[]{"PM-1023", "Lập trình Java Cơ Bản", "01/03/2026", "15/03/2026", "Còn hạn"});
-        tableModel.addRow(new Object[]{"PM-1024", "Cấu trúc dữ liệu & Thuật toán", "20/02/2026", "05/03/2026", "Còn hạn"});
-        tableModel.addRow(new Object[]{"PM-0988", "Clean Code", "10/01/2026", "24/01/2026", "Quá hạn (Bị phạt)"});
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.getViewport().setBackground(Color.WHITE);
-
-        // ==========================================
-        // PHẦN DƯỚI: NÚT GIA HẠN
-        // ==========================================
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-        bottomPanel.setBackground(new Color(248, 250, 252));
-
-        JButton btnRenew = new JButton("Gia Hạn Mượn Sách");
-        btnRenew.setFont(new Font(tenFont, Font.BOLD, 14));
-        btnRenew.setBackground(new Color(245, 158, 11)); // Màu vàng cam (Warning / Warning-ish)
-        btnRenew.setForeground(Color.WHITE);
-        btnRenew.setFocusPainted(false);
-        btnRenew.setPreferredSize(new Dimension(180, 40));
-
-        bottomPanel.add(btnRenew);
-
-        borrowedPanel.add(topPanel, BorderLayout.NORTH);
-        borrowedPanel.add(scrollPane, BorderLayout.CENTER);
-        borrowedPanel.add(bottomPanel, BorderLayout.SOUTH);
-
-        // ==========================================
-        // BẮT SỰ KIỆN NÚT GIA HẠN
-        // ==========================================
-        btnRenew.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int selectedRow = table.getSelectedRow();
-                if (selectedRow == -1) {
-                    JOptionPane.showMessageDialog(borrowedPanel, "Vui lòng chọn quyển sách bạn muốn gia hạn!", "Thông báo", JOptionPane.WARNING_MESSAGE);
-                } else {
-                    String bookName = tableModel.getValueAt(selectedRow, 1).toString();
-                    String status = tableModel.getValueAt(selectedRow, 4).toString();
-                    
-                    // Logic kiểm tra: Sách quá hạn không cho gia hạn
-                    if (status.contains("Quá hạn")) {
-                        JOptionPane.showMessageDialog(borrowedPanel, "Sách '" + bookName + "' đã quá hạn trả! Bạn không thể gia hạn mà phải đến thư viện nộp phạt.", "Từ chối gia hạn", JOptionPane.ERROR_MESSAGE);
-                    } else {
-                        // Logic cho phép gia hạn
-                        int confirm = JOptionPane.showConfirmDialog(borrowedPanel, "Bạn có chắc muốn gia hạn sách '" + bookName + "' thêm 7 ngày không?", "Xác nhận gia hạn", JOptionPane.YES_NO_OPTION);
-                        if (confirm == JOptionPane.YES_OPTION) {
-                            JOptionPane.showMessageDialog(borrowedPanel, "Đã gửi yêu cầu gia hạn thành công. Vui lòng chờ thủ thư duyệt.", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                        }
-                    }
-                }
-            }
-        });
-
-        return borrowedPanel;
-    }
-
-    // ==========================================
-    // CÁC HÀM TIỆN ÍCH DÙNG CHUNG
-    // ==========================================
-
+    // Hàm tạo ra 1 Thẻ sách
     private JPanel createBookCard(String title, String author, String category) {
         JPanel card = new JPanel();
         card.setLayout(new BorderLayout(0, 10));
@@ -485,6 +396,7 @@ public class UserHomeFrame extends JFrame {
         return card;
     }
 
+    // Hàm thiết kế hình thức cho các Nút ở Menu bên trái
     private JButton createMenuButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font(tenFont, Font.PLAIN, 14)); 
@@ -509,6 +421,7 @@ public class UserHomeFrame extends JFrame {
         return button;
     }
     
+    // Hàm tạo 1 Panel trống
     private JPanel createPlaceholderPanel(String text) {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
@@ -522,9 +435,7 @@ public class UserHomeFrame extends JFrame {
         return panel;
     }
 
-    // ==========================================
-    // HÀM MAIN CHẠY CHƯƠNG TRÌNH
-    // ==========================================
+    // Hàm Main để chạy thử Form
     public static void main(String args[]) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
