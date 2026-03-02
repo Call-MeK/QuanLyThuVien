@@ -156,10 +156,26 @@ public class UserHomeFrame extends JFrame {
         centerPanel.setBackground(new Color(248, 250, 252));
 
         // Khung để chèn ảnh banner
-        JLabel banner = new JLabel("[ Chỗ chèn ảnh Banner ]", SwingConstants.CENTER);
+        JLabel banner = new JLabel("", SwingConstants.CENTER);
         banner.setOpaque(true);
         banner.setBackground(new Color(226, 232, 240)); 
-        banner.setPreferredSize(new Dimension(0, 150)); 
+        banner.setPreferredSize(new Dimension(0, 150));
+        try {
+            java.net.URL imgURL = getClass().getResource("C:\\Users\\Admin\\Documents\\NetBeansProjects\\QuanLyThuVien\\src\\main\\resources\\Images\\Background_Library_fix.jpg");
+    
+    if (imgURL != null) {
+        ImageIcon originalIcon = new ImageIcon(imgURL);
+        java.awt.Image img = originalIcon.getImage();
+
+        java.awt.Image scaledImg = img.getScaledInstance(900, 150, java.awt.Image.SCALE_SMOOTH);
+        banner.setIcon(new ImageIcon(scaledImg));
+    } else {
+        banner.setText("Không tìm thấy ảnh!");
+        banner.setForeground(Color.RED);
+    }
+} catch (Exception e) {
+    e.printStackTrace();
+}
         centerPanel.add(banner, BorderLayout.NORTH);
 
         // Khung sách gợi ý
