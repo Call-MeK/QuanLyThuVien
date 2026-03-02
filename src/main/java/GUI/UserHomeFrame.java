@@ -78,9 +78,12 @@ public class UserHomeFrame extends JFrame {
         mainContentPanel.setLayout(cardLayout);
         mainContentPanel.setBackground(new Color(248, 250, 252)); 
         
-        // Tạo các Panel cho từng chức năng
+        // TẠO CÁC TRANG (PANEL) CHO TỪNG CHỨC NĂNG
         JPanel panelTrangChu = createHomePanel(); 
-        JPanel panelTimSach = createPlaceholderPanel("Giao diện Tìm kiếm sách");
+        
+        // ---> ĐÃ SỬA: Gọi hàm createSearchPanel() thay vì trang trống
+        JPanel panelTimSach = createSearchPanel(); 
+        
         JPanel panelSachDangMuon = createPlaceholderPanel("Giao diện Sách đang mượn");
         JPanel panelThongTin = createPlaceholderPanel("Giao diện Thông tin cá nhân");
         
@@ -91,9 +94,8 @@ public class UserHomeFrame extends JFrame {
         mainContentPanel.add(panelThongTin, "ThongTin");
         
         // ==========================================
-        // 3. BẮT SỰ KIỆN KHI CLICK VÀO CÁC NÚT (Sử dụng cách viết truyền thống)
+        // 3. BẮT SỰ KIỆN KHI CLICK VÀO CÁC NÚT
         // ==========================================
-        
         btnTrangChu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -125,11 +127,10 @@ public class UserHomeFrame extends JFrame {
         btnDangXuat.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Hiển thị hộp thoại xác nhận
                 int confirm = JOptionPane.showConfirmDialog(UserHomeFrame.this, "Bạn có chắc chắn muốn đăng xuất?", "Xác nhận", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     JOptionPane.showMessageDialog(UserHomeFrame.this, "Đăng xuất thành công!");
-                    dispose(); // Đóng cửa sổ hiện tại
+                    dispose(); 
                 }
             }
         });
@@ -182,60 +183,184 @@ public class UserHomeFrame extends JFrame {
         lblHotBooksTitle.setForeground(new Color(51, 65, 85));
         hotBooksContainer.add(lblHotBooksTitle, BorderLayout.NORTH);
 
-        // Panel chứa danh sách các thẻ sách (Sử dụng FlowLayout để sách không bị co giãn)
         JPanel booksListPanel = new JPanel();
         booksListPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 5));
         booksListPanel.setBackground(new Color(248, 250, 252));
 
-        // Thêm các thẻ sách vào panel
         booksListPanel.add(createBookCard("Đắc Nhân Tâm", "Dale Carnegie", "Kỹ năng sống"));
         booksListPanel.add(createBookCard("Nhà Giả Kim", "Paulo Coelho", "Tiểu thuyết"));
         booksListPanel.add(createBookCard("Sapiens", "Yuval Noah Harari", "Lịch sử"));
         booksListPanel.add(createBookCard("Tuổi Trẻ Đáng Giá...", "Rosie Nguyễn", "Tự lực"));
         booksListPanel.add(createBookCard("Harry Potter", "J.K. Rowling", "Fantasy"));
 
-        // Tạo thanh cuộn cho danh sách sách
         JScrollPane scrollPane = new JScrollPane(booksListPanel);
         scrollPane.setBackground(new Color(248, 250, 252));
         scrollPane.getViewport().setBackground(new Color(248, 250, 252)); 
-        scrollPane.setBorder(BorderFactory.createEmptyBorder()); // Xóa viền của scrollpane
-        // Chỉ cho phép cuộn ngang, tắt cuộn dọc
+        scrollPane.setBorder(BorderFactory.createEmptyBorder()); 
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED); 
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER); 
-        scrollPane.getHorizontalScrollBar().setUnitIncrement(16); // Tốc độ cuộn chuột
+        scrollPane.getHorizontalScrollBar().setUnitIncrement(16); 
 
         hotBooksContainer.add(scrollPane, BorderLayout.CENTER);
-        
-        // Lắp ráp vào mainAreaPanel
         mainAreaPanel.add(hotBooksContainer, BorderLayout.CENTER);
-        
-        // Lắp ráp vào homePanel
         homePanel.add(mainAreaPanel, BorderLayout.CENTER);
 
         return homePanel;
     }
 
-    // Hàm tạo ra 1 Thẻ sách (Gồm Ảnh, Tên, Tác giả, Nút bấm)
+    // Hàm tạo giao diện Tìm Sách
+    private JPanel createSearchPanel() {
+        JPanel searchPanel = new JPanel();
+        searchPanel.setLayout(new BorderLayout(0, 20));
+        searchPanel.setBackground(new Color(248, 250, 252)); 
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30));
+
+        // ==========================================
+        // PHẦN TRÊN: TIÊU ĐỀ VÀ THANH TÌM KIẾM
+        // ==========================================
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BorderLayout(0, 15));
+        topPanel.setBackground(new Color(248, 250, 252));
+
+        JLabel lblPageTitle = new JLabel("Tìm Kiếm Sách");
+        lblPageTitle.setFont(new Font(tenFont, Font.BOLD, 28));
+        lblPageTitle.setForeground(new Color(15, 23, 42)); 
+        topPanel.add(lblPageTitle, BorderLayout.NORTH);
+
+        JPanel filterPanel = new JPanel();
+        filterPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 15, 0));
+        filterPanel.setBackground(new Color(248, 250, 252));
+
+        JLabel lblKeyword = new JLabel("Từ khóa:");
+        lblKeyword.setFont(new Font(tenFont, Font.PLAIN, 14));
+
+        JTextField txtSearch = new JTextField(25);
+        txtSearch.setFont(new Font(tenFont, Font.PLAIN, 14));
+        txtSearch.setPreferredSize(new Dimension(txtSearch.getPreferredSize().width, 30));
+
+        String[] criteria = {"Tên sách", "Tác giả", "Thể loại"};
+        JComboBox<String> cbCriteria = new JComboBox<>(criteria);
+        cbCriteria.setFont(new Font(tenFont, Font.PLAIN, 14));
+        cbCriteria.setPreferredSize(new Dimension(120, 30));
+        cbCriteria.setBackground(Color.WHITE);
+
+        JButton btnSearch = new JButton("Tìm kiếm");
+        btnSearch.setFont(new Font(tenFont, Font.BOLD, 13));
+        btnSearch.setBackground(new Color(14, 165, 233)); 
+        btnSearch.setForeground(Color.WHITE);
+        btnSearch.setFocusPainted(false);
+        btnSearch.setPreferredSize(new Dimension(100, 30));
+
+        filterPanel.add(lblKeyword);
+        filterPanel.add(txtSearch);
+        filterPanel.add(cbCriteria);
+        filterPanel.add(btnSearch);
+
+        topPanel.add(filterPanel, BorderLayout.CENTER);
+
+        // ==========================================
+        // PHẦN GIỮA: BẢNG KẾT QUẢ TÌM KIẾM (JTABLE)
+        // ==========================================
+        String[] columnNames = {"Mã Sách", "Tên Sách", "Tác Giả", "Thể Loại", "Số Lượng", "Trạng Thái"};
+        
+        javax.swing.table.DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(columnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; 
+            }
+        };
+
+        JTable table = new JTable(tableModel);
+        table.setFont(new Font(tenFont, Font.PLAIN, 14));
+        table.setRowHeight(30); 
+        table.setSelectionBackground(new Color(226, 232, 240)); 
+        table.setSelectionForeground(Color.BLACK);
+        
+        table.getTableHeader().setFont(new Font(tenFont, Font.BOLD, 14));
+        table.getTableHeader().setBackground(new Color(241, 245, 249));
+        table.getTableHeader().setPreferredSize(new Dimension(100, 35));
+
+        tableModel.addRow(new Object[]{"B001", "Đắc Nhân Tâm", "Dale Carnegie", "Kỹ năng sống", 5, "Sẵn sàng"});
+        tableModel.addRow(new Object[]{"B002", "Nhà Giả Kim", "Paulo Coelho", "Tiểu thuyết", 2, "Sẵn sàng"});
+        tableModel.addRow(new Object[]{"B003", "Sapiens", "Yuval Noah Harari", "Lịch sử", 0, "Đã mượn hết"});
+        tableModel.addRow(new Object[]{"B004", "Tuổi Trẻ Đáng Giá Bao Nhiêu", "Rosie Nguyễn", "Tự lực", 10, "Sẵn sàng"});
+        tableModel.addRow(new Object[]{"B005", "Dế Mèn Phiêu Lưu Ký", "Tô Hoài", "Văn học VN", 3, "Sẵn sàng"});
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.getViewport().setBackground(Color.WHITE);
+
+        // ==========================================
+        // PHẦN DƯỚI: NÚT CHỨC NĂNG
+        // ==========================================
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        bottomPanel.setBackground(new Color(248, 250, 252));
+
+        JButton btnBorrow = new JButton("Đăng Ký Mượn Sách");
+        btnBorrow.setFont(new Font(tenFont, Font.BOLD, 14));
+        btnBorrow.setBackground(new Color(34, 197, 94)); 
+        btnBorrow.setForeground(Color.WHITE);
+        btnBorrow.setFocusPainted(false);
+        btnBorrow.setPreferredSize(new Dimension(180, 40));
+
+        bottomPanel.add(btnBorrow);
+
+        searchPanel.add(topPanel, BorderLayout.NORTH);
+        searchPanel.add(scrollPane, BorderLayout.CENTER);
+        searchPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+        // ==========================================
+        // BẮT SỰ KIỆN CHO CÁC NÚT (Trong Tìm Sách)
+        // ==========================================
+        btnSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String keyword = txtSearch.getText();
+                String type = cbCriteria.getSelectedItem().toString();
+                JOptionPane.showMessageDialog(searchPanel, "Đang tìm sách: " + keyword + "\nTheo tiêu chí: " + type);
+            }
+        });
+
+        btnBorrow.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow == -1) {
+                    JOptionPane.showMessageDialog(searchPanel, "Vui lòng chọn một quyển sách để mượn!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    String bookName = tableModel.getValueAt(selectedRow, 1).toString();
+                    String status = tableModel.getValueAt(selectedRow, 5).toString();
+                    
+                    if (status.equals("Đã mượn hết")) {
+                        JOptionPane.showMessageDialog(searchPanel, "Sách này hiện đã được mượn hết, vui lòng chọn sách khác!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(searchPanel, "Bạn đã đăng ký mượn quyển: " + bookName, "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+            }
+        });
+
+        return searchPanel;
+    }
+
+    // Hàm tạo ra 1 Thẻ sách
     private JPanel createBookCard(String title, String author, String category) {
         JPanel card = new JPanel();
         card.setLayout(new BorderLayout(0, 10));
         card.setBackground(Color.WHITE);
         card.setPreferredSize(new Dimension(180, 260)); 
         
-        // Kẻ viền cho thẻ sách
         card.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
                 BorderFactory.createEmptyBorder(12, 12, 12, 12)
         ));
 
-        // Nhãn chứa ảnh bìa sách
         JLabel lblCover = new JLabel("[Ảnh]", SwingConstants.CENTER);
         lblCover.setOpaque(true);
         lblCover.setBackground(new Color(241, 245, 249));
         lblCover.setForeground(new Color(148, 163, 184));
         lblCover.setPreferredSize(new Dimension(100, 140)); 
 
-        // Panel chứa thông tin chữ
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new GridLayout(3, 1, 0, 3));
         infoPanel.setBackground(Color.WHITE);
@@ -256,7 +381,6 @@ public class UserHomeFrame extends JFrame {
         infoPanel.add(lblAuthor);
         infoPanel.add(lblCategory);
 
-        // Nút bấm Xem Chi Tiết
         JButton btnView = new JButton("Xem Ngay");
         btnView.setFont(new Font(tenFont, Font.BOLD, 12));
         btnView.setBackground(new Color(14, 165, 233)); 
@@ -265,7 +389,6 @@ public class UserHomeFrame extends JFrame {
         btnView.setBorder(BorderFactory.createEmptyBorder(6, 0, 6, 0));
         btnView.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Thêm vào thẻ chính
         card.add(lblCover, BorderLayout.NORTH);
         card.add(infoPanel, BorderLayout.CENTER);
         card.add(btnView, BorderLayout.SOUTH);
@@ -285,7 +408,6 @@ public class UserHomeFrame extends JFrame {
         button.setBorder(BorderFactory.createEmptyBorder(12, 25, 12, 25)); 
         button.setCursor(new Cursor(Cursor.HAND_CURSOR)); 
         
-        // Sự kiện khi dùng chuột trỏ vào nút thì đổi màu (Hover)
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent evt) {
@@ -299,7 +421,7 @@ public class UserHomeFrame extends JFrame {
         return button;
     }
     
-    // Hàm tạo 1 Panel trống để giữ chỗ cho các chức năng chưa code
+    // Hàm tạo 1 Panel trống
     private JPanel createPlaceholderPanel(String text) {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
@@ -315,14 +437,12 @@ public class UserHomeFrame extends JFrame {
 
     // Hàm Main để chạy thử Form
     public static void main(String args[]) {
-        // Áp dụng giao diện của Hệ điều hành đang chạy
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        // Chạy giao diện
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
