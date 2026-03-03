@@ -53,7 +53,7 @@ public class LoginFrame extends JFrame {
         lblImage.setHorizontalAlignment(SwingConstants.CENTER);
         try {
             ImageIcon icon = new ImageIcon(
-                    getClass().getResource("/src/main/resources/Images/Background_ Library_fix.jpg"));
+                    getClass().getResource("/Images/thuvien.jpg"));
             Image img = icon.getImage().getScaledInstance(350, 250, Image.SCALE_SMOOTH);
             lblImage.setIcon(new ImageIcon(img));
         } catch (Exception e) {
