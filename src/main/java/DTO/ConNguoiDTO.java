@@ -37,6 +37,9 @@ public class ConNguoiDTO {
         return MaNguoi;
     }
 
+    public ConNguoiDTO() {
+    }
+
     public void setMaNguoi(String MaNguoi) {
         this.MaNguoi = MaNguoi;
     }

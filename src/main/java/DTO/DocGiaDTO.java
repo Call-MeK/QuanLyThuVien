@@ -24,6 +24,10 @@ public class DocGiaDTO extends ConNguoiDTO{
         this.NgayXoa = NgayXoa;
     }
 
+    public DocGiaDTO(String MaNguoi, String HoTen, String NgaySinh, String TenDangNhap, String MatKhau, String GioiTinh, String DiaChi, String SoDienThoai, String Email, String TrangThai) {
+        super(MaNguoi, HoTen, NgaySinh, TenDangNhap, MatKhau, GioiTinh, DiaChi, SoDienThoai, Email, TrangThai);
+    }
+
     public String getMaDocGia() {
         return MaDocGia;
     }

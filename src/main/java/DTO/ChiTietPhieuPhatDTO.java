@@ -18,6 +18,9 @@ public class ChiTietPhieuPhatDTO {
         this.TrangThai = TrangThai;
     }
 
+    public ChiTietPhieuPhatDTO() {
+    }
+
     // Constructor 5 tham số (giữ lại để code cũ không lỗi)
     public ChiTietPhieuPhatDTO(String MaCTPP, String MaPP, String MaCuonSach, String LyDo, String SoTien) {
         this.MaCTPP = MaCTPP;

@@ -27,6 +27,9 @@ public class PhieuMuonDTO {
         this.MaThe = MaThe;
     }
 
+    public PhieuMuonDTO() {
+    }
+
     public String getMaPM() {
         return MaPM;
     }

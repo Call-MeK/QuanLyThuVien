@@ -16,6 +16,9 @@ public class SachHongDTO {
     private String NgayGhiNhan;
     private String LyDo;
 
+    public SachHongDTO() {
+    }
+
     public SachHongDTO(int MaSachHong, String TenSachHong, String MaVach, int SoLuong, String NgayGhiNhan, String LyDo) {
         this.MaSachHong = MaSachHong;
         this.TenSachHong = TenSachHong;

@@ -11,6 +11,9 @@ package DTO;
 public class NhaXuatBanDTO {
     private String MaNXB;
     private String TenNXB;
+
+    public NhaXuatBanDTO() {
+    }
     private String DiaChi;
     private String Email;
     private String SoDienThoai;

@@ -12,6 +12,9 @@ public class TheLoaiDTO {
     private String MaTheLoai;
     private String TenTheLoai;
 
+    public TheLoaiDTO() {
+    }
+
     public TheLoaiDTO(String MaTheLoai, String TenTheLoai) {
         this.MaTheLoai = MaTheLoai;
         this.TenTheLoai = TenTheLoai;

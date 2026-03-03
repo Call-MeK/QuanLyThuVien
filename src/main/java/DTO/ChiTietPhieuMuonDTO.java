@@ -19,6 +19,9 @@ public class ChiTietPhieuMuonDTO {
         this.TinhTrangSach = TinhTrangSach;
     }
 
+    public ChiTietPhieuMuonDTO() {
+    }
+
     public String getMaPM() {
         return MaPM;
     }
