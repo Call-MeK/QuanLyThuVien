@@ -25,13 +25,13 @@ public class AdminFrame extends JFrame {
 
     private void initComponents() {
         setTitle("Quản Lý Thư Viện - Admin System");
-        // Đặt kích thước dự phòng nếu user thoát chế độ toàn màn hình
-        setSize(1280, 768); 
+        // Kích thước mặc định đủ rộng để không vỡ layout khi chưa Fullscreen
+        setSize(1250, 750); 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         
-        // BÍ KÍP 1: Ép phần mềm luôn mở ở chế độ Toàn Màn Hình (Fullscreen)
+        // Mở ứng dụng toàn màn hình theo chuẩn
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         // ==========================================
@@ -39,12 +39,11 @@ public class AdminFrame extends JFrame {
         // ==========================================
         panelMenu = new JPanel();
         panelMenu.setBackground(colorMenuBg);
-        // Tăng chút chiều rộng menu cho thoáng
-        panelMenu.setPreferredSize(new Dimension(250, 0));
+        panelMenu.setPreferredSize(new Dimension(240, 0));
         panelMenu.setLayout(new BoxLayout(panelMenu, BoxLayout.Y_AXIS));
 
         JLabel lblTitle = new JLabel("ADMIN PANEL", SwingConstants.CENTER);
-        lblTitle.setFont(new Font(tenFont, Font.BOLD, 24)); 
+        lblTitle.setFont(new Font(tenFont, Font.BOLD, 22)); 
         lblTitle.setForeground(colorPrimary);
         lblTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         lblTitle.setBorder(BorderFactory.createEmptyBorder(35, 0, 35, 0));
@@ -76,7 +75,6 @@ public class AdminFrame extends JFrame {
         panelMenu.add(btnDangXuat);
         panelMenu.add(Box.createVerticalStrut(25)); 
 
-        // BÍ KÍP 2: Gắn JScrollPane cho Menu phòng trường hợp màn hình bé bị che mất nút Đăng Xuất
         JScrollPane scrollMenu = new JScrollPane(panelMenu);
         scrollMenu.setBorder(null);
         scrollMenu.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -118,7 +116,6 @@ public class AdminFrame extends JFrame {
             }
         });
 
-        // Mặc định mở Trang Chủ
         cardLayout.show(panelContent, "CardTrangChu");
     }
 
@@ -128,13 +125,13 @@ public class AdminFrame extends JFrame {
     private JPanel createTrangChuPanel() {
         JPanel panel = new JPanel(new BorderLayout(20, 20));
         panel.setBackground(colorBackground);
-        panel.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40));
+        panel.setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30));
         
         JPanel pnlTop = new JPanel(new GridLayout(2, 1, 0, 5));
         pnlTop.setBackground(colorBackground);
         
         JLabel lblWelcome = new JLabel("👋 CHÀO MỪNG ADMIN TRỞ LẠI!");
-        lblWelcome.setFont(new Font(tenFont, Font.BOLD, 28));
+        lblWelcome.setFont(new Font(tenFont, Font.BOLD, 26));
         lblWelcome.setForeground(new Color(33, 37, 41));
         
         JLabel lblSub = new JLabel("Dưới đây là tổng quan tình hình thư viện hôm nay.");
@@ -148,9 +145,10 @@ public class AdminFrame extends JFrame {
         JPanel pnlCenter = new JPanel(new BorderLayout(30, 0)); 
         pnlCenter.setBackground(colorBackground);
 
+        // CỘT TRÁI (Đã thu gọn kích thước để vừa cửa sổ)
         JPanel pnlLeft = new JPanel(new GridLayout(4, 1, 0, 20)); 
         pnlLeft.setBackground(colorBackground);
-        pnlLeft.setPreferredSize(new Dimension(280, 0)); 
+        pnlLeft.setPreferredSize(new Dimension(240, 0)); 
         
         pnlLeft.add(createStatCard("📚 TỔNG SỐ SÁCH", "1,245", "Cuốn", new Color(13, 110, 253)));
         pnlLeft.add(createStatCard("👥 TỔNG ĐỘC GIẢ", "320", "Người", new Color(25, 135, 84)));
@@ -159,6 +157,7 @@ public class AdminFrame extends JFrame {
         
         pnlCenter.add(pnlLeft, BorderLayout.WEST);
 
+        // CỘT PHẢI
         JPanel pnlRight = new JPanel(new BorderLayout(0, 20));
         pnlRight.setBackground(colorBackground);
 
@@ -167,13 +166,13 @@ public class AdminFrame extends JFrame {
         lblImage.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230), 1)); 
         try {
             ImageIcon icon = new ImageIcon(getClass().getResource("/Images/thuvien.jpg"));
-            Image img = icon.getImage().getScaledInstance(700, 250, Image.SCALE_SMOOTH);
+            Image img = icon.getImage().getScaledInstance(650, 220, Image.SCALE_SMOOTH);
             lblImage.setIcon(new ImageIcon(img));
         } catch (Exception e) {
-            lblImage.setText("[ Không tải được hình ảnh từ /Images/thuvien.jpg ]");
+            lblImage.setText("[ Hình ảnh minh họa Thư Viện ]");
             lblImage.setOpaque(true);
             lblImage.setBackground(new Color(233, 236, 239));
-            lblImage.setPreferredSize(new Dimension(700, 250));
+            lblImage.setPreferredSize(new Dimension(650, 220));
         }
         pnlRight.add(lblImage, BorderLayout.NORTH);
 
@@ -222,18 +221,19 @@ public class AdminFrame extends JFrame {
 
         JPanel content = new JPanel(new GridLayout(3, 1));
         content.setBackground(Color.WHITE);
-        content.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
+        content.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
         JLabel lblTitle = new JLabel(title);
-        lblTitle.setFont(new Font(tenFont, Font.BOLD, 16));
+        lblTitle.setFont(new Font(tenFont, Font.BOLD, 14)); // Giảm nhẹ Font Title
         lblTitle.setForeground(new Color(108, 117, 125));
 
+        // Đã giảm cỡ chữ giá trị từ 36 xuống 28 để không bị tràn khi thu nhỏ màn hình
         JLabel lblValue = new JLabel(value);
-        lblValue.setFont(new Font(tenFont, Font.BOLD, 36));
+        lblValue.setFont(new Font(tenFont, Font.BOLD, 28)); 
         lblValue.setForeground(topColor);
 
         JLabel lblUnit = new JLabel(unit);
-        lblUnit.setFont(new Font(tenFont, Font.PLAIN, 14));
+        lblUnit.setFont(new Font(tenFont, Font.PLAIN, 13));
         lblUnit.setForeground(Color.GRAY);
 
         content.add(lblTitle);
@@ -268,25 +268,25 @@ public class AdminFrame extends JFrame {
     private JPanel createQuanLySachPanel() {
         JPanel pnlMain = new JPanel(new BorderLayout(15, 15));
         pnlMain.setBackground(colorBackground);
-        pnlMain.setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30)); 
+        pnlMain.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25)); 
 
         JLabel lblTitle = new JLabel("Quản Lý Thông Tin Sách");
-        lblTitle.setFont(new Font(tenFont, Font.BOLD, 26)); 
+        lblTitle.setFont(new Font(tenFont, Font.BOLD, 24)); 
         lblTitle.setForeground(new Color(33, 37, 41));
         pnlMain.add(lblTitle, BorderLayout.NORTH);
 
-        JPanel pnlCenter = new JPanel(new BorderLayout(0, 25));
+        JPanel pnlCenter = new JPanel(new BorderLayout(0, 20));
         pnlCenter.setBackground(colorBackground);
 
-        JPanel pnlInput = new JPanel(new GridLayout(3, 4, 20, 15));
+        JPanel pnlInput = new JPanel(new GridLayout(3, 4, 15, 15));
         pnlInput.setBackground(Color.WHITE);
         pnlInput.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(222, 226, 230), 1, true),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
 
         Font fontLabel = new Font(tenFont, Font.BOLD, 14); 
-        Font fontInput = new Font(tenFont, Font.PLAIN, 15); 
+        Font fontInput = new Font(tenFont, Font.PLAIN, 14); 
 
         JTextField txtMaSach = new JTextField(); txtMaSach.setFont(fontInput);
         JTextField txtTenSach = new JTextField(); txtTenSach.setFont(fontInput);
@@ -309,7 +309,7 @@ public class AdminFrame extends JFrame {
         DefaultTableModel model = new DefaultTableModel(columns, 0);
         JTable table = new JTable(model);
         
-        table.setRowHeight(35); 
+        table.setRowHeight(32); 
         table.setFont(new Font(tenFont, Font.PLAIN, 14));
         table.getTableHeader().setFont(new Font(tenFont, Font.BOLD, 14));
         table.getTableHeader().setBackground(new Color(233, 236, 239));
@@ -328,8 +328,7 @@ public class AdminFrame extends JFrame {
 
         pnlMain.add(pnlCenter, BorderLayout.CENTER);
 
-        // BÍ KÍP 3: Tăng chiều cao của vùng chứa nút bấm để không bị cắt xén
-        JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10)); // Thêm margin dọc 10px
+        JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         pnlButtons.setBackground(colorBackground);
 
         JButton btnThem = createActionButton("Thêm Mới", new Color(25, 135, 84)); 
@@ -354,25 +353,25 @@ public class AdminFrame extends JFrame {
     private JPanel createQuanLyDocGiaPanel() {
         JPanel pnlMain = new JPanel(new BorderLayout(15, 15));
         pnlMain.setBackground(colorBackground);
-        pnlMain.setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30)); 
+        pnlMain.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25)); 
 
         JLabel lblTitle = new JLabel("Quản Lý Thông Tin Độc Giả");
-        lblTitle.setFont(new Font(tenFont, Font.BOLD, 26)); 
+        lblTitle.setFont(new Font(tenFont, Font.BOLD, 24)); 
         lblTitle.setForeground(new Color(33, 37, 41));
         pnlMain.add(lblTitle, BorderLayout.NORTH);
 
         JPanel pnlCenter = new JPanel(new BorderLayout(0, 15)); 
         pnlCenter.setBackground(colorBackground);
 
-        JPanel pnlInput = new JPanel(new GridLayout(4, 4, 20, 15));
+        JPanel pnlInput = new JPanel(new GridLayout(4, 4, 15, 15));
         pnlInput.setBackground(Color.WHITE);
         pnlInput.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(222, 226, 230), 1, true),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
 
         Font fontLabel = new Font(tenFont, Font.BOLD, 14); 
-        Font fontInput = new Font(tenFont, Font.PLAIN, 15); 
+        Font fontInput = new Font(tenFont, Font.PLAIN, 14); 
 
         JTextField txtMaDG = new JTextField(); txtMaDG.setFont(fontInput);
         JTextField txtHoTen = new JTextField(); txtHoTen.setFont(fontInput);
@@ -394,22 +393,21 @@ public class AdminFrame extends JFrame {
 
         JPanel pnlSearch = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         pnlSearch.setBackground(colorBackground);
-        pnlSearch.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0)); 
+        pnlSearch.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0)); 
 
-        JLabel lblSearch = createLabel("🔍 Tìm kiếm:", new Font(tenFont, Font.BOLD, 15));
-        JTextField txtSearch = new JTextField(20); // Thu nhỏ bớt chiều dài ô nhập text để nhường chỗ cho nút Lọc
+        JLabel lblSearch = createLabel("🔍 Tìm kiếm:", new Font(tenFont, Font.BOLD, 14));
+        JTextField txtSearch = new JTextField(20); 
         txtSearch.setFont(fontInput);
-        txtSearch.setPreferredSize(new Dimension(txtSearch.getPreferredSize().width, 38)); 
+        txtSearch.setPreferredSize(new Dimension(0, 35)); 
 
         JComboBox<String> cbSearchCriteria = new JComboBox<>(new String[]{"Tất cả", "Mã ĐG", "Họ Tên", "Số Điện Thoại", "Trạng Thái"});
         cbSearchCriteria.setFont(fontInput);
-        cbSearchCriteria.setPreferredSize(new Dimension(150, 38));
+        cbSearchCriteria.setPreferredSize(new Dimension(140, 35));
 
-        // Nút tìm kiếm phụ nên cho kích thước vừa đủ (130x38)
         JButton btnSearch = createActionButton("Lọc", new Color(13, 110, 253)); 
-        btnSearch.setPreferredSize(new Dimension(130, 38)); 
+        btnSearch.setPreferredSize(new Dimension(100, 35)); 
         JButton btnResetSearch = createActionButton("Hủy Lọc", new Color(108, 117, 125));
-        btnResetSearch.setPreferredSize(new Dimension(130, 38));
+        btnResetSearch.setPreferredSize(new Dimension(100, 35));
 
         pnlSearch.add(lblSearch);
         pnlSearch.add(txtSearch);
@@ -429,7 +427,7 @@ public class AdminFrame extends JFrame {
         DefaultTableModel model = new DefaultTableModel(columns, 0);
         JTable table = new JTable(model);
         
-        table.setRowHeight(35); 
+        table.setRowHeight(32); 
         table.setFont(new Font(tenFont, Font.PLAIN, 14));
         table.getTableHeader().setFont(new Font(tenFont, Font.BOLD, 14));
         table.getTableHeader().setBackground(new Color(233, 236, 239));
@@ -473,25 +471,25 @@ public class AdminFrame extends JFrame {
     private JPanel createQuanLyMuonTraPanel() {
         JPanel pnlMain = new JPanel(new BorderLayout(15, 15));
         pnlMain.setBackground(colorBackground);
-        pnlMain.setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30)); 
+        pnlMain.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25)); 
 
         JLabel lblTitle = new JLabel("Quản Lý Mượn - Trả Sách");
-        lblTitle.setFont(new Font(tenFont, Font.BOLD, 26)); 
+        lblTitle.setFont(new Font(tenFont, Font.BOLD, 24)); 
         lblTitle.setForeground(new Color(33, 37, 41));
         pnlMain.add(lblTitle, BorderLayout.NORTH);
 
         JPanel pnlCenter = new JPanel(new BorderLayout(0, 15)); 
         pnlCenter.setBackground(colorBackground);
 
-        JPanel pnlInput = new JPanel(new GridLayout(4, 4, 20, 15));
+        JPanel pnlInput = new JPanel(new GridLayout(4, 4, 15, 15));
         pnlInput.setBackground(Color.WHITE);
         pnlInput.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(222, 226, 230), 1, true),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
 
         Font fontLabel = new Font(tenFont, Font.BOLD, 14); 
-        Font fontInput = new Font(tenFont, Font.PLAIN, 15); 
+        Font fontInput = new Font(tenFont, Font.PLAIN, 14); 
 
         JTextField txtMaPhieu = new JTextField(); txtMaPhieu.setFont(fontInput);
         JTextField txtMaDG = new JTextField(); txtMaDG.setFont(fontInput);
@@ -513,21 +511,21 @@ public class AdminFrame extends JFrame {
 
         JPanel pnlSearch = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         pnlSearch.setBackground(colorBackground);
-        pnlSearch.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0)); 
+        pnlSearch.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0)); 
 
-        JLabel lblSearch = createLabel("🔍 Tra cứu phiếu:", new Font(tenFont, Font.BOLD, 15));
+        JLabel lblSearch = createLabel("🔍 Tra cứu phiếu:", new Font(tenFont, Font.BOLD, 14));
         JTextField txtSearch = new JTextField(20); 
         txtSearch.setFont(fontInput);
-        txtSearch.setPreferredSize(new Dimension(txtSearch.getPreferredSize().width, 38)); 
+        txtSearch.setPreferredSize(new Dimension(0, 35)); 
 
         JComboBox<String> cbSearchCriteria = new JComboBox<>(new String[]{"Tất cả", "Mã Phiếu", "Mã Độc Giả", "Trạng Thái"});
         cbSearchCriteria.setFont(fontInput);
-        cbSearchCriteria.setPreferredSize(new Dimension(150, 38));
+        cbSearchCriteria.setPreferredSize(new Dimension(140, 35));
 
         JButton btnSearch = createActionButton("Tìm Kiếm", new Color(13, 110, 253)); 
-        btnSearch.setPreferredSize(new Dimension(130, 38)); 
+        btnSearch.setPreferredSize(new Dimension(110, 35)); 
         JButton btnResetSearch = createActionButton("Hủy Lọc", new Color(108, 117, 125));
-        btnResetSearch.setPreferredSize(new Dimension(130, 38));
+        btnResetSearch.setPreferredSize(new Dimension(100, 35));
 
         pnlSearch.add(lblSearch);
         pnlSearch.add(txtSearch);
@@ -547,7 +545,7 @@ public class AdminFrame extends JFrame {
         DefaultTableModel model = new DefaultTableModel(columns, 0);
         JTable table = new JTable(model);
         
-        table.setRowHeight(35); 
+        table.setRowHeight(32); 
         table.setFont(new Font(tenFont, Font.PLAIN, 14));
         table.getTableHeader().setFont(new Font(tenFont, Font.BOLD, 14));
         table.getTableHeader().setBackground(new Color(233, 236, 239));
@@ -586,30 +584,30 @@ public class AdminFrame extends JFrame {
     }
 
     // =====================================================================
-    // QUẢN LÝ NHẬP SÁCH (THIẾT KẾ ĐỒNG BỘ)
+    // QUẢN LÝ NHẬP SÁCH
     // =====================================================================
     private JPanel createQuanLyNhapSachPanel() {
         JPanel pnlMain = new JPanel(new BorderLayout(15, 15));
         pnlMain.setBackground(colorBackground);
-        pnlMain.setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30)); 
+        pnlMain.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25)); 
 
         JLabel lblTitle = new JLabel("Quản Lý Phiếu Nhập Sách");
-        lblTitle.setFont(new Font(tenFont, Font.BOLD, 26)); 
+        lblTitle.setFont(new Font(tenFont, Font.BOLD, 24)); 
         lblTitle.setForeground(new Color(33, 37, 41));
         pnlMain.add(lblTitle, BorderLayout.NORTH);
 
         JPanel pnlCenter = new JPanel(new BorderLayout(0, 15)); 
         pnlCenter.setBackground(colorBackground);
 
-        JPanel pnlInput = new JPanel(new GridLayout(4, 4, 20, 15));
+        JPanel pnlInput = new JPanel(new GridLayout(4, 4, 15, 15));
         pnlInput.setBackground(Color.WHITE);
         pnlInput.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(222, 226, 230), 1, true),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
 
         Font fontLabel = new Font(tenFont, Font.BOLD, 14); 
-        Font fontInput = new Font(tenFont, Font.PLAIN, 15); 
+        Font fontInput = new Font(tenFont, Font.PLAIN, 14); 
 
         JTextField txtMaPN = new JTextField(); txtMaPN.setFont(fontInput);
         JTextField txtNguoiNhap = new JTextField(); txtNguoiNhap.setFont(fontInput);
@@ -631,21 +629,21 @@ public class AdminFrame extends JFrame {
 
         JPanel pnlSearch = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         pnlSearch.setBackground(colorBackground);
-        pnlSearch.setBorder(BorderFactory.createEmptyBorder(10, 0, 5, 0)); 
+        pnlSearch.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0)); 
 
-        JLabel lblSearch = createLabel("🔍 Tra cứu phiếu nhập:", new Font(tenFont, Font.BOLD, 15));
+        JLabel lblSearch = createLabel("🔍 Tra cứu phiếu nhập:", new Font(tenFont, Font.BOLD, 14));
         JTextField txtSearch = new JTextField(20); 
         txtSearch.setFont(fontInput);
-        txtSearch.setPreferredSize(new Dimension(txtSearch.getPreferredSize().width, 38)); 
+        txtSearch.setPreferredSize(new Dimension(0, 35)); 
 
         JComboBox<String> cbSearchCriteria = new JComboBox<>(new String[]{"Tất cả", "Mã Phiếu", "Mã Sách", "Nhà Cung Cấp"});
         cbSearchCriteria.setFont(fontInput);
-        cbSearchCriteria.setPreferredSize(new Dimension(150, 38));
+        cbSearchCriteria.setPreferredSize(new Dimension(140, 35));
 
         JButton btnSearch = createActionButton("Tìm Kiếm", new Color(13, 110, 253)); 
-        btnSearch.setPreferredSize(new Dimension(130, 38)); 
+        btnSearch.setPreferredSize(new Dimension(110, 35)); 
         JButton btnResetSearch = createActionButton("Hủy Lọc", new Color(108, 117, 125));
-        btnResetSearch.setPreferredSize(new Dimension(130, 38));
+        btnResetSearch.setPreferredSize(new Dimension(100, 35));
 
         pnlSearch.add(lblSearch);
         pnlSearch.add(txtSearch);
@@ -665,7 +663,7 @@ public class AdminFrame extends JFrame {
         DefaultTableModel model = new DefaultTableModel(columns, 0);
         JTable table = new JTable(model);
         
-        table.setRowHeight(35); 
+        table.setRowHeight(32); 
         table.setFont(new Font(tenFont, Font.PLAIN, 14));
         table.getTableHeader().setFont(new Font(tenFont, Font.BOLD, 14));
         table.getTableHeader().setBackground(new Color(233, 236, 239));
@@ -716,7 +714,7 @@ public class AdminFrame extends JFrame {
 
     private JButton createMenuButton(String text) {
         JButton btn = new JButton(text);
-        btn.setMaximumSize(new Dimension(250, 50)); 
+        btn.setMaximumSize(new Dimension(240, 50)); 
         btn.setAlignmentX(Component.CENTER_ALIGNMENT);
         btn.setHorizontalAlignment(SwingConstants.LEFT);
         btn.setBorder(BorderFactory.createEmptyBorder(5, 25, 5, 10)); 
@@ -737,7 +735,7 @@ public class AdminFrame extends JFrame {
         return btn;
     }
 
-    // BÍ KÍP 4: Thay vì ép cứng width 140px, cho phép nút bấm phình ra 170x45px để nhét vừa mọi loại chữ
+    // Nút chức năng đã được chỉnh về kích thước an toàn 150x40
     private JButton createActionButton(String text, Color bgColor) {
         JButton btn = new JButton(text);
         btn.setFont(new Font(tenFont, Font.BOLD, 14));
@@ -745,7 +743,7 @@ public class AdminFrame extends JFrame {
         btn.setBackground(bgColor);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
-        btn.setPreferredSize(new Dimension(170, 45)); 
+        btn.setPreferredSize(new Dimension(150, 40)); 
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }
