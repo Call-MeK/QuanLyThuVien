@@ -21,6 +21,7 @@ public class UserHomeFrame extends JFrame {
     private TimKiemSachPanel panelTimSach;
     private SachDangMuonPanel panelSachDangMuon;
     private ThongTinCaNhanPanel panelThongTin;
+    private PhieuPhatPanel panelPhieuPhat;
     private String previousCard = "TrangChu"; // Lưu vết để biết đường quay lại
     
     public UserHomeFrame() {
@@ -41,7 +42,7 @@ public class UserHomeFrame extends JFrame {
         sidebarPanel.setPreferredSize(new Dimension(240, 0));
         
         JPanel menuPanel = new JPanel();
-        menuPanel.setLayout(new GridLayout(6, 1, 0, 5)); 
+        menuPanel.setLayout(new GridLayout(7, 1, 0, 5)); 
         menuPanel.setBackground(new Color(30, 41, 59));
         menuPanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0)); 
         
@@ -54,6 +55,7 @@ public class UserHomeFrame extends JFrame {
         JButton btnTrangChu = createMenuButton("Trang Chủ");
         JButton btnTimSach = createMenuButton("Tìm Sách");
         JButton btnSachDangMuon = createMenuButton("Sách Đang Mượn");
+        JButton btnPhieuPhat = createMenuButton("Phiếu Phạt & Thanh Toán");
         JButton btnThongTin = createMenuButton("Thông Tin Cá Nhân");
         JButton btnDangXuat = createMenuButton("Đăng Xuất");
 
@@ -62,6 +64,7 @@ public class UserHomeFrame extends JFrame {
         menuPanel.add(btnTrangChu);
         menuPanel.add(btnTimSach);
         menuPanel.add(btnSachDangMuon);
+        menuPanel.add(btnPhieuPhat);
         menuPanel.add(btnThongTin);
         menuPanel.add(btnDangXuat);
         
@@ -75,12 +78,14 @@ public class UserHomeFrame extends JFrame {
         
         JPanel panelTrangChu = createHomePanel(); 
         panelTimSach = new TimKiemSachPanel();
-        panelSachDangMuon = new SachDangMuonPanel(); 
+        panelSachDangMuon = new SachDangMuonPanel();
+        panelPhieuPhat = new PhieuPhatPanel();
         panelThongTin = new ThongTinCaNhanPanel();
         
         mainContentPanel.add(panelTrangChu, "TrangChu");
         mainContentPanel.add(panelTimSach, "TimSach");
         mainContentPanel.add(panelSachDangMuon, "SachDangMuon");
+        mainContentPanel.add(panelPhieuPhat, "PhieuPhat");
         mainContentPanel.add(panelThongTin, "ThongTin");
 
         // KHỞI TẠO VÀ THÊM CHI TIẾT SÁCH PANEL VÀO HOME
@@ -119,6 +124,11 @@ public class UserHomeFrame extends JFrame {
             previousCard = "SachDangMuon"; 
         });
         
+        btnPhieuPhat.addActionListener(e -> {
+            cardLayout.show(mainContentPanel, "PhieuPhat");
+            previousCard = "PhieuPhat"; 
+        });
+
         btnThongTin.addActionListener(e -> {
             cardLayout.show(mainContentPanel, "ThongTin");
             previousCard = "ThongTin"; 
@@ -218,6 +228,50 @@ public class UserHomeFrame extends JFrame {
                 if(confirm == JOptionPane.YES_OPTION) {
                     JOptionPane.showMessageDialog(UserHomeFrame.this, "Xác nhận trả sách thành công! Cảm ơn bạn.");
                     // Code update trạng thái trong CSDL
+                }
+            }
+        });
+        
+        // ==========================================
+        // SỰ KIỆN CHO PANEL PHIẾU PHẠT
+        // ==========================================
+        // Sự kiện Xem chi tiết
+        panelPhieuPhat.getBtnXemChiTiet().addActionListener(e -> {
+            int row = panelPhieuPhat.getTable().getSelectedRow();
+            if(row == -1) {
+                JOptionPane.showMessageDialog(UserHomeFrame.this, "Vui lòng chọn một phiếu phạt để xem!");
+            } else {
+                String maPhat = panelPhieuPhat.getTable().getValueAt(row, 0).toString();
+                String lyDo = panelPhieuPhat.getTable().getValueAt(row, 2).toString();
+                JOptionPane.showMessageDialog(UserHomeFrame.this, "Chi tiết Phiếu Phạt: " + maPhat + "\nLý do: " + lyDo);
+            }
+        });
+
+        // Sự kiện Thanh toán
+        panelPhieuPhat.getBtnThanhToan().addActionListener(e -> {
+            JTable table = panelPhieuPhat.getTable();
+            int row = table.getSelectedRow();
+            if(row == -1) {
+                JOptionPane.showMessageDialog(UserHomeFrame.this, "Vui lòng chọn phiếu phạt cần thanh toán!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            } else {
+                String status = table.getValueAt(row, 4).toString();
+                if(status.equalsIgnoreCase("Đã thanh toán")) {
+                    JOptionPane.showMessageDialog(UserHomeFrame.this, "Phiếu phạt này đã được thanh toán rồi!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    String soTien = table.getValueAt(row, 3).toString();
+                    // Bạn có thể thiết kế thêm 1 Dialog chọn phương thức thanh toán (Momo, VNPay, Tiền mặt...) ở đây
+                    Object[] options = {"Thanh toán Momo", "Thanh toán VNPay", "Hủy"};
+                    int choice = JOptionPane.showOptionDialog(UserHomeFrame.this, 
+                        "Chọn phương thức thanh toán cho số tiền: " + soTien + " VNĐ", 
+                        "Thanh toán phiếu phạt", 
+                        JOptionPane.YES_NO_CANCEL_OPTION, 
+                        JOptionPane.QUESTION_MESSAGE, 
+                        null, options, options[0]);
+
+                    if(choice == 0 || choice == 1) {
+                        JOptionPane.showMessageDialog(UserHomeFrame.this, "Giao dịch thành công! Đã thanh toán " + soTien + " VNĐ.");
+                        // Chỗ này gọi hàm Update DAO để đổi trạng thái thành "Đã thanh toán"
+                    }
                 }
             }
         });
