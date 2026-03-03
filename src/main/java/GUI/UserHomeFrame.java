@@ -18,6 +18,7 @@ public class UserHomeFrame extends JFrame {
     
     // Khai báo Panel Chi Tiết riêng biệt
     private ChiTietSachPanel panelChiTietSach;
+    private TimKiemSachPanel panelTimSach;
     private String previousCard = "TrangChu"; // Lưu vết để biết đường quay lại
     
     public UserHomeFrame() {
@@ -71,7 +72,7 @@ public class UserHomeFrame extends JFrame {
         mainContentPanel.setBackground(new Color(248, 250, 252)); 
         
         JPanel panelTrangChu = createHomePanel(); 
-        JPanel panelTimSach = createSearchPanel(); 
+        panelTimSach = new TimKiemSachPanel();
         JPanel panelSachDangMuon = createBorrowedBooksPanel(); 
         JPanel panelThongTin = createPlaceholderPanel("Giao diện Thông tin cá nhân");
         
@@ -131,6 +132,40 @@ public class UserHomeFrame extends JFrame {
         
         add(sidebarPanel, BorderLayout.WEST); 
         add(mainContentPanel, BorderLayout.CENTER); 
+        
+        // Sự kiện: Bấm "Xem Chi Tiết / Mượn" trong trang Tìm Sách
+panelTimSach.getBtnXemChiTiet().addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        JTable table = panelTimSach.getTable();
+        int row = table.getSelectedRow();
+        
+        if(row == -1) {
+            JOptionPane.showMessageDialog(UserHomeFrame.this, "Vui lòng chọn 1 sách trong bảng!");
+        } else {
+            // Lấy dữ liệu từ dòng được chọn trong bảng
+            String tenSach = table.getValueAt(row, 1).toString();
+            String tacGia = table.getValueAt(row, 2).toString();
+            String theLoai = table.getValueAt(row, 3).toString();
+            String tinhTrang = table.getValueAt(row, 4).toString();
+
+            // Truyền dữ liệu sang panel Chi Tiết Sách
+            panelChiTietSach.setThongTinSach(
+                tenSach, 
+                tacGia, 
+                theLoai, 
+                "NXB Mặc Định", 
+                "2023", 
+                tinhTrang, 
+                "Mô tả chi tiết cho sách: " + tenSach
+            );
+
+            // Cập nhật vết (để biết ấn nút Quay Lại sẽ về trang Tìm Kiếm)
+            previousCard = "TimSach"; 
+            cardLayout.show(mainContentPanel, "ChiTietSach");
+        }
+    }
+});
     }
     
     // --- CÁC PANEL CHỨC NĂNG CỦA HOME ---
@@ -190,28 +225,6 @@ public class UserHomeFrame extends JFrame {
 
         centerPanel.add(booksArea, BorderLayout.CENTER);
         panel.add(centerPanel, BorderLayout.CENTER);
-
-        return panel;
-    }
-
-    private JPanel createSearchPanel() {
-        JPanel panel = new JPanel(new BorderLayout(0, 15));
-        panel.setBackground(new Color(248, 250, 252)); 
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        
-        // (Giữ nguyên nội dung của Trang Tìm Sách)
-        JLabel title = new JLabel("Tìm Kiếm Sách");
-        title.setFont(new Font(tenFont, Font.BOLD, 26));
-        panel.add(title, BorderLayout.NORTH);
-        
-        String[] cols = {"Mã Sách", "Tên Sách", "Tác Giả", "Thể Loại", "Số Lượng", "Trạng Thái"};
-        Object[][] data = {
-            {"B01", "Lập trình Java", "Nhiều tác giả", "Giáo trình", "5", "Sẵn sàng"},
-            {"B02", "Cấu trúc dữ liệu", "Nguyễn Văn A", "Giáo trình", "0", "Hết sách"}
-        };
-        JTable table = new JTable(data, cols);
-        table.setRowHeight(25);
-        panel.add(new JScrollPane(table), BorderLayout.CENTER);
 
         return panel;
     }
