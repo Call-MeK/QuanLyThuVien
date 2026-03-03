@@ -87,12 +87,13 @@ public class AdminFrame extends JFrame {
         panelContent = new JPanel(cardLayout);
         panelContent.setBackground(colorBackground);
 
+        // Tích hợp ĐẦY ĐỦ 6 màn hình chức năng
         panelContent.add(createTrangChuPanel(), "CardTrangChu");
         panelContent.add(createQuanLySachPanel(), "CardSach");
         panelContent.add(createQuanLyDocGiaPanel(), "CardDocGia"); 
         panelContent.add(createQuanLyMuonTraPanel(), "CardMuonTra"); 
         panelContent.add(createQuanLyNhapSachPanel(), "CardNhapSach"); 
-        panelContent.add(createSimplePanel("Quản Lý Phí Phạt"), "CardPhiPhat");
+        panelContent.add(createQuanLyPhiPhatPanel(), "CardPhiPhat"); // <--- Mảnh ghép cuối cùng
 
         add(panelContent, BorderLayout.CENTER);
 
@@ -145,7 +146,6 @@ public class AdminFrame extends JFrame {
         JPanel pnlCenter = new JPanel(new BorderLayout(30, 0)); 
         pnlCenter.setBackground(colorBackground);
 
-        // CỘT TRÁI (Đã thu gọn kích thước để vừa cửa sổ)
         JPanel pnlLeft = new JPanel(new GridLayout(4, 1, 0, 20)); 
         pnlLeft.setBackground(colorBackground);
         pnlLeft.setPreferredSize(new Dimension(240, 0)); 
@@ -157,7 +157,6 @@ public class AdminFrame extends JFrame {
         
         pnlCenter.add(pnlLeft, BorderLayout.WEST);
 
-        // CỘT PHẢI
         JPanel pnlRight = new JPanel(new BorderLayout(0, 20));
         pnlRight.setBackground(colorBackground);
 
@@ -224,10 +223,9 @@ public class AdminFrame extends JFrame {
         content.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
         JLabel lblTitle = new JLabel(title);
-        lblTitle.setFont(new Font(tenFont, Font.BOLD, 14)); // Giảm nhẹ Font Title
+        lblTitle.setFont(new Font(tenFont, Font.BOLD, 14)); 
         lblTitle.setForeground(new Color(108, 117, 125));
 
-        // Đã giảm cỡ chữ giá trị từ 36 xuống 28 để không bị tràn khi thu nhỏ màn hình
         JLabel lblValue = new JLabel(value);
         lblValue.setFont(new Font(tenFont, Font.BOLD, 28)); 
         lblValue.setForeground(topColor);
@@ -702,6 +700,126 @@ public class AdminFrame extends JFrame {
     }
 
     // =====================================================================
+    // QUẢN LÝ PHÍ PHẠT (MẢNH GHÉP CUỐI CÙNG)
+    // =====================================================================
+    private JPanel createQuanLyPhiPhatPanel() {
+        JPanel pnlMain = new JPanel(new BorderLayout(15, 15));
+        pnlMain.setBackground(colorBackground);
+        pnlMain.setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25)); 
+
+        JLabel lblTitle = new JLabel("Quản Lý Phiếu Phạt");
+        lblTitle.setFont(new Font(tenFont, Font.BOLD, 24)); 
+        lblTitle.setForeground(new Color(33, 37, 41));
+        pnlMain.add(lblTitle, BorderLayout.NORTH);
+
+        JPanel pnlCenter = new JPanel(new BorderLayout(0, 15)); 
+        pnlCenter.setBackground(colorBackground);
+
+        // --- 1. FORM NHẬP LIỆU ---
+        JPanel pnlInput = new JPanel(new GridLayout(3, 4, 15, 15)); // 3 hàng là đủ cho phí phạt
+        pnlInput.setBackground(Color.WHITE);
+        pnlInput.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(222, 226, 230), 1, true),
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        ));
+
+        Font fontLabel = new Font(tenFont, Font.BOLD, 14); 
+        Font fontInput = new Font(tenFont, Font.PLAIN, 14); 
+
+        JTextField txtMaPhieuPhat = new JTextField(); txtMaPhieuPhat.setFont(fontInput);
+        JTextField txtMaPhieuMuon = new JTextField(); txtMaPhieuMuon.setFont(fontInput);
+        JTextField txtMaDG = new JTextField(); txtMaDG.setFont(fontInput);
+        JComboBox<String> cbLyDo = new JComboBox<>(new String[]{"Trả sách trễ hạn", "Làm rách/bẩn sách", "Làm mất sách", "Lý do khác"}); cbLyDo.setFont(fontInput);
+        JTextField txtSoTien = new JTextField("0"); txtSoTien.setFont(fontInput);
+        JComboBox<String> cbTrangThai = new JComboBox<>(new String[]{"Chưa thanh toán", "Đã thanh toán"}); cbTrangThai.setFont(fontInput);
+
+        pnlInput.add(createLabel("Mã phiếu phạt:", fontLabel)); pnlInput.add(txtMaPhieuPhat);
+        pnlInput.add(createLabel("Mã phiếu mượn:", fontLabel)); pnlInput.add(txtMaPhieuMuon);
+        pnlInput.add(createLabel("Mã độc giả:", fontLabel));    pnlInput.add(txtMaDG);
+        pnlInput.add(createLabel("Lý do phạt:", fontLabel));    pnlInput.add(cbLyDo);
+        pnlInput.add(createLabel("Số tiền (VNĐ):", fontLabel)); pnlInput.add(txtSoTien);
+        pnlInput.add(createLabel("Trạng thái:", fontLabel));    pnlInput.add(cbTrangThai);
+
+        // --- 2. THANH TÌM KIẾM ---
+        JPanel pnlSearch = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
+        pnlSearch.setBackground(colorBackground);
+        pnlSearch.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0)); 
+
+        JLabel lblSearch = createLabel("🔍 Tra cứu phiếu phạt:", new Font(tenFont, Font.BOLD, 14));
+        JTextField txtSearch = new JTextField(20); 
+        txtSearch.setFont(fontInput);
+        txtSearch.setPreferredSize(new Dimension(0, 35)); 
+
+        JComboBox<String> cbSearchCriteria = new JComboBox<>(new String[]{"Tất cả", "Mã Phạt", "Mã Độc Giả", "Trạng Thái"});
+        cbSearchCriteria.setFont(fontInput);
+        cbSearchCriteria.setPreferredSize(new Dimension(140, 35));
+
+        JButton btnSearch = createActionButton("Tìm Kiếm", new Color(13, 110, 253)); 
+        btnSearch.setPreferredSize(new Dimension(110, 35)); 
+        JButton btnResetSearch = createActionButton("Hủy Lọc", new Color(108, 117, 125));
+        btnResetSearch.setPreferredSize(new Dimension(100, 35));
+
+        pnlSearch.add(lblSearch);
+        pnlSearch.add(txtSearch);
+        pnlSearch.add(createLabel(" theo ", fontInput));
+        pnlSearch.add(cbSearchCriteria);
+        pnlSearch.add(btnSearch);
+        pnlSearch.add(btnResetSearch);
+
+        JPanel pnlTopCenter = new JPanel(new BorderLayout(0, 5));
+        pnlTopCenter.setBackground(colorBackground);
+        pnlTopCenter.add(pnlInput, BorderLayout.NORTH);
+        pnlTopCenter.add(pnlSearch, BorderLayout.CENTER);
+
+        pnlCenter.add(pnlTopCenter, BorderLayout.NORTH);
+
+        // --- 3. BẢNG HIỂN THỊ DỮ LIỆU ---
+        String[] columns = {"Mã Phạt", "Mã Phiếu Mượn", "Mã Độc Giả", "Lý Do Phạt", "Số Tiền", "Trạng Thái"};
+        DefaultTableModel model = new DefaultTableModel(columns, 0);
+        JTable table = new JTable(model);
+        
+        table.setRowHeight(32); 
+        table.setFont(new Font(tenFont, Font.PLAIN, 14));
+        table.getTableHeader().setFont(new Font(tenFont, Font.BOLD, 14));
+        table.getTableHeader().setBackground(new Color(233, 236, 239));
+        table.getTableHeader().setOpaque(false);
+        table.setShowGrid(false); 
+        table.setIntercellSpacing(new Dimension(0, 0));
+        table.setShowHorizontalLines(true); 
+        table.setGridColor(new Color(222, 226, 230));
+
+        // Mock data
+        model.addRow(new Object[]{"PP001", "PM002", "DG005", "Trả sách trễ hạn", "20,000", "Chưa thanh toán"});
+        model.addRow(new Object[]{"PP002", "PM015", "DG012", "Làm mất sách", "150,000", "Đã thanh toán"});
+        model.addRow(new Object[]{"PP003", "PM008", "DG002", "Làm rách bìa", "50,000", "Chưa thanh toán"});
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230), 1));
+        pnlCenter.add(scrollPane, BorderLayout.CENTER);
+
+        pnlMain.add(pnlCenter, BorderLayout.CENTER);
+
+        // --- 4. CÁC NÚT CHỨC NĂNG ---
+        JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
+        pnlButtons.setBackground(colorBackground);
+
+        JButton btnThem = createActionButton("Lập Phiếu Phạt", new Color(34, 197, 94)); 
+        JButton btnThuTien = createActionButton("Xác Nhận Thu", new Color(13, 110, 253)); 
+        JButton btnXoa = createActionButton("Hủy Phiếu", new Color(220, 53, 69)); 
+        JButton btnLamMoi = createActionButton("Làm Mới Form", new Color(108, 117, 125)); 
+
+        pnlButtons.add(btnThem);
+        pnlButtons.add(btnThuTien);
+        pnlButtons.add(btnXoa);
+        pnlButtons.add(btnLamMoi);
+
+        pnlMain.add(pnlButtons, BorderLayout.SOUTH);
+
+        return pnlMain;
+    }
+
+
+    // =====================================================================
     // CÁC HÀM TIỆN ÍCH LÀM ĐẸP UI
     // =====================================================================
     
@@ -714,7 +832,7 @@ public class AdminFrame extends JFrame {
 
     private JButton createMenuButton(String text) {
         JButton btn = new JButton(text);
-        btn.setMaximumSize(new Dimension(240, 50)); 
+        btn.setMaximumSize(new Dimension(250, 50)); 
         btn.setAlignmentX(Component.CENTER_ALIGNMENT);
         btn.setHorizontalAlignment(SwingConstants.LEFT);
         btn.setBorder(BorderFactory.createEmptyBorder(5, 25, 5, 10)); 
@@ -735,7 +853,6 @@ public class AdminFrame extends JFrame {
         return btn;
     }
 
-    // Nút chức năng đã được chỉnh về kích thước an toàn 150x40
     private JButton createActionButton(String text, Color bgColor) {
         JButton btn = new JButton(text);
         btn.setFont(new Font(tenFont, Font.BOLD, 14));
