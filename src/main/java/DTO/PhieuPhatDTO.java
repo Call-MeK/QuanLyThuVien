@@ -28,6 +28,9 @@ public class PhieuPhatDTO {
         this.TrangThai = 1; // Mặc định khi tạo đối tượng mới là 1 (Tồn tại)
     }
 
+    public PhieuPhatDTO() {
+    }
+
     // --- Các hàm Getter & Setter ---
 
     public String getMaPP() {

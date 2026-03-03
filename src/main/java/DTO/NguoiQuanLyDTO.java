@@ -13,6 +13,10 @@ public class NguoiQuanLyDTO extends ConNguoiDTO{
     private String VaiTro;
     private Boolean IsDeleted;
 
+    public NguoiQuanLyDTO(String MaNguoi, String HoTen, String NgaySinh, String TenDangNhap, String MatKhau, String GioiTinh, String DiaChi, String SoDienThoai, String Email, String TrangThai) {
+        super(MaNguoi, HoTen, NgaySinh, TenDangNhap, MatKhau, GioiTinh, DiaChi, SoDienThoai, Email, TrangThai);
+    }
+
     public NguoiQuanLyDTO(String MaNQL, String VaiTro, Boolean IsDeleted, String MaNguoi, String HoTen, String NgaySinh, String TenDangNhap, String MatKhau, String GioiTinh, String DiaChi, String SoDienThoai, String Email, String TrangThai) {
         super(MaNguoi, HoTen, NgaySinh, TenDangNhap, MatKhau, GioiTinh, DiaChi, SoDienThoai, Email, TrangThai);
         this.MaNQL = MaNQL;

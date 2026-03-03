@@ -27,6 +27,9 @@ public class PhieuNhapDTO {
         return MaPN;
     }
 
+    public PhieuNhapDTO() {
+    }
+
     public void setMaPN(String MaPN) {
         this.MaPN = MaPN;
     }

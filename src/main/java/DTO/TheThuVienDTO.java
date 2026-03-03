@@ -13,6 +13,9 @@ public class TheThuVienDTO {
     private String TenThe;
     private String MaDocGia;
     private String NgayCap;
+
+    public TheThuVienDTO() {
+    }
     private String NgayHetHan;
     private String MaNQL;
 

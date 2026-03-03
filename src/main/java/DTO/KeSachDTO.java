@@ -19,6 +19,9 @@ public class KeSachDTO {
         this.MaTheLoai = MaTheLoai;
     }
 
+    public KeSachDTO() {
+    }
+
     public String getMaKeSach() {
         return MaKeSach;
     }

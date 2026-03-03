@@ -21,6 +21,9 @@ public class TacGiaDTO {
         this.TenTacGia = TenTacGia;
     }
 
+    public TacGiaDTO() {
+    }
+
     public TacGiaDTO(String MaTacGia, String TenTacGia, String QuocTich, String DiaChi, String SoDienThoai, String Email) {
         this.MaTacGia = MaTacGia;
         this.TenTacGia = TenTacGia;

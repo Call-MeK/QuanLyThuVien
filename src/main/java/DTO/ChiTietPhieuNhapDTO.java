@@ -21,6 +21,9 @@ public class ChiTietPhieuNhapDTO {
         this.DonGia = DonGia;
     }
 
+    public ChiTietPhieuNhapDTO() {
+    }
+
     public String getMaPN() {
         return MaPN;
     }

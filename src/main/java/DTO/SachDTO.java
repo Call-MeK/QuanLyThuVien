@@ -18,8 +18,6 @@ public class SachDTO {
     private int NamXB;
     private String NgonNgu;
 
-    public SachDTO() {
-    }
     private Float GiaBia;
     private Boolean isDeleted;
     
@@ -28,6 +26,8 @@ public class SachDTO {
     public SachDTO(String MaSach, String tenSach) {
         this.MaSach = MaSach;
         this.tenSach = tenSach;
+    }
+    public SachDTO() {
     }
 
     public SachDTO(String MaSach, String tenSach, String TheLoai, String MaNXB, int NamXB, String NgonNgu, Float GiaBia, Boolean isDeleted, ArrayList<TacGiaDTO> DanhSachTacGia) {
