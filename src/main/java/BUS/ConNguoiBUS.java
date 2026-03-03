@@ -29,32 +29,50 @@ public class ConNguoiBUS {
         return conNguoiDAO.getByID(MaNguoi);
     }
 
-    public boolean add(ConNguoiDTO connguoi) {
-        boolean success = conNguoiDAO.add(connguoi);
-        if (success) {
-            listConNguoi.add(connguoi);
+    public boolean hasMaNguoi(String maNguoi) {
+        for (ConNguoiDTO cn : listConNguoi) {
+            if (cn.getMaNguoi().equals(maNguoi)) {
+                return true;
+            }
         }
-        return success;
+        return false;
     }
 
-    public boolean update(ConNguoiDTO connguoi) {
-        boolean success = conNguoiDAO.update(connguoi);
-        if (success) {
+    public String addConNguoi(ConNguoiDTO connguoi) {
+        if (hasMaNguoi(connguoi.getMaNguoi())) {
+            return "Mã người đã tồn tại";
+        }
+        if (conNguoiDAO.add(connguoi)) {
+            listConNguoi.add(connguoi);
+            return "Thêm thành công";
+        }
+        return "Thêm thất bại";
+    }
+
+    public String updateConNguoi(ConNguoiDTO connguoi) {
+        if (!hasMaNguoi(connguoi.getMaNguoi())) {
+            return "Mã người không tồn tại";
+        }
+        if (conNguoiDAO.update(connguoi)) {
             for (int i = 0; i < listConNguoi.size(); i++) {
                 if (listConNguoi.get(i).getMaNguoi().equals(connguoi.getMaNguoi())) {
                     listConNguoi.set(i, connguoi);
                     break;
                 }
             }
+            return "Cập nhật thành công";
         }
-        return success;
+        return "Cập nhật thất bại";
     }
 
-    public boolean delete(String MaNguoi) {
-        boolean success = conNguoiDAO.delete(MaNguoi);
-        if (success) {
-            listConNguoi.removeIf(cn -> cn.getMaNguoi().equals(MaNguoi));
+    public String deleteConNguoi(String maNguoi) {
+        if (!hasMaNguoi(maNguoi)) {
+            return "Mã người không tồn tại";
         }
-        return success;
+        if (conNguoiDAO.delete(maNguoi)) {
+            listConNguoi.removeIf(cn -> cn.getMaNguoi().equals(maNguoi));
+            return "Xóa thành công";
+        }
+        return "Xóa thất bại";
     }
 }

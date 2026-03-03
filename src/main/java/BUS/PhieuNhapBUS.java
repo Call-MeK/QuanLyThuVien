@@ -11,7 +11,7 @@ public class PhieuNhapBUS {
     public PhieuNhapBUS() {
         phieuNhapDAO = new PhieuNhapDAO();
         // Lấy tất cả dữ liệu từ database khi khởi tạo
-        listPhieuNhap = phieuNhapDAO.findAll(); 
+        listPhieuNhap = phieuNhapDAO.findAll();
     }
 
     public List<PhieuNhapDTO> findAll() {
@@ -26,32 +26,50 @@ public class PhieuNhapBUS {
         return phieuNhapDAO.findById(maPN);
     }
 
-    public boolean insert(PhieuNhapDTO pn) {
-        boolean success = phieuNhapDAO.insert(pn);
-        if (success) {
-            listPhieuNhap.add(pn);
+    public boolean hasMaPN(String maPN) {
+        for (PhieuNhapDTO pn : listPhieuNhap) {
+            if (pn.getMaPN().equals(maPN)) {
+                return true;
+            }
         }
-        return success;
+        return false;
     }
 
-    public boolean update(PhieuNhapDTO pn) {
-        boolean success = phieuNhapDAO.update(pn);
-        if (success) {
+    public String addPhieuNhap(PhieuNhapDTO pn) {
+        if (hasMaPN(pn.getMaPN())) {
+            return "Mã phiếu nhập đã tồn tại";
+        }
+        if (phieuNhapDAO.insert(pn)) {
+            listPhieuNhap.add(pn);
+            return "Thêm thành công";
+        }
+        return "Thêm thất bại";
+    }
+
+    public String updatePhieuNhap(PhieuNhapDTO pn) {
+        if (!hasMaPN(pn.getMaPN())) {
+            return "Mã phiếu nhập không tồn tại";
+        }
+        if (phieuNhapDAO.update(pn)) {
             for (int i = 0; i < listPhieuNhap.size(); i++) {
                 if (listPhieuNhap.get(i).getMaPN().equals(pn.getMaPN())) {
                     listPhieuNhap.set(i, pn);
                     break;
                 }
             }
+            return "Cập nhật thành công";
         }
-        return success;
+        return "Cập nhật thất bại";
     }
 
-    public boolean delete(String maPN) {
-        boolean success = phieuNhapDAO.delete(maPN);
-        if (success) {
-            listPhieuNhap.removeIf(pn -> pn.getMaPN().equals(maPN));
+    public String deletePhieuNhap(String maPN) {
+        if (!hasMaPN(maPN)) {
+            return "Mã phiếu nhập không tồn tại";
         }
-        return success;
+        if (phieuNhapDAO.delete(maPN)) {
+            listPhieuNhap.removeIf(pn -> pn.getMaPN().equals(maPN));
+            return "Xóa thành công";
+        }
+        return "Xóa thất bại";
     }
 }
