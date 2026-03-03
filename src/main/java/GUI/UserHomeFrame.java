@@ -19,6 +19,7 @@ public class UserHomeFrame extends JFrame {
     // Khai báo Panel Chi Tiết riêng biệt
     private ChiTietSachPanel panelChiTietSach;
     private TimKiemSachPanel panelTimSach;
+    private SachDangMuonPanel panelSachDangMuon;
     private String previousCard = "TrangChu"; // Lưu vết để biết đường quay lại
     
     public UserHomeFrame() {
@@ -73,7 +74,7 @@ public class UserHomeFrame extends JFrame {
         
         JPanel panelTrangChu = createHomePanel(); 
         panelTimSach = new TimKiemSachPanel();
-        JPanel panelSachDangMuon = createBorrowedBooksPanel(); 
+        panelSachDangMuon = new SachDangMuonPanel(); 
         JPanel panelThongTin = createPlaceholderPanel("Giao diện Thông tin cá nhân");
         
         mainContentPanel.add(panelTrangChu, "TrangChu");
@@ -134,39 +135,91 @@ public class UserHomeFrame extends JFrame {
         add(mainContentPanel, BorderLayout.CENTER); 
         
         // Sự kiện: Bấm "Xem Chi Tiết / Mượn" trong trang Tìm Sách
-panelTimSach.getBtnXemChiTiet().addActionListener(new ActionListener() {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        JTable table = panelTimSach.getTable();
-        int row = table.getSelectedRow();
-        
-        if(row == -1) {
-            JOptionPane.showMessageDialog(UserHomeFrame.this, "Vui lòng chọn 1 sách trong bảng!");
-        } else {
-            // Lấy dữ liệu từ dòng được chọn trong bảng
-            String tenSach = table.getValueAt(row, 1).toString();
-            String tacGia = table.getValueAt(row, 2).toString();
-            String theLoai = table.getValueAt(row, 3).toString();
-            String tinhTrang = table.getValueAt(row, 4).toString();
+        panelTimSach.getBtnXemChiTiet().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JTable table = panelTimSach.getTable();
+                int row = table.getSelectedRow();
 
-            // Truyền dữ liệu sang panel Chi Tiết Sách
-            panelChiTietSach.setThongTinSach(
-                tenSach, 
-                tacGia, 
-                theLoai, 
-                "NXB Mặc Định", 
-                "2023", 
-                tinhTrang, 
-                "Mô tả chi tiết cho sách: " + tenSach
-            );
+                if(row == -1) {
+                JOptionPane.showMessageDialog(UserHomeFrame.this, "Vui lòng chọn 1 sách trong bảng!");
+                } else {
+                    // Lấy dữ liệu từ dòng được chọn trong bảng
+                    String tenSach = table.getValueAt(row, 1).toString();
+                    String tacGia = table.getValueAt(row, 2).toString();
+                    String theLoai = table.getValueAt(row, 3).toString();
+                    String tinhTrang = table.getValueAt(row, 4).toString();
 
-            // Cập nhật vết (để biết ấn nút Quay Lại sẽ về trang Tìm Kiếm)
-            previousCard = "TimSach"; 
-            cardLayout.show(mainContentPanel, "ChiTietSach");
-        }
-    }
-});
-    }
+                    // Truyền dữ liệu sang panel Chi Tiết Sách
+                    panelChiTietSach.setThongTinSach(
+                        tenSach, 
+                        tacGia, 
+                        theLoai, 
+                        "NXB Mặc Định", 
+                        "2023", 
+                        tinhTrang, 
+                        "Mô tả chi tiết cho sách: " + tenSach
+                    );
+
+                    // Cập nhật vết (để biết ấn nút Quay Lại sẽ về trang Tìm Kiếm)
+                    previousCard = "TimSach"; 
+                    cardLayout.show(mainContentPanel, "ChiTietSach");
+                }   
+            }
+        });
+                // ==========================================
+        // SỰ KIỆN CHO PANEL SÁCH ĐANG MƯỢN
+        // ==========================================
+        // 1. Nút Xem Chi Tiết
+        panelSachDangMuon.getBtnXemChiTiet().addActionListener(e -> {
+            JTable table = panelSachDangMuon.getTable();
+            int row = table.getSelectedRow();
+            if(row == -1) {
+                JOptionPane.showMessageDialog(UserHomeFrame.this, "Vui lòng chọn 1 phiếu mượn để xem chi tiết!");
+            } else {
+                String tenSach = table.getValueAt(row, 1).toString();
+                // Mượn tạm giao diện ChiTietSachPanel để hiển thị, hoặc sau này bạn tạo ChiTietPhieuMuonFrame riêng
+                panelChiTietSach.setThongTinSach(tenSach, "Đang cập nhật", "Đang cập nhật", "N/A", "N/A", "Đang mượn", "Chi tiết cho phiếu mượn: " + table.getValueAt(row, 0));
+                previousCard = "SachDangMuon";
+                cardLayout.show(mainContentPanel, "ChiTietSach");
+            }
+        });
+
+        // 2. Nút Gia Hạn
+        panelSachDangMuon.getBtnGiaHan().addActionListener(e -> {
+            JTable table = panelSachDangMuon.getTable();
+            int row = table.getSelectedRow();
+            if(row == -1) {
+                JOptionPane.showMessageDialog(UserHomeFrame.this, "Vui lòng chọn 1 sách để gia hạn!");
+            } else {
+                String status = table.getValueAt(row, 4).toString();
+                if(status.equalsIgnoreCase("Quá hạn")) {
+                    JOptionPane.showMessageDialog(UserHomeFrame.this, "Sách đã quá hạn, không thể gia hạn. Vui lòng mang sách đến thư viện nộp phạt!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    int confirm = JOptionPane.showConfirmDialog(UserHomeFrame.this, "Bạn có chắc chắn muốn gia hạn thêm 7 ngày cho sách: " + table.getValueAt(row, 1) + "?", "Xác nhận gia hạn", JOptionPane.YES_NO_OPTION);
+                    if(confirm == JOptionPane.YES_OPTION) {
+                        JOptionPane.showMessageDialog(UserHomeFrame.this, "Gia hạn thành công!");
+                        // Code update CSDL sau này ở đây
+                    }
+                }
+            }
+        });
+
+        // 3. Nút Trả Sách
+        panelSachDangMuon.getBtnTraSach().addActionListener(e -> {
+            JTable table = panelSachDangMuon.getTable();
+            int row = table.getSelectedRow();
+            if(row == -1) {
+                JOptionPane.showMessageDialog(UserHomeFrame.this, "Vui lòng chọn 1 sách để trả!");
+            } else {
+                int confirm = JOptionPane.showConfirmDialog(UserHomeFrame.this, "Bạn muốn xác nhận trả cuốn sách: " + table.getValueAt(row, 1) + "?", "Xác nhận trả sách", JOptionPane.YES_NO_OPTION);
+                if(confirm == JOptionPane.YES_OPTION) {
+                    JOptionPane.showMessageDialog(UserHomeFrame.this, "Xác nhận trả sách thành công! Cảm ơn bạn.");
+                    // Code update trạng thái trong CSDL
+                }
+            }
+        });
+            }
     
     // --- CÁC PANEL CHỨC NĂNG CỦA HOME ---
 
