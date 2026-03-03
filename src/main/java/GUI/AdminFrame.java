@@ -42,19 +42,19 @@ public class AdminFrame extends JFrame {
         panelMenu.setPreferredSize(new Dimension(240, 0));
         panelMenu.setLayout(new BoxLayout(panelMenu, BoxLayout.Y_AXIS));
 
-        JLabel lblTitle = new JLabel("ADMIN PANEL", SwingConstants.CENTER);
+        JLabel lblTitle = new JLabel("ADMIN", SwingConstants.CENTER);
         lblTitle.setFont(new Font(tenFont, Font.BOLD, 22)); 
         lblTitle.setForeground(colorPrimary);
         lblTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         lblTitle.setBorder(BorderFactory.createEmptyBorder(35, 0, 35, 0));
         panelMenu.add(lblTitle);
 
-        JButton btnTrangChu = createMenuButton("🏠  Trang Chủ");
-        JButton btnQuanLySach = createMenuButton("📚  Quản Lý Sách");
-        JButton btnQuanLyDocGia = createMenuButton("👥  Quản Lý Độc Giả");
-        JButton btnQuanLyMuonTra = createMenuButton("🔄  Quản Lý Mượn Trả");
-        JButton btnQuanLyNhapSach = createMenuButton("📥  Quản Lý Nhập Sách");
-        JButton btnQuanLyPhiPhat = createMenuButton("💰  Quản Lý Phí Phạt");
+        JButton btnTrangChu = createMenuButton("Trang Chủ");
+        JButton btnQuanLySach = createMenuButton("Quản Lý Sách");
+        JButton btnQuanLyDocGia = createMenuButton("Quản Lý Độc Giả");
+        JButton btnQuanLyMuonTra = createMenuButton("Quản Lý Mượn Trả");
+        JButton btnQuanLyNhapSach = createMenuButton("Quản Lý Nhập Sách");
+        JButton btnQuanLyPhiPhat = createMenuButton("Quản Lý Phí Phạt");
         
         panelMenu.add(btnTrangChu);
         panelMenu.add(Box.createVerticalStrut(5));
@@ -70,7 +70,7 @@ public class AdminFrame extends JFrame {
         
         panelMenu.add(Box.createVerticalGlue()); 
 
-        JButton btnDangXuat = createMenuButton("🚪  Đăng Xuất");
+        JButton btnDangXuat = createMenuButton("Đăng Xuất");
         btnDangXuat.setForeground(new Color(220, 53, 69)); 
         panelMenu.add(btnDangXuat);
         panelMenu.add(Box.createVerticalStrut(25)); 
@@ -131,7 +131,7 @@ public class AdminFrame extends JFrame {
         JPanel pnlTop = new JPanel(new GridLayout(2, 1, 0, 5));
         pnlTop.setBackground(colorBackground);
         
-        JLabel lblWelcome = new JLabel("👋 CHÀO MỪNG ADMIN TRỞ LẠI!");
+        JLabel lblWelcome = new JLabel("Chào mừng bạn quay trở lại");
         lblWelcome.setFont(new Font(tenFont, Font.BOLD, 26));
         lblWelcome.setForeground(new Color(33, 37, 41));
         
@@ -150,10 +150,10 @@ public class AdminFrame extends JFrame {
         pnlLeft.setBackground(colorBackground);
         pnlLeft.setPreferredSize(new Dimension(240, 0)); 
         
-        pnlLeft.add(createStatCard("📚 TỔNG SỐ SÁCH", "1,245", "Cuốn", new Color(13, 110, 253)));
-        pnlLeft.add(createStatCard("👥 TỔNG ĐỘC GIẢ", "320", "Người", new Color(25, 135, 84)));
-        pnlLeft.add(createStatCard("🔄 SÁCH ĐANG MƯỢN", "85", "Phiếu", new Color(255, 193, 7)));
-        pnlLeft.add(createStatCard("⚠️ TRỄ HẠN TRẢ", "12", "Trường hợp", new Color(220, 53, 69)));
+        pnlLeft.add(createStatCard("TỔNG SỐ SÁCH", "1,245", "Cuốn", new Color(13, 110, 253)));
+        pnlLeft.add(createStatCard("TỔNG ĐỘC GIẢ", "320", "Người", new Color(25, 135, 84)));
+        pnlLeft.add(createStatCard("SÁCH ĐANG MƯỢN", "85", "Phiếu", new Color(255, 193, 7)));
+        pnlLeft.add(createStatCard("TRỄ HẠN TRẢ", "12", "Trường hợp", new Color(220, 53, 69)));
         
         pnlCenter.add(pnlLeft, BorderLayout.WEST);
 
@@ -164,7 +164,7 @@ public class AdminFrame extends JFrame {
         lblImage.setHorizontalAlignment(SwingConstants.CENTER);
         lblImage.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230), 1)); 
         try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/Images/thuvien.jpg"));
+            ImageIcon icon = new ImageIcon(getClass().getResource("/Images/lib.jpg"));
             Image img = icon.getImage().getScaledInstance(650, 220, Image.SCALE_SMOOTH);
             lblImage.setIcon(new ImageIcon(img));
         } catch (Exception e) {
@@ -182,7 +182,7 @@ public class AdminFrame extends JFrame {
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
 
-        JLabel lblRecentTitle = new JLabel("🕒 Hoạt Động Gần Đây Nhất");
+        JLabel lblRecentTitle = new JLabel("Hoạt Động Gần Đây Nhất");
         lblRecentTitle.setFont(new Font(tenFont, Font.BOLD, 18));
         lblRecentTitle.setForeground(new Color(33, 37, 41));
         pnlRecent.add(lblRecentTitle, BorderLayout.NORTH);
@@ -511,7 +511,7 @@ public class AdminFrame extends JFrame {
         pnlSearch.setBackground(colorBackground);
         pnlSearch.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0)); 
 
-        JLabel lblSearch = createLabel("🔍 Tra cứu phiếu:", new Font(tenFont, Font.BOLD, 14));
+        JLabel lblSearch = createLabel("Tra cứu phiếu:", new Font(tenFont, Font.BOLD, 14));
         JTextField txtSearch = new JTextField(20); 
         txtSearch.setFont(fontInput);
         txtSearch.setPreferredSize(new Dimension(0, 35)); 
@@ -629,7 +629,7 @@ public class AdminFrame extends JFrame {
         pnlSearch.setBackground(colorBackground);
         pnlSearch.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0)); 
 
-        JLabel lblSearch = createLabel("🔍 Tra cứu phiếu nhập:", new Font(tenFont, Font.BOLD, 14));
+        JLabel lblSearch = createLabel("Tra cứu phiếu nhập:", new Font(tenFont, Font.BOLD, 14));
         JTextField txtSearch = new JTextField(20); 
         txtSearch.setFont(fontInput);
         txtSearch.setPreferredSize(new Dimension(0, 35)); 
@@ -745,7 +745,7 @@ public class AdminFrame extends JFrame {
         pnlSearch.setBackground(colorBackground);
         pnlSearch.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0)); 
 
-        JLabel lblSearch = createLabel("🔍 Tra cứu phiếu phạt:", new Font(tenFont, Font.BOLD, 14));
+        JLabel lblSearch = createLabel("Tra cứu phiếu phạt:", new Font(tenFont, Font.BOLD, 14));
         JTextField txtSearch = new JTextField(20); 
         txtSearch.setFont(fontInput);
         txtSearch.setPreferredSize(new Dimension(0, 35)); 
