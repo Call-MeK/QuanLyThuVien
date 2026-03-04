@@ -23,9 +23,14 @@ public class UserHomeFrame extends JFrame {
     private SachDangMuonPanel panelSachDangMuon;
     private ThongTinCaNhanPanel panelThongTin;
     private PhieuPhatPanel panelPhieuPhat;
-    private String previousCard = "TrangChu"; // Lưu vết để biết đường quay lại
     
-    public UserHomeFrame() {
+    private String previousCard = "TrangChu"; // Lưu vết để biết đường quay lại
+    private String maDocGiaDangNhap = ""; // Biến hứng mã Độc giả
+    
+    // HÀM KHỞI TẠO ĐỂ NHẬN MÃ ĐỘC GIẢ TỪ LOGIN
+    public UserHomeFrame(String maDocGia) {
+        this.maDocGiaDangNhap = maDocGia;
+        
         setTitle("Hệ thống Quản lý Thư viện - Dành cho Độc giả");
         setSize(1000, 700); 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -33,6 +38,11 @@ public class UserHomeFrame extends JFrame {
         setLayout(new BorderLayout()); 
         
         initComponents();
+        
+        // TRUYỀN MÃ CHO PANEL THÔNG TIN SAU KHI NÓ ĐÃ ĐƯỢC KHỞI TẠO
+        if (panelThongTin != null && !this.maDocGiaDangNhap.isEmpty()) {
+            panelThongTin.loadData(this.maDocGiaDangNhap);
+        }
     }
     
     private void initComponents() {
@@ -79,8 +89,8 @@ public class UserHomeFrame extends JFrame {
         
         JPanel panelTrangChu = createHomePanel(); 
         panelTimSach = new TimKiemSachPanel();
-        panelSachDangMuon = new SachDangMuonPanel(); // Các sự kiện đã nằm gọn trong class này
-        panelPhieuPhat = new PhieuPhatPanel();       // Các sự kiện đã nằm gọn trong class này
+        panelSachDangMuon = new SachDangMuonPanel(); 
+        panelPhieuPhat = new PhieuPhatPanel();       
         panelThongTin = new ThongTinCaNhanPanel();
         
         mainContentPanel.add(panelTrangChu, "TrangChu");
@@ -105,7 +115,6 @@ public class UserHomeFrame extends JFrame {
         panelChiTietSach.getBtnMuonSach().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Đã thay đổi thông báo theo ý bạn
                 JOptionPane.showMessageDialog(UserHomeFrame.this, 
                     "Sách hiện đang có sẵn. Vui lòng mang thẻ độc giả đến quầy thư viện để làm thủ tục mượn!", 
                     "Hướng dẫn mượn sách", 
@@ -143,6 +152,9 @@ public class UserHomeFrame extends JFrame {
             int confirm = JOptionPane.showConfirmDialog(UserHomeFrame.this, "Bạn có muốn đăng xuất không?", "Xác nhận", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 JOptionPane.showMessageDialog(UserHomeFrame.this, "Đăng xuất thành công!");
+                
+                // Mở lại form đăng nhập khi đăng xuất
+                new LoginFrame().setVisible(true);
                 dispose(); 
             }
         });
@@ -160,13 +172,11 @@ public class UserHomeFrame extends JFrame {
                 if(row == -1) {
                 JOptionPane.showMessageDialog(UserHomeFrame.this, "Vui lòng chọn 1 sách trong bảng!");
                 } else {
-                    // Lấy dữ liệu từ dòng được chọn trong bảng
                     String tenSach = table.getValueAt(row, 1).toString();
                     String tacGia = table.getValueAt(row, 2).toString();
                     String theLoai = table.getValueAt(row, 3).toString();
                     String tinhTrang = table.getValueAt(row, 4).toString();
 
-                    // Truyền dữ liệu sang panel Chi Tiết Sách
                     panelChiTietSach.setThongTinSach(
                         tenSach, 
                         tacGia, 
@@ -177,49 +187,13 @@ public class UserHomeFrame extends JFrame {
                         "Mô tả chi tiết cho sách: " + tenSach
                     );
 
-                    // Cập nhật vết (để biết ấn nút Quay Lại sẽ về trang Tìm Kiếm)
                     previousCard = "TimSach"; 
                     cardLayout.show(mainContentPanel, "ChiTietSach");
                 }   
             }
         });
-        
-        // ==========================================
-        // SỰ KIỆN CHO PANEL THÔNG TIN CÁ NHÂN
-        // ==========================================
-        // 1. Nút Cập nhật thông tin
-        panelThongTin.getBtnCapNhat().addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(UserHomeFrame.this, "Bạn có muốn lưu các thay đổi về thông tin cá nhân không?", "Xác nhận", JOptionPane.YES_NO_OPTION);
-            if(confirm == JOptionPane.YES_OPTION) {
-                String sdtMoi = panelThongTin.getSoDienThoai();
-                String emailMoi = panelThongTin.getEmail();
-                // Gọi DAO cập nhật CSDL ở đây...
-
-                JOptionPane.showMessageDialog(UserHomeFrame.this, "Cập nhật thông tin thành công!\nSĐT: " + sdtMoi + "\nEmail: " + emailMoi);
-            }
-        });
-
-        // 2. Nút Đổi mật khẩu
-        panelThongTin.getBtnDoiMatKhau().addActionListener(e -> {
-            // Mở một Dialog nhỏ để nhập mật khẩu cũ, mới
-            JPasswordField txtPassCu = new JPasswordField();
-            JPasswordField txtPassMoi = new JPasswordField();
-            JPasswordField txtXacNhan = new JPasswordField();
-
-            Object[] message = {
-                "Mật khẩu hiện tại:", txtPassCu,
-                "Mật khẩu mới:", txtPassMoi,
-                "Xác nhận mật khẩu mới:", txtXacNhan
-            };
-
-            int option = JOptionPane.showConfirmDialog(UserHomeFrame.this, message, "Đổi Mật Khẩu", JOptionPane.OK_CANCEL_OPTION);
-            if (option == JOptionPane.OK_OPTION) {
-                // Xử lý logic so sánh mật khẩu ở đây
-                JOptionPane.showMessageDialog(UserHomeFrame.this, "Đổi mật khẩu thành công! Vui lòng sử dụng mật khẩu mới cho lần đăng nhập sau.");
-            }
-        });
     }
-    
+        
     // --- CÁC PANEL CHỨC NĂNG CỦA HOME ---
 
     private JPanel createHomePanel() {
@@ -282,7 +256,6 @@ public class UserHomeFrame extends JFrame {
     }
 
     private JPanel createBorrowedBooksPanel() {
-        // Gọi thẳng cái Panel hoàn chỉnh mà chúng ta vừa làm ở bước trước ra xài
         return new SachDangMuonPanel();
     }
 
@@ -309,11 +282,9 @@ public class UserHomeFrame extends JFrame {
         btn.setBackground(new Color(14, 165, 233));
         btn.setForeground(Color.WHITE);
 
-        // BẮT SỰ KIỆN GỌI GIAO DIỆN CHITIETSACHPANEL
         btn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Truyền dữ liệu vào Panel Chi Tiết
                 panelChiTietSach.setThongTinSach(
                     title, 
                     author, 
@@ -324,7 +295,6 @@ public class UserHomeFrame extends JFrame {
                     "Mô tả chi tiết của sách " + title + " sẽ được tải từ CSDL."
                 );
                 
-                // Hiển thị panel chi tiết
                 cardLayout.show(mainContentPanel, "ChiTietSach");
             }
         });
@@ -363,6 +333,7 @@ public class UserHomeFrame extends JFrame {
     }
 
     public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(() -> new UserHomeFrame().setVisible(true));
+        // Truyền tạm 1 mã vào đây để lúc bạn test bằng cách Run File này nó không bị lỗi
+        java.awt.EventQueue.invokeLater(() -> new UserHomeFrame("DG00000002").setVisible(true));
     }
 }
