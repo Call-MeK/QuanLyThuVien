@@ -97,7 +97,7 @@ public class AdminFrame extends JFrame {
         add(panelContent, BorderLayout.CENTER);
 
         // ==========================================
-        // 3. SỰ KIỆN CHUYỂN TRANG
+        // 3. SỰ KIỆN CHUYỂN TRANG VÀ ĐĂNG XUẤT
         // ==========================================
         btnTrangChu.addActionListener(e -> cardLayout.show(panelContent, "CardTrangChu"));
         btnQuanLySach.addActionListener(e -> cardLayout.show(panelContent, "CardSach"));
@@ -113,7 +113,10 @@ public class AdminFrame extends JFrame {
             int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn đăng xuất?", "Xác nhận",
                     JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
+                // Đóng form Admin
                 dispose();
+                // Mở lại form Đăng nhập
+                new LoginFrame().setVisible(true);
             }
         });
 
