@@ -5,6 +5,8 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import BUS.ConNguoiBUS;
+import DTO.ConNguoiDTO;
 
 public class LoginFrame extends JFrame {
 
@@ -52,8 +54,7 @@ public class LoginFrame extends JFrame {
         JLabel lblImage = new JLabel();
         lblImage.setHorizontalAlignment(SwingConstants.CENTER);
         try {
-            ImageIcon icon = new ImageIcon(
-                    getClass().getResource("/Images/thuvien.jpg"));
+            ImageIcon icon = new ImageIcon(getClass().getResource("/Images/thuvien.jpg"));
             Image img = icon.getImage().getScaledInstance(350, 250, Image.SCALE_SMOOTH);
             lblImage.setIcon(new ImageIcon(img));
         } catch (Exception e) {
@@ -141,49 +142,46 @@ public class LoginFrame extends JFrame {
             public void mouseEntered(MouseEvent evt) {
                 btnLogin.setBackground(new Color(11, 94, 215));
             }
-
             public void mouseExited(MouseEvent evt) {
                 btnLogin.setBackground(colorPrimary);
             }
         });
 
-        // Event Đăng nhập
+        // Event Đăng nhập xử lý qua BUS
         btnLogin.addActionListener(e -> {
             String username = txtUsername.getText();
             String password = new String(txtPassword.getPassword());
             String role = (String) cbRole.getSelectedItem();
 
             if (username.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!", "Lỗi",
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // Logic chuyển hướng dựa trên lựa chọn Role
-            if (role.equals("Quản trị viên (Admin)")) {
-                // Kiểm tra demo admin (Có thể thay bằng gọi DAO sau này)
-                if (username.equals("admin") && password.equals("admin")) {
-                    JOptionPane.showMessageDialog(this, "Đăng nhập Admin thành công!", "Thông báo",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    AdminFrame adminFrame = new AdminFrame();
-                    adminFrame.setVisible(true);
-                    this.dispose();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Sai tên đăng nhập hoặc mật khẩu Admin!", "Lỗi",
-                            JOptionPane.ERROR_MESSAGE);
+            ConNguoiBUS cnBus = new ConNguoiBUS();
+            boolean loginSuccess = false;
+            String userRolePrefix = role.equals("Quản trị viên (Admin)") ? "NV" : "DG";
+
+            for (ConNguoiDTO cn : cnBus.getListConNguoi()) {
+                if (cn.getTenDangNhap().equals(username) && cn.getMatKhau().equals(password)) {
+                    if (cn.getMaNguoi().startsWith(userRolePrefix)) {
+                        loginSuccess = true;
+                        break;
+                    }
                 }
+            }
+
+            if (loginSuccess) {
+                if (role.equals("Quản trị viên (Admin)")) {
+                    JOptionPane.showMessageDialog(this, "Đăng nhập Admin thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                    new AdminFrame().setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Đăng nhập Độc giả thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                    new UserHomeFrame().setVisible(true);
+                }
+                this.dispose();
             } else {
-                // Độc giả
-                if (username.equals("user") && password.equals("user")) {
-                    JOptionPane.showMessageDialog(this, "Đăng nhập Độc giả thành công!", "Thông báo",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    UserHomeFrame userFrame = new UserHomeFrame();
-                    userFrame.setVisible(true);
-                    this.dispose(); // Đóng form đăng nhập
-                } else {
-                    JOptionPane.showMessageDialog(this, "Sai tên đăng nhập hoặc mật khẩu Độc giả!", "Lỗi",
-                            JOptionPane.ERROR_MESSAGE);
-                }
+                JOptionPane.showMessageDialog(this, "Sai tên đăng nhập, mật khẩu hoặc sai vai trò!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -198,10 +196,8 @@ public class LoginFrame extends JFrame {
 
         mainPanel.add(leftPanel);
         mainPanel.add(rightPanel);
-
         add(mainPanel, BorderLayout.CENTER);
 
-        // Cú pháp focus vào txtUsername khi mở Frame
         SwingUtilities.invokeLater(() -> txtUsername.requestFocusInWindow());
     }
 
@@ -211,8 +207,6 @@ public class LoginFrame extends JFrame {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        SwingUtilities.invokeLater(() -> {
-            new LoginFrame().setVisible(true);
-        });
+        SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
     }
 }
