@@ -1,7 +1,7 @@
 package GUI;
 
 import BUS.ThongKeBUS;
-
+import Utils.PDFExporter;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -26,6 +26,11 @@ public class ThongKePanel extends JPanel {
     private DefaultTableModel modelTheLoai;
     private DefaultTableModel modelDocGia;
     private DefaultTableModel modelSach;
+    
+    private JTable tableTheLoai;
+    private JTable tableDocGia;
+    private JTable tableSach;
+    private JTabbedPane tabbedPane;
 
     // Biểu đồ cột
     private BarChartPanel chartTheLoai;
@@ -50,6 +55,27 @@ public class ThongKePanel extends JPanel {
         lblTitle.setForeground(new Color(33, 37, 41));
         pnlHeader.add(lblTitle, BorderLayout.WEST);
 
+        JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        pnlButtons.setBackground(colorBackground);
+
+        JButton btnXuatExcel = new JButton("Xuất Excel");
+        btnXuatExcel.setFont(new Font(tenFont, Font.BOLD, 14));
+        btnXuatExcel.setForeground(Color.WHITE);
+        btnXuatExcel.setBackground(new Color(25, 135, 84));
+        btnXuatExcel.setBorderPainted(false);
+        btnXuatExcel.setFocusPainted(false);
+        btnXuatExcel.setPreferredSize(new Dimension(130, 40));
+        btnXuatExcel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        JButton btnXuatPDF = new JButton("Xuất PDF");
+        btnXuatPDF.setFont(new Font(tenFont, Font.BOLD, 14));
+        btnXuatPDF.setForeground(Color.WHITE);
+        btnXuatPDF.setBackground(new Color(220, 53, 69)); 
+        btnXuatPDF.setBorderPainted(false);
+        btnXuatPDF.setFocusPainted(false);
+        btnXuatPDF.setPreferredSize(new Dimension(130, 40));
+        btnXuatPDF.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
         JButton btnLoad = new JButton("Tải Thống Kê");
         btnLoad.setFont(new Font(tenFont, Font.BOLD, 14));
         btnLoad.setForeground(Color.WHITE);
@@ -58,18 +84,26 @@ public class ThongKePanel extends JPanel {
         btnLoad.setFocusPainted(false);
         btnLoad.setPreferredSize(new Dimension(160, 40));
         btnLoad.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnLoad.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loadThongKe();
-            }
+        
+        // --- SỰ KIỆN CHO CÁC NÚT ---
+        btnLoad.addActionListener(e -> loadThongKe());
+        
+        btnXuatPDF.addActionListener(e -> exportToPDF());
+
+        btnXuatExcel.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "Chức năng xuất Excel đang được xây dựng!");
         });
-        pnlHeader.add(btnLoad, BorderLayout.EAST);
+
+        pnlButtons.add(btnXuatExcel);
+        pnlButtons.add(btnXuatPDF);
+        pnlButtons.add(btnLoad);
+
+        pnlHeader.add(pnlButtons, BorderLayout.EAST);
 
         add(pnlHeader, BorderLayout.NORTH);
 
         // ============== NỘI DUNG CHÍNH: TABBED PANE ==============
-        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font(tenFont, Font.BOLD, 14));
         tabbedPane.setBackground(colorBackground);
 
@@ -78,6 +112,21 @@ public class ThongKePanel extends JPanel {
         tabbedPane.addTab("Top 10 Sách Mượn Nhiều", createTabSach());
 
         add(tabbedPane, BorderLayout.CENTER);
+    }
+    private void exportToPDF() {
+        if (modelTheLoai.getRowCount() == 0 && modelDocGia.getRowCount() == 0 && modelSach.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "Chưa có dữ liệu thống kê! Vui lòng nhấn 'Tải Thống Kê' trước.", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int selectedIndex = tabbedPane.getSelectedIndex();
+        if (selectedIndex == 0) {
+            PDFExporter.exportTableToPDF(tableTheLoai, "BAO CAO THONG KE SACH THEO THE LOAI");
+        } else if (selectedIndex == 1) {
+            PDFExporter.exportTableToPDF(tableDocGia, "BAO CAO TOP 5 DOC GIA MUON NHIEU NHAT");
+        } else if (selectedIndex == 2) {
+            PDFExporter.exportTableToPDF(tableSach, "BAO CAO TOP 10 SACH DUOC MUON NHIEU NHAT");
+        }
     }
 
     // =====================================================================
@@ -95,8 +144,8 @@ public class ThongKePanel extends JPanel {
                 return false;
             }
         };
-        JTable table = createStyledTable(modelTheLoai);
-        JScrollPane scrollPane = new JScrollPane(table);
+        tableTheLoai = (JTable) createStyledTable(modelTheLoai); 
+        JScrollPane scrollPane = new JScrollPane(tableTheLoai); 
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230), 1));
 
         JPanel pnlTable = createSectionPanel("Bảng Dữ Liệu");
@@ -128,8 +177,8 @@ public class ThongKePanel extends JPanel {
                 return false;
             }
         };
-        JTable table = createStyledTable(modelDocGia);
-        JScrollPane scrollPane = new JScrollPane(table);
+        tableDocGia = (JTable) createStyledTable(modelDocGia);
+        JScrollPane scrollPane = new JScrollPane(tableDocGia);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230), 1));
 
         JPanel pnlTable = createSectionPanel("Bảng Dữ Liệu");
@@ -160,8 +209,8 @@ public class ThongKePanel extends JPanel {
                 return false;
             }
         };
-        JTable table = createStyledTable(modelSach);
-        JScrollPane scrollPane = new JScrollPane(table);
+        tableSach = (JTable) createStyledTable(modelSach);
+        JScrollPane scrollPane = new JScrollPane(tableSach);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230), 1));
 
         JPanel pnlTable = createSectionPanel("Bảng Dữ Liệu");
