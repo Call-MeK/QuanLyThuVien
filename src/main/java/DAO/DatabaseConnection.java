@@ -19,7 +19,7 @@ public class DatabaseConnection {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             String URL = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyThuVien;trustServerCertificate=true";
             String UserName="sa";
-            String Password="12345";
+            String Password="nhiheo";
             
             if(connection==null|| connection.isClosed()){
                 connection = DriverManager.getConnection(URL,UserName,Password);   
@@ -36,4 +36,13 @@ public class DatabaseConnection {
         }
             return connection;
     }   
+//    // Thêm hàm main này vào để chạy test thử
+//    public static void main(String[] args) {
+//        Connection conn = DatabaseConnection.getConnection();
+//        if (conn != null) {
+//            System.out.println("Chúc mừng! Bạn đã kết nối Database thành công!");
+//        } else {
+//            System.out.println("Kết nối thất bại, hãy kiểm tra lại lỗi ở trên.");
+//        }
+//    }
 }
