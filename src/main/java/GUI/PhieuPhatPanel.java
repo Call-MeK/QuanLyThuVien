@@ -1,6 +1,7 @@
 package GUI;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 public class PhieuPhatPanel extends JPanel {
@@ -74,7 +75,15 @@ public class PhieuPhatPanel extends JPanel {
             {"PP003", "PM002", "Trễ hạn 2 ngày", "10,000", "Đã thanh toán"}
         };
         
-        table = new JTable(data, cols);
+        // SỬ DỤNG DEFAULT TABLE MODEL ĐỂ KHÓA CHỈNH SỬA (READ-ONLY)
+        DefaultTableModel model = new DefaultTableModel(data, cols) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Trả về false sẽ khóa toàn bộ các ô, không cho gõ vào bảng
+            }
+        };
+        
+        table = new JTable(model);
         table.setRowHeight(30);
         table.getTableHeader().setFont(new Font(tenFont, Font.BOLD, 14));
         table.getTableHeader().setBackground(new Color(241, 245, 249)); 
@@ -90,20 +99,54 @@ public class PhieuPhatPanel extends JPanel {
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
         bottomPanel.setBackground(Color.WHITE);
         
-        // Nút Xem Chi Tiết
+        // 1. NÚT XEM CHI TIẾT
         btnXemChiTiet = new JButton("Xem Chi Tiết");
         btnXemChiTiet.setBackground(new Color(100, 116, 139)); // Xám
         btnXemChiTiet.setForeground(Color.WHITE);
         btnXemChiTiet.setFont(new Font(tenFont, Font.BOLD, 13));
         btnXemChiTiet.setFocusPainted(false);
+        
+        // Xử lý sự kiện Xem chi tiết
+        btnXemChiTiet.addActionListener(e -> {
+            int row = table.getSelectedRow();
+            if (row == -1) {
+                JOptionPane.showMessageDialog(PhieuPhatPanel.this, "Vui lòng chọn một phiếu phạt trên bảng để xem!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            } else {
+                String maPhat = table.getValueAt(row, 0).toString();
+                String lyDo = table.getValueAt(row, 2).toString();
+                String soTien = table.getValueAt(row, 3).toString();
+                JOptionPane.showMessageDialog(PhieuPhatPanel.this, 
+                        "Mã Phiếu Phạt: " + maPhat + "\nLý do vi phạm: " + lyDo + "\nSố tiền phạt: " + soTien + " VNĐ",
+                        "Chi Tiết Phiếu Phạt", 
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
 
-        // Nút Thanh Toán (Màu Đỏ/Hồng nhạt cảnh báo hoặc Xanh lá để thanh toán)
+        // 2. NÚT THANH TOÁN
         btnThanhToan = new JButton("Thanh Toán Ngay");
-        btnThanhToan.setBackground(new Color(239, 68, 68)); // Màu đỏ (gây chú ý để thanh toán)
+        btnThanhToan.setBackground(new Color(239, 68, 68)); // Màu đỏ (gây chú ý)
         btnThanhToan.setForeground(Color.WHITE);
         btnThanhToan.setFont(new Font(tenFont, Font.BOLD, 13));
         btnThanhToan.setFocusPainted(false);
-        // Có thể thêm icon ví tiền nếu bạn có sẵn icon
+        
+        // Xử lý sự kiện Thanh toán
+        btnThanhToan.addActionListener(e -> {
+            int row = table.getSelectedRow();
+            if (row == -1) {
+                JOptionPane.showMessageDialog(PhieuPhatPanel.this, "Vui lòng chọn phiếu phạt cần thanh toán!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            } else {
+                String status = table.getValueAt(row, 4).toString();
+                // Kiểm tra xem đã thanh toán chưa
+                if (status.equalsIgnoreCase("Đã thanh toán")) {
+                    JOptionPane.showMessageDialog(PhieuPhatPanel.this, "Phiếu phạt này đã được thanh toán rồi!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(PhieuPhatPanel.this, 
+                        "Vui lòng đến quầy thủ thư của thư viện để nộp tiền phạt trực tiếp!",
+                        "Hướng dẫn thanh toán", 
+                        JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        });
 
         bottomPanel.add(btnXemChiTiet);
         bottomPanel.add(btnThanhToan);
@@ -114,7 +157,7 @@ public class PhieuPhatPanel extends JPanel {
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    // --- CÁC HÀM GETTER ĐỂ BÊN NGOÀI BẮT SỰ KIỆN ---
+    // --- CÁC HÀM GETTER ĐỂ BÊN NGOÀI BẮT SỰ KIỆN (NẾU CẦN SAU NÀY) ---
     public JTable getTable() { return table; }
     public JButton getBtnXemChiTiet() { return btnXemChiTiet; }
     public JButton getBtnThanhToan() { return btnThanhToan; }

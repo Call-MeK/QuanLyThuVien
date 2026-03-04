@@ -232,49 +232,7 @@ public class UserHomeFrame extends JFrame {
             }
         });
         
-        // ==========================================
-        // SỰ KIỆN CHO PANEL PHIẾU PHẠT
-        // ==========================================
-        // Sự kiện Xem chi tiết
-        panelPhieuPhat.getBtnXemChiTiet().addActionListener(e -> {
-            int row = panelPhieuPhat.getTable().getSelectedRow();
-            if(row == -1) {
-                JOptionPane.showMessageDialog(UserHomeFrame.this, "Vui lòng chọn một phiếu phạt để xem!");
-            } else {
-                String maPhat = panelPhieuPhat.getTable().getValueAt(row, 0).toString();
-                String lyDo = panelPhieuPhat.getTable().getValueAt(row, 2).toString();
-                JOptionPane.showMessageDialog(UserHomeFrame.this, "Chi tiết Phiếu Phạt: " + maPhat + "\nLý do: " + lyDo);
-            }
-        });
-
-        // Sự kiện Thanh toán
-        panelPhieuPhat.getBtnThanhToan().addActionListener(e -> {
-            JTable table = panelPhieuPhat.getTable();
-            int row = table.getSelectedRow();
-            if(row == -1) {
-                JOptionPane.showMessageDialog(UserHomeFrame.this, "Vui lòng chọn phiếu phạt cần thanh toán!", "Thông báo", JOptionPane.WARNING_MESSAGE);
-            } else {
-                String status = table.getValueAt(row, 4).toString();
-                if(status.equalsIgnoreCase("Đã thanh toán")) {
-                    JOptionPane.showMessageDialog(UserHomeFrame.this, "Phiếu phạt này đã được thanh toán rồi!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    String soTien = table.getValueAt(row, 3).toString();
-                    // Bạn có thể thiết kế thêm 1 Dialog chọn phương thức thanh toán (Momo, VNPay, Tiền mặt...) ở đây
-                    Object[] options = {"Thanh toán Momo", "Thanh toán VNPay", "Hủy"};
-                    int choice = JOptionPane.showOptionDialog(UserHomeFrame.this, 
-                        "Chọn phương thức thanh toán cho số tiền: " + soTien + " VNĐ", 
-                        "Thanh toán phiếu phạt", 
-                        JOptionPane.YES_NO_CANCEL_OPTION, 
-                        JOptionPane.QUESTION_MESSAGE, 
-                        null, options, options[0]);
-
-                    if(choice == 0 || choice == 1) {
-                        JOptionPane.showMessageDialog(UserHomeFrame.this, "Giao dịch thành công! Đã thanh toán " + soTien + " VNĐ.");
-                        // Chỗ này gọi hàm Update DAO để đổi trạng thái thành "Đã thanh toán"
-                    }
-                }
-            }
-        });
+        
         
         // ==========================================
         // SỰ KIỆN CHO PANEL THÔNG TIN CÁ NHÂN
