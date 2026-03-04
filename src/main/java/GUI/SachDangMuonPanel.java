@@ -70,11 +70,8 @@ public class SachDangMuonPanel extends JPanel {
         // PHẦN GIỮA: BẢNG DANH SÁCH MƯỢN
         // ==========================================
         String[] cols = {"Mã Phiếu", "Tên Sách", "Ngày Mượn", "Hạn Trả", "Trạng Thái"};
-        Object[][] data = {
-            {"PM001", "Dế Mèn Phiêu Lưu Ký", "10/03/2026", "24/03/2026", "Còn hạn"},
-            {"PM002", "Clean Code", "01/03/2026", "15/03/2026", "Quá hạn"},
-            {"PM003", "Nhà Giả Kim", "18/03/2026", "02/04/2026", "Còn hạn"}
-        };
+        Object[][] data = {};
+            
         
         // SỬ DỤNG DEFAULT TABLE MODEL ĐỂ KHÓA CHỈNH SỬA (READ-ONLY)
         DefaultTableModel model = new DefaultTableModel(data, cols) {

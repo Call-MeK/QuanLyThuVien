@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+
 public class UserHomeFrame extends JFrame {
     
     // Các thành phần chính của giao diện
@@ -104,7 +105,11 @@ public class UserHomeFrame extends JFrame {
         panelChiTietSach.getBtnMuonSach().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(UserHomeFrame.this, "Đã gửi yêu cầu mượn sách thành công!");
+                // Đã thay đổi thông báo theo ý bạn
+                JOptionPane.showMessageDialog(UserHomeFrame.this, 
+                    "Sách hiện đang có sẵn. Vui lòng mang thẻ độc giả đến quầy thư viện để làm thủ tục mượn!", 
+                    "Hướng dẫn mượn sách", 
+                    JOptionPane.INFORMATION_MESSAGE);
             }
         });
         

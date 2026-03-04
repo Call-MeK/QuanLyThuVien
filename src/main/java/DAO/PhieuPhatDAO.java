@@ -115,4 +115,36 @@ public class PhieuPhatDAO {
         }
         return false;
     }
+    // Thêm hàm này vào PhieuPhatDAO.java
+    public ArrayList<Object[]> getDanhSachHienThiGUI() {
+        ArrayList<Object[]> list = new ArrayList<>();
+        String sql = "SELECT p.MaPP, p.MaPM, c.LyDo, p.TongTien, p.TrangThai " +
+                     "FROM PHIEUPHAT p " +
+                     "LEFT JOIN CHITIETPHIEUPHAT c ON p.MaPP = c.MaPP";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                String maPP = rs.getString("MaPP");
+                String maPM = rs.getString("MaPM");
+                String lyDo = rs.getString("LyDo");
+                if (lyDo == null) lyDo = "Nhiều lý do / Xem chi tiết";
+                
+                double tien = rs.getDouble("TongTien");
+                String soTien = String.format("%,.0f", tien); 
+                
+                boolean isTrangThai = rs.getBoolean("TrangThai");
+                String trangThai = isTrangThai ? "Chưa thanh toán" : "Đã thanh toán";
+
+                // Gom thành 1 dòng dữ liệu
+                Object[] row = new Object[]{maPP, maPM, lyDo, soTien, trangThai};
+                list.add(row);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }

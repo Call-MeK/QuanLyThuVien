@@ -3,7 +3,8 @@ package GUI;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-
+import java.util.ArrayList;
+import javax.swing.table.TableRowSorter;
 public class PhieuPhatPanel extends JPanel {
 
     private String tenFont = "Segoe UI";
@@ -15,9 +16,11 @@ public class PhieuPhatPanel extends JPanel {
 
     public PhieuPhatPanel() {
         initComponents();
+        loadDataToTable();
     }
 
     private void initComponents() {
+        
         setLayout(new BorderLayout(0, 20));
         setBackground(Color.WHITE); 
         setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30));
@@ -36,7 +39,7 @@ public class PhieuPhatPanel extends JPanel {
         lblTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // 2. Phụ đề
-        JLabel lblSubtitle = new JLabel("Theo dõi các khoản phạt vi phạm và thực hiện thanh toán trực tuyến");
+        JLabel lblSubtitle = new JLabel("Theo dõi các khoản phạt vi phạm và trạng thái");
         lblSubtitle.setFont(new Font(tenFont, Font.ITALIC, 14));
         lblSubtitle.setForeground(new Color(108, 117, 125)); 
         lblSubtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -55,6 +58,22 @@ public class PhieuPhatPanel extends JPanel {
         cbStatus.setPreferredSize(new Dimension(160, 30));
         cbStatus.setFont(new Font(tenFont, Font.PLAIN, 13));
         cbStatus.setBackground(Color.WHITE);
+        cbStatus.addActionListener(e -> {
+            String selected = cbStatus.getSelectedItem().toString();
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            
+            // Khởi tạo công cụ lọc của bảng
+            TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+            table.setRowSorter(sorter);
+
+            if (selected.equals("Tất cả")) {
+                sorter.setRowFilter(null); // Không lọc, hiện tất cả
+            } else {
+                // Lọc chính xác nội dung ở cột số 4 (Cột "Trạng Thái")
+                // Sử dụng regex "^...$" để so khớp chính xác từng chữ
+                sorter.setRowFilter(RowFilter.regexFilter("^" + selected + "$", 4));
+            }
+        });
 
         filterPanel.add(lblFilter);
         filterPanel.add(cbStatus);
@@ -69,11 +88,7 @@ public class PhieuPhatPanel extends JPanel {
         // PHẦN GIỮA: BẢNG DANH SÁCH PHIẾU PHẠT
         // ==========================================
         String[] cols = {"Mã Phạt", "Mã Phiếu Mượn", "Lý Do Phạt", "Số Tiền (VNĐ)", "Trạng Thái"};
-        Object[][] data = {
-            {"PP001", "PM012", "Trễ hạn 5 ngày", "25,000", "Chưa thanh toán"},
-            {"PP002", "PM008", "Làm rách trang sách", "50,000", "Chưa thanh toán"},
-            {"PP003", "PM002", "Trễ hạn 2 ngày", "10,000", "Đã thanh toán"}
-        };
+        Object[][] data = {};
         
         // SỬ DỤNG DEFAULT TABLE MODEL ĐỂ KHÓA CHỈNH SỬA (READ-ONLY)
         DefaultTableModel model = new DefaultTableModel(data, cols) {
@@ -161,4 +176,20 @@ public class PhieuPhatPanel extends JPanel {
     public JTable getTable() { return table; }
     public JButton getBtnXemChiTiet() { return btnXemChiTiet; }
     public JButton getBtnThanhToan() { return btnThanhToan; }
+    
+    
+    // Khai báo thêm biến BUS ở đầu class PhieuPhatPanel
+    private BUS.PhieuPhatBUS phieuPhatBUS = new BUS.PhieuPhatBUS();
+
+    // Viết lại hàm loadDataToTable()
+    public void loadDataToTable() {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(0); // Làm sạch bảng
+
+        // Chỉ cần 2 dòng code để lấy dữ liệu từ BUS và in ra bảng!
+        ArrayList<Object[]> dsHienThi = phieuPhatBUS.getDanhSachHienThiGUI();
+        for (Object[] row : dsHienThi) {
+            model.addRow(row);
+        }
+    }
 }
