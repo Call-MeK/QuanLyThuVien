@@ -251,4 +251,52 @@ public class DocGiaDAO {
         }
         return false;
     }
-}
+  // Lấy thông tin cá nhân bằng lệnh JOIN 3 bảng
+    public Object[] getThongTinCaNhan(String maDocGia) {
+        String sql = "SELECT c.MaNguoi, c.HoTen, c.NgaySinh, c.SoDienThoai, c.Email, t.NgayCap, t.NgayHetHan " +
+                     "FROM CONNGUOI c " +
+                     "JOIN DOCGIA d ON c.MaNguoi = d.MaDocGia " +
+                     "LEFT JOIN THETHUVIEN t ON d.MaDocGia = t.MaDocGia " +
+                     "WHERE c.MaNguoi = ?";
+                     
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+             
+            ps.setString(1, maDocGia);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                return new Object[]{
+                    rs.getString("MaNguoi"),
+                    rs.getString("HoTen"),
+                    rs.getDate("NgaySinh") != null ? rs.getDate("NgaySinh").toString() : "Chưa cập nhật",
+                    rs.getString("SoDienThoai"),
+                    rs.getString("Email"),
+                    rs.getDate("NgayCap") != null ? rs.getDate("NgayCap").toString() : "Chưa có thẻ",
+                    rs.getDate("NgayHetHan") != null ? rs.getDate("NgayHetHan").toString() : "Chưa có thẻ"
+                };
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Cập nhật Số điện thoại và Email
+    public boolean updateThongTinLienHe(String maDocGia, String sdt, String email) {
+        String sql = "UPDATE CONNGUOI SET SoDienThoai = ?, Email = ? WHERE MaNguoi = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+             
+            ps.setString(1, sdt);
+            ps.setString(2, email);
+            ps.setString(3, maDocGia);
+            
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+}  
+

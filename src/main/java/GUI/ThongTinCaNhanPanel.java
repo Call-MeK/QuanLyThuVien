@@ -1,5 +1,6 @@
 package GUI;
 
+import BUS.DocGiaBUS;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -7,6 +8,7 @@ import java.awt.*;
 public class ThongTinCaNhanPanel extends JPanel {
 
     private String tenFont = "Segoe UI";
+    private DocGiaBUS docGiaBUS = new DocGiaBUS(); // Khai báo BUS
 
     // Các trường dữ liệu
     private JTextField txtMaDocGia, txtHoTen, txtNgaySinh, txtSoDienThoai, txtEmail, txtNgayDangKy, txtHanThe;
@@ -14,11 +16,13 @@ public class ThongTinCaNhanPanel extends JPanel {
 
     public ThongTinCaNhanPanel() {
         initComponents();
+        // Gọi dữ liệu thật để test (Mã DG00000002 có trong CSDL mẫu của bạn)
+        loadData("DG00000002"); 
     }
 
     private void initComponents() {
         setLayout(new BorderLayout(0, 20));
-        setBackground(Color.WHITE); // Nền trắng chuẩn thiết kế phẳng
+        setBackground(Color.WHITE); 
         setBorder(new EmptyBorder(25, 30, 25, 30));
 
         // ==========================================
@@ -46,7 +50,6 @@ public class ThongTinCaNhanPanel extends JPanel {
         // ==========================================
         // PHẦN GIỮA: FORM ĐIỀN THÔNG TIN
         // ==========================================
-        // Sử dụng GridBagLayout để căn chỉnh form đẹp mắt
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(Color.WHITE);
         formPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -55,18 +58,17 @@ public class ThongTinCaNhanPanel extends JPanel {
         ));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(10, 15, 10, 15); // Khoảng cách giữa các ô
+        gbc.insets = new Insets(10, 15, 10, 15); 
 
-        // Khởi tạo các ô nhập liệu
-        txtMaDocGia = createTextField("DG00102", false);
-        txtHoTen = createTextField("Nguyễn Văn A", false);
-        txtNgaySinh = createTextField("15/08/2004", false);
-        txtSoDienThoai = createTextField("0901234567", true); // Cho phép sửa
-        txtEmail = createTextField("nguyenvana@gmail.com", true); // Cho phép sửa
-        txtNgayDangKy = createTextField("01/01/2026", false);
-        txtHanThe = createTextField("31/12/2026", false);
+        // Khởi tạo các ô nhập liệu rỗng (Sẽ được đổ dữ liệu sau)
+        txtMaDocGia = createTextField("", false);
+        txtHoTen = createTextField("", false);
+        txtNgaySinh = createTextField("", false);
+        txtSoDienThoai = createTextField("", true); // Chỉ SĐT là sửa được
+        txtEmail = createTextField("", true);       // Chỉ Email là sửa được
+        txtNgayDangKy = createTextField("", false);
+        txtHanThe = createTextField("", false);
 
-        // Cột 1: Labels
         int row = 0;
         addFormRow(formPanel, gbc, "Mã độc giả (Số thẻ):", txtMaDocGia, row++);
         addFormRow(formPanel, gbc, "Họ và tên:", txtHoTen, row++);
@@ -76,7 +78,6 @@ public class ThongTinCaNhanPanel extends JPanel {
         addFormRow(formPanel, gbc, "Ngày đăng ký thẻ:", txtNgayDangKy, row++);
         addFormRow(formPanel, gbc, "Hạn sử dụng thẻ:", txtHanThe, row++);
 
-        // Bọc formPanel trong một JPanel khác để nó không bị giãn hết màn hình
         JPanel centerWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT));
         centerWrapper.setBackground(Color.WHITE);
         centerWrapper.add(formPanel);
@@ -89,59 +90,114 @@ public class ThongTinCaNhanPanel extends JPanel {
         bottomPanel.setBorder(new EmptyBorder(10, 0, 0, 0));
 
         btnCapNhat = new JButton("Lưu Thay Đổi");
-        btnCapNhat.setBackground(new Color(13, 110, 253)); // Xanh dương
+        btnCapNhat.setBackground(new Color(13, 110, 253)); 
         btnCapNhat.setForeground(Color.WHITE);
         btnCapNhat.setFont(new Font(tenFont, Font.BOLD, 14));
         btnCapNhat.setPreferredSize(new Dimension(150, 40));
         btnCapNhat.setFocusPainted(false);
 
+        // --- SỰ KIỆN NÚT CẬP NHẬT ---
+        btnCapNhat.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this, "Bạn có muốn lưu thay đổi không?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+            if(confirm == JOptionPane.YES_OPTION) {
+                String ma = txtMaDocGia.getText();
+                String sdtMoi = txtSoDienThoai.getText();
+                String emailMoi = txtEmail.getText();
+                
+                // Gọi BUS để update xuống Database
+                String msg = docGiaBUS.updateThongTinLienHe(ma, sdtMoi, emailMoi);
+                JOptionPane.showMessageDialog(this, msg);
+            }
+        });
+
         btnDoiMatKhau = new JButton("Đổi Mật Khẩu");
-        btnDoiMatKhau.setBackground(new Color(100, 116, 139)); // Xám
+        btnDoiMatKhau.setBackground(new Color(100, 116, 139)); 
         btnDoiMatKhau.setForeground(Color.WHITE);
         btnDoiMatKhau.setFont(new Font(tenFont, Font.BOLD, 14));
         btnDoiMatKhau.setPreferredSize(new Dimension(150, 40));
         btnDoiMatKhau.setFocusPainted(false);
+        // =========================================================
+        // THÊM SỰ KIỆN ĐỔI MẬT KHẨU NGAY TẠI ĐÂY
+        // =========================================================
+        btnDoiMatKhau.addActionListener(e -> {
+            JPasswordField txtPassCu = new JPasswordField();
+            JPasswordField txtPassMoi = new JPasswordField();
+            JPasswordField txtXacNhan = new JPasswordField();
+
+            Object[] message = {
+                "Mật khẩu hiện tại:", txtPassCu,
+                "Mật khẩu mới:", txtPassMoi,
+                "Xác nhận mật khẩu mới:", txtXacNhan
+            };
+
+            int option = JOptionPane.showConfirmDialog(this, message, "Đổi Mật Khẩu", JOptionPane.OK_CANCEL_OPTION);
+            
+            if (option == JOptionPane.OK_OPTION) {
+                String passCu = new String(txtPassCu.getPassword());
+                String passMoi = new String(txtPassMoi.getPassword());
+                String xacNhan = new String(txtXacNhan.getPassword());
+                
+                // Kiểm tra sơ bộ các lỗi nhập liệu cơ bản
+                if (passCu.isEmpty() || passMoi.isEmpty() || xacNhan.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                } else if (!passMoi.equals(xacNhan)) {
+                    JOptionPane.showMessageDialog(this, "Mật khẩu xác nhận không khớp!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    // TODO: Chỗ này sau này sẽ gọi docGiaBUS để update mật khẩu xuống CSDL
+                    JOptionPane.showMessageDialog(this, "Đổi mật khẩu thành công! Vui lòng sử dụng mật khẩu mới cho lần đăng nhập sau.");
+                }
+            }
+        });
+        // =========================================================
 
         bottomPanel.add(btnCapNhat);
         bottomPanel.add(btnDoiMatKhau);
 
-        // Lắp ráp vào Panel chính
         add(topPanel, BorderLayout.NORTH);
         add(centerWrapper, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    // Hàm tiện ích tạo JTextField
+    // =======================================================
+    // HÀM KẾT NỐI DATA VÀ ĐỔ LÊN FORM
+    // =======================================================
+    public void loadData(String maDocGia) {
+        Object[] data = docGiaBUS.getThongTinCaNhan(maDocGia);
+        if (data != null) {
+            txtMaDocGia.setText(data[0] != null ? data[0].toString() : "");
+            txtHoTen.setText(data[1] != null ? data[1].toString() : "");
+            txtNgaySinh.setText(data[2] != null ? data[2].toString() : "");
+            txtSoDienThoai.setText(data[3] != null ? data[3].toString() : "");
+            txtEmail.setText(data[4] != null ? data[4].toString() : "");
+            txtNgayDangKy.setText(data[5] != null ? data[5].toString() : "");
+            txtHanThe.setText(data[6] != null ? data[6].toString() : "");
+        }
+    }
+
     private JTextField createTextField(String text, boolean isEditable) {
         JTextField txt = new JTextField(text, 25);
         txt.setFont(new Font(tenFont, Font.PLAIN, 14));
         txt.setPreferredSize(new Dimension(250, 35));
         txt.setEditable(isEditable);
         if (!isEditable) {
-            txt.setBackground(new Color(248, 250, 252)); // Nền xám nhạt cho ô không sửa được
+            txt.setBackground(new Color(248, 250, 252)); 
             txt.setForeground(Color.DARK_GRAY);
         }
         return txt;
     }
 
-    // Hàm tiện ích thêm 1 dòng vào Form
     private void addFormRow(JPanel panel, GridBagConstraints gbc, String labelText, JTextField txtField, int row) {
         gbc.gridy = row;
-        
-        // Cột Label
         gbc.gridx = 0;
         gbc.anchor = GridBagConstraints.WEST;
         JLabel label = new JLabel(labelText);
         label.setFont(new Font(tenFont, Font.BOLD, 14));
         label.setForeground(new Color(71, 85, 105));
         panel.add(label, gbc);
-
-        // Cột TextField
         gbc.gridx = 1;
         panel.add(txtField, gbc);
     }
-
-    // --- CÁC HÀM GETTER BẮT SỰ KIỆN ---
+    // --- CÁC HÀM GETTER BẮT SỰ KIỆN CHO USERHOMEFRAME ---
     public JButton getBtnCapNhat() { return btnCapNhat; }
     public JButton getBtnDoiMatKhau() { return btnDoiMatKhau; }
     public String getSoDienThoai() { return txtSoDienThoai.getText(); }

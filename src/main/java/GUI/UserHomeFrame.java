@@ -183,42 +183,9 @@ public class UserHomeFrame extends JFrame {
                 }   
             }
         });
-        
-        // ==========================================
-        // SỰ KIỆN CHO PANEL THÔNG TIN CÁ NHÂN
-        // ==========================================
-        // 1. Nút Cập nhật thông tin
-        panelThongTin.getBtnCapNhat().addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(UserHomeFrame.this, "Bạn có muốn lưu các thay đổi về thông tin cá nhân không?", "Xác nhận", JOptionPane.YES_NO_OPTION);
-            if(confirm == JOptionPane.YES_OPTION) {
-                String sdtMoi = panelThongTin.getSoDienThoai();
-                String emailMoi = panelThongTin.getEmail();
-                // Gọi DAO cập nhật CSDL ở đây...
-
-                JOptionPane.showMessageDialog(UserHomeFrame.this, "Cập nhật thông tin thành công!\nSĐT: " + sdtMoi + "\nEmail: " + emailMoi);
-            }
-        });
-
-        // 2. Nút Đổi mật khẩu
-        panelThongTin.getBtnDoiMatKhau().addActionListener(e -> {
-            // Mở một Dialog nhỏ để nhập mật khẩu cũ, mới
-            JPasswordField txtPassCu = new JPasswordField();
-            JPasswordField txtPassMoi = new JPasswordField();
-            JPasswordField txtXacNhan = new JPasswordField();
-
-            Object[] message = {
-                "Mật khẩu hiện tại:", txtPassCu,
-                "Mật khẩu mới:", txtPassMoi,
-                "Xác nhận mật khẩu mới:", txtXacNhan
-            };
-
-            int option = JOptionPane.showConfirmDialog(UserHomeFrame.this, message, "Đổi Mật Khẩu", JOptionPane.OK_CANCEL_OPTION);
-            if (option == JOptionPane.OK_OPTION) {
-                // Xử lý logic so sánh mật khẩu ở đây
-                JOptionPane.showMessageDialog(UserHomeFrame.this, "Đổi mật khẩu thành công! Vui lòng sử dụng mật khẩu mới cho lần đăng nhập sau.");
-            }
-        });
     }
+        
+        
     
     // --- CÁC PANEL CHỨC NĂNG CỦA HOME ---
 

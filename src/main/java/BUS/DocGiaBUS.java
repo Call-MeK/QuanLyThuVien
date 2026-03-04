@@ -106,4 +106,31 @@ public class DocGiaBUS {
         }
         return null;
     }
+    // =======================================================
+    // CÁC HÀM DÀNH RIÊNG CHO TRANG "THÔNG TIN CÁ NHÂN"
+    // =======================================================
+    
+    // Lấy thông tin cá nhân gom từ 3 bảng
+    public Object[] getThongTinCaNhan(String maDocGia) {
+        return docGiaDAO.getThongTinCaNhan(maDocGia);
+    }
+
+    // Cập nhật Số điện thoại và Email
+    public String updateThongTinLienHe(String maDocGia, String sdt, String email) {
+        if (sdt.trim().isEmpty() || email.trim().isEmpty()) {
+            return "Số điện thoại và Email không được để trống!";
+        }
+        if (docGiaDAO.updateThongTinLienHe(maDocGia, sdt, email)) {
+            // Cập nhật thành công thì ta cập nhật luôn cái cache listDocGia cho đồng bộ
+            for (DocGiaDTO dg : listdocGia) {
+                if (dg.getMaDocGia().equals(maDocGia)) {
+                    dg.setSoDienThoai(sdt);
+                    dg.setEmail(email);
+                    break;
+                }
+            }
+            return "Cập nhật thông tin thành công!";
+        }
+        return "Cập nhật thất bại. Vui lòng thử lại!";
+    }
 }
