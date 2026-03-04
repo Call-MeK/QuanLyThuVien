@@ -17,7 +17,7 @@ public class ThongTinCaNhanPanel extends JPanel {
     public ThongTinCaNhanPanel() {
         initComponents();
         // Gọi dữ liệu thật để test (Mã DG00000002 có trong CSDL mẫu của bạn)
-        loadData("DG00000002"); 
+        //loadData("DG00000002"); 
     }
 
     private void initComponents() {
@@ -95,6 +95,10 @@ public class ThongTinCaNhanPanel extends JPanel {
         btnCapNhat.setFont(new Font(tenFont, Font.BOLD, 14));
         btnCapNhat.setPreferredSize(new Dimension(150, 40));
         btnCapNhat.setFocusPainted(false);
+        // THÊM 2 DÒNG NÀY ĐỂ ÉP MÀU:
+        btnCapNhat.setOpaque(true); 
+        btnCapNhat.setBorderPainted(false);
+        
 
         // --- SỰ KIỆN NÚT CẬP NHẬT ---
         btnCapNhat.addActionListener(e -> {
@@ -116,6 +120,10 @@ public class ThongTinCaNhanPanel extends JPanel {
         btnDoiMatKhau.setFont(new Font(tenFont, Font.BOLD, 14));
         btnDoiMatKhau.setPreferredSize(new Dimension(150, 40));
         btnDoiMatKhau.setFocusPainted(false);
+        // THÊM 2 DÒNG NÀY ĐỂ ÉP MÀU:
+        btnDoiMatKhau.setOpaque(true); 
+        btnDoiMatKhau.setBorderPainted(false);
+        
         // =========================================================
         // THÊM SỰ KIỆN ĐỔI MẬT KHẨU NGAY TẠI ĐÂY
         // =========================================================
