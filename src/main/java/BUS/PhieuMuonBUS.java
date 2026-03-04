@@ -143,4 +143,10 @@ public class PhieuMuonBUS {
         }
         return result;
     }
+    // =======================================================
+    // HÀM GỌI DỮ LIỆU ĐÃ JOIN DÀNH RIÊNG CHO GIAO DIỆN
+    // =======================================================
+    public ArrayList<Object[]> getDanhSachSachDangMuon() {
+        return pmDAO.getDanhSachSachDangMuon();
+    }
 }

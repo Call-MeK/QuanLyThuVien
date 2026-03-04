@@ -2,25 +2,30 @@ package GUI;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class SachDangMuonPanel extends JPanel {
 
     private String tenFont = "Segoe UI";
     private JTable table;
     
+    // Khai báo BUS
+    private BUS.PhieuMuonBUS phieuMuonBUS = new BUS.PhieuMuonBUS();
+    
     // Khai báo các nút chức năng (Đã bỏ nút Gia Hạn)
     private JButton btnXemChiTiet;
-    // private JButton btnGiaHan;
     private JButton btnTraSach;
 
     public SachDangMuonPanel() {
         initComponents();
+        loadDataToTable(); // Đổ dữ liệu ngay khi mở panel
     }
 
     private void initComponents() {
         setLayout(new BorderLayout(0, 20));
-        setBackground(Color.WHITE); // Nền trắng chuẩn thiết kế phẳng
+        setBackground(Color.WHITE); 
         setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30));
 
         // ==========================================
@@ -30,19 +35,16 @@ public class SachDangMuonPanel extends JPanel {
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.setBackground(Color.WHITE);
 
-        // 1. Tiêu đề
         JLabel lblTitle = new JLabel("Sách Đang Mượn Của Bạn");
         lblTitle.setFont(new Font(tenFont, Font.BOLD, 22));
         lblTitle.setForeground(new Color(33, 37, 41));
         lblTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // 2. Phụ đề
         JLabel lblSubtitle = new JLabel("Theo dõi hạn trả và quản lý các cuốn sách bạn đang mượn từ thư viện");
         lblSubtitle.setFont(new Font(tenFont, Font.ITALIC, 14));
         lblSubtitle.setForeground(new Color(108, 117, 125)); 
         lblSubtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // 3. Bộ lọc trạng thái (Combo Box)
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         filterPanel.setBackground(Color.WHITE);
         filterPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -50,12 +52,29 @@ public class SachDangMuonPanel extends JPanel {
         JLabel lblFilter = new JLabel("Trạng thái:");
         lblFilter.setFont(new Font(tenFont, Font.PLAIN, 14));
         
+        // Đã sửa lại các item cho khớp với dữ liệu thật trong Database
         JComboBox<String> cbStatus = new JComboBox<>(new String[]{
-            "Tất cả", "Còn hạn", "Sắp tới hạn", "Quá hạn"
+            "Tất cả", "Đang mượn", "Đã trả", "Đã trả quá hạn"
         });
         cbStatus.setPreferredSize(new Dimension(150, 30));
         cbStatus.setFont(new Font(tenFont, Font.PLAIN, 13));
         cbStatus.setBackground(Color.WHITE);
+
+        // Sự kiện lọc dữ liệu bằng TableRowSorter
+        cbStatus.addActionListener(e -> {
+            String selected = cbStatus.getSelectedItem().toString();
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            
+            TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+            table.setRowSorter(sorter);
+
+            if (selected.equals("Tất cả")) {
+                sorter.setRowFilter(null); 
+            } else {
+                // Lọc ở cột số 4 (Cột Trạng Thái)
+                sorter.setRowFilter(RowFilter.regexFilter("^" + selected + "$", 4));
+            }
+        });
 
         filterPanel.add(lblFilter);
         filterPanel.add(cbStatus);
@@ -72,19 +91,17 @@ public class SachDangMuonPanel extends JPanel {
         String[] cols = {"Mã Phiếu", "Tên Sách", "Ngày Mượn", "Hạn Trả", "Trạng Thái"};
         Object[][] data = {};
             
-        
-        // SỬ DỤNG DEFAULT TABLE MODEL ĐỂ KHÓA CHỈNH SỬA (READ-ONLY)
         DefaultTableModel model = new DefaultTableModel(data, cols) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Trả về false sẽ khóa toàn bộ các ô
+                return false; 
             }
         };
         
         table = new JTable(model);
         table.setRowHeight(30);
         table.getTableHeader().setFont(new Font(tenFont, Font.BOLD, 14));
-        table.getTableHeader().setBackground(new Color(241, 245, 249)); // Màu xám nhạt cho Header
+        table.getTableHeader().setBackground(new Color(241, 245, 249)); 
         table.setFont(new Font(tenFont, Font.PLAIN, 14));
         
         JScrollPane scrollPane = new JScrollPane(table);
@@ -97,14 +114,12 @@ public class SachDangMuonPanel extends JPanel {
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
         bottomPanel.setBackground(Color.WHITE);
         
-        // Nút Xem Chi Tiết
         btnXemChiTiet = new JButton("Xem Chi Tiết");
-        btnXemChiTiet.setBackground(new Color(100, 116, 139)); // Xám xanh dương
+        btnXemChiTiet.setBackground(new Color(100, 116, 139)); 
         btnXemChiTiet.setForeground(Color.WHITE);
         btnXemChiTiet.setFont(new Font(tenFont, Font.BOLD, 13));
         btnXemChiTiet.setFocusPainted(false);
         
-        // Xử lý sự kiện Xem Chi Tiết
         btnXemChiTiet.addActionListener(e -> {
             int row = table.getSelectedRow();
             if (row == -1) {
@@ -121,22 +136,12 @@ public class SachDangMuonPanel extends JPanel {
             }
         });
 
-        /* ĐÃ ẨN NÚT GIA HẠN THEO YÊU CẦU
-        btnGiaHan = new JButton("Gia Hạn Sách");
-        btnGiaHan.setBackground(new Color(245, 158, 11)); // Màu cam
-        btnGiaHan.setForeground(Color.WHITE);
-        btnGiaHan.setFont(new Font(tenFont, Font.BOLD, 13));
-        btnGiaHan.setFocusPainted(false);
-        */
-
-        // Nút Trả Sách
         btnTraSach = new JButton("Trả Sách");
-        btnTraSach.setBackground(new Color(34, 197, 94)); // Màu xanh lá
+        btnTraSach.setBackground(new Color(34, 197, 94)); 
         btnTraSach.setForeground(Color.WHITE);
         btnTraSach.setFont(new Font(tenFont, Font.BOLD, 13));
         btnTraSach.setFocusPainted(false);
         
-        // Xử lý sự kiện Trả Sách
         btnTraSach.addActionListener(e -> {
             int row = table.getSelectedRow();
             if (row == -1) {
@@ -150,18 +155,27 @@ public class SachDangMuonPanel extends JPanel {
         });
 
         bottomPanel.add(btnXemChiTiet);
-        // bottomPanel.add(btnGiaHan); // Đã ẩn khỏi Panel
         bottomPanel.add(btnTraSach);
 
-        // Lắp ráp vào Panel chính
         add(topPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    // --- CÁC HÀM GETTER ĐỂ BÊN NGOÀI BẮT SỰ KIỆN ---
+    // =======================================================
+    // HÀM KẾT NỐI DATA VÀ ĐỔ LÊN BẢNG
+    // =======================================================
+    public void loadDataToTable() {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(0); 
+
+        ArrayList<Object[]> dsHienThi = phieuMuonBUS.getDanhSachSachDangMuon();
+        for (Object[] row : dsHienThi) {
+            model.addRow(row);
+        }
+    }
+
     public JTable getTable() { return table; }
     public JButton getBtnXemChiTiet() { return btnXemChiTiet; }
-    // public JButton getBtnGiaHan() { return btnGiaHan; }
     public JButton getBtnTraSach() { return btnTraSach; }
 }
