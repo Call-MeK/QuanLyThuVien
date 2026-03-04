@@ -115,4 +115,31 @@ public class PhieuMuonDAO {
         }
         return 0;
     }
+    public ArrayList<Object[]> getDanhSachSachDangMuon() {
+        ArrayList<Object[]> list = new ArrayList<>();
+        // Câu lệnh JOIN 4 bảng để lấy đầy đủ Tên Sách và Thông tin mượn
+        String sql = "SELECT pm.MaPM, s.TenSach, pm.NgayMuon, pm.HenTra, pm.TinhTrang " +
+                     "FROM PHIEUMUON pm " +
+                     "JOIN CHITIETPHIEUMUON ct ON pm.MaPM = ct.MaPM " +
+                     "JOIN SACHCOPY sc ON ct.MaCuonSach = sc.MaVach " +
+                     "JOIN SACH s ON sc.MaSach = s.MaSach";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                String maPM = rs.getString("MaPM");
+                String tenSach = rs.getString("TenSach");
+                String ngayMuon = rs.getString("NgayMuon");
+                String henTra = rs.getString("HenTra");
+                String trangThai = rs.getString("TinhTrang");
+
+                list.add(new Object[]{maPM, tenSach, ngayMuon, henTra, trangThai});
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
