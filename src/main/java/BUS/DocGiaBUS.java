@@ -88,4 +88,22 @@ public class DocGiaBUS {
         }
         return "Xóa mềm thất bại";
     }
+
+    // Đăng nhập Độc giả: kiểm tra TenDangNhap + MatKhau trong DB
+    public DocGiaDTO login(String tenDangNhap, String matKhau) {
+        if (listdocGia == null || listdocGia.isEmpty()) {
+            listdocGia = docGiaDAO.getAll();
+        }
+        for (DocGiaDTO dg : listdocGia) {
+            // Bỏ qua độc giả đã bị xóa mềm
+            if (dg.getIsDeleted() != null && dg.getIsDeleted()) {
+                continue;
+            }
+            if (dg.getTenDangNhap() != null && dg.getMatKhau() != null &&
+                    dg.getTenDangNhap().equals(tenDangNhap) && dg.getMatKhau().equals(matKhau)) {
+                return dg;
+            }
+        }
+        return null;
+    }
 }
