@@ -147,7 +147,9 @@ public class LoginFrame extends JFrame {
             }
         });
 
-        // Event Đăng nhập xử lý qua BUS
+        // ==========================================
+        // SỰ KIỆN ĐĂNG NHẬP (ĐÃ CẬP NHẬT TRUYỀN MÃ)
+        // ==========================================
         btnLogin.addActionListener(e -> {
             String username = txtUsername.getText();
             String password = new String(txtPassword.getPassword());
@@ -160,12 +162,14 @@ public class LoginFrame extends JFrame {
 
             ConNguoiBUS cnBus = new ConNguoiBUS();
             boolean loginSuccess = false;
+            String loggedInUserId = ""; // Biến để hứng mã Độc giả
             String userRolePrefix = role.equals("Quản trị viên (Admin)") ? "NV" : "DG";
 
             for (ConNguoiDTO cn : cnBus.getListConNguoi()) {
                 if (cn.getTenDangNhap().equals(username) && cn.getMatKhau().equals(password)) {
                     if (cn.getMaNguoi().startsWith(userRolePrefix)) {
                         loginSuccess = true;
+                        loggedInUserId = cn.getMaNguoi(); // Bắt lấy mã của người đăng nhập
                         break;
                     }
                 }
@@ -174,12 +178,13 @@ public class LoginFrame extends JFrame {
             if (loginSuccess) {
                 if (role.equals("Quản trị viên (Admin)")) {
                     JOptionPane.showMessageDialog(this, "Đăng nhập Admin thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-                    new AdminFrame().setVisible(true);
+                    new AdminFrame().setVisible(true); // Nếu sau này AdminFrame cần truyền mã thì bạn thêm vào đây
                 } else {
                     JOptionPane.showMessageDialog(this, "Đăng nhập Độc giả thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-                    new UserHomeFrame().setVisible(true);
+                    // Truyền mã Độc giả vừa bắt được sang UserHomeFrame
+                    new UserHomeFrame(loggedInUserId).setVisible(true);
                 }
-                this.dispose();
+                this.dispose(); // Đóng form đăng nhập
             } else {
                 JOptionPane.showMessageDialog(this, "Sai tên đăng nhập, mật khẩu hoặc sai vai trò!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
