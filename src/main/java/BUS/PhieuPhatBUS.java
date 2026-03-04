@@ -75,4 +75,8 @@ public class PhieuPhatBUS {
 
         return "Tạo phiếu phạt thất bại"; // Trả về false nếu thêm bảng cha bị lỗi
     }
+    // Thêm hàm này vào PhieuPhatBUS.java
+    public ArrayList<Object[]> getDanhSachHienThiGUI() {
+        return phieuPhatDAO.getDanhSachHienThiGUI();
+    }
 }
