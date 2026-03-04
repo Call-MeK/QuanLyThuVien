@@ -1,0 +1,646 @@
+﻿USE [master]
+GO
+/****** Object:  Database [QuanLyThuVien]    Script Date: 3/4/2026 7:22:19 AM ******/
+CREATE DATABASE [QuanLyThuVien]
+ CONTAINMENT = NONE
+ ON  PRIMARY 
+( NAME = N'QuanLyThuVien', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\QuanLyThuVien.mdf' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+ LOG ON 
+( NAME = N'QuanLyThuVien_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\QuanLyThuVien_log.ldf' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+ WITH CATALOG_COLLATION = DATABASE_DEFAULT, LEDGER = OFF
+GO
+ALTER DATABASE [QuanLyThuVien] SET COMPATIBILITY_LEVEL = 160
+GO
+IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
+begin
+EXEC [QuanLyThuVien].[dbo].[sp_fulltext_database] @action = 'enable'
+end
+GO
+ALTER DATABASE [QuanLyThuVien] SET ANSI_NULL_DEFAULT OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET ANSI_NULLS OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET ANSI_PADDING OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET ANSI_WARNINGS OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET ARITHABORT OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET AUTO_CLOSE OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET AUTO_SHRINK OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET AUTO_UPDATE_STATISTICS ON 
+GO
+ALTER DATABASE [QuanLyThuVien] SET CURSOR_CLOSE_ON_COMMIT OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET CURSOR_DEFAULT  GLOBAL 
+GO
+ALTER DATABASE [QuanLyThuVien] SET CONCAT_NULL_YIELDS_NULL OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET NUMERIC_ROUNDABORT OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET QUOTED_IDENTIFIER OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET RECURSIVE_TRIGGERS OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET  DISABLE_BROKER 
+GO
+ALTER DATABASE [QuanLyThuVien] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET DATE_CORRELATION_OPTIMIZATION OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET TRUSTWORTHY OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET PARAMETERIZATION SIMPLE 
+GO
+ALTER DATABASE [QuanLyThuVien] SET READ_COMMITTED_SNAPSHOT OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET HONOR_BROKER_PRIORITY OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET RECOVERY FULL 
+GO
+ALTER DATABASE [QuanLyThuVien] SET  MULTI_USER 
+GO
+ALTER DATABASE [QuanLyThuVien] SET PAGE_VERIFY CHECKSUM  
+GO
+ALTER DATABASE [QuanLyThuVien] SET DB_CHAINING OFF 
+GO
+ALTER DATABASE [QuanLyThuVien] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
+GO
+ALTER DATABASE [QuanLyThuVien] SET TARGET_RECOVERY_TIME = 60 SECONDS 
+GO
+ALTER DATABASE [QuanLyThuVien] SET DELAYED_DURABILITY = DISABLED 
+GO
+ALTER DATABASE [QuanLyThuVien] SET ACCELERATED_DATABASE_RECOVERY = OFF  
+GO
+EXEC sys.sp_db_vardecimal_storage_format N'QuanLyThuVien', N'ON'
+GO
+ALTER DATABASE [QuanLyThuVien] SET QUERY_STORE = ON
+GO
+ALTER DATABASE [QuanLyThuVien] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 30), DATA_FLUSH_INTERVAL_SECONDS = 900, INTERVAL_LENGTH_MINUTES = 60, MAX_STORAGE_SIZE_MB = 1000, QUERY_CAPTURE_MODE = AUTO, SIZE_BASED_CLEANUP_MODE = AUTO, MAX_PLANS_PER_QUERY = 200, WAIT_STATS_CAPTURE_MODE = ON)
+GO
+USE [QuanLyThuVien]
+GO
+/****** Object:  Table [dbo].[CHITIETPHIEUMUON]    Script Date: 3/4/2026 7:22:19 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[CHITIETPHIEUMUON](
+	[MaPM] [char](10) NOT NULL,
+	[MaCuonSach] [char](20) NOT NULL,
+	[TinhTrangSach] [nvarchar](50) NULL,
+ CONSTRAINT [PK_CHITIETPHIEUMUON] PRIMARY KEY CLUSTERED 
+(
+	[MaPM] ASC,
+	[MaCuonSach] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[CHITIETPHIEUNHAP]    Script Date: 3/4/2026 7:22:20 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[CHITIETPHIEUNHAP](
+	[MaPN] [char](10) NOT NULL,
+	[MaSach] [char](10) NOT NULL,
+	[SoLuongNhap] [int] NULL,
+	[DonGia] [decimal](10, 2) NULL,
+ CONSTRAINT [PK_CHITIETPHIEUNHAP] PRIMARY KEY CLUSTERED 
+(
+	[MaPN] ASC,
+	[MaSach] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[CHITIETPHIEUPHAT]    Script Date: 3/4/2026 7:22:20 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[CHITIETPHIEUPHAT](
+	[MaCTPP] [char](10) NOT NULL,
+	[MaPP] [char](10) NOT NULL,
+	[MaCuonSach] [char](20) NOT NULL,
+	[LyDo] [nvarchar](300) NOT NULL,
+	[SoTien] [decimal](10, 2) NOT NULL,
+	[TrangThai] [bit] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[MaCTPP] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[CONNGUOI]    Script Date: 3/4/2026 7:22:20 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[CONNGUOI](
+	[MaNguoi] [char](10) NOT NULL,
+	[HoTen] [nvarchar](100) NOT NULL,
+	[NgaySinh] [date] NULL,
+	[TenDangNhap] [varchar](50) NOT NULL,
+	[MatKhau] [varchar](255) NOT NULL,
+	[GioiTinh] [nvarchar](10) NULL,
+	[DiaChi] [nvarchar](200) NULL,
+	[SoDienThoai] [varchar](15) NULL,
+	[Email] [varchar](50) NULL,
+	[TrangThai] [nvarchar](50) NULL,
+ CONSTRAINT [PK_CONNGUOI] PRIMARY KEY CLUSTERED 
+(
+	[MaNguoi] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[DOCGIA]    Script Date: 3/4/2026 7:22:20 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[DOCGIA](
+	[MaDocGia] [char](10) NOT NULL,
+	[NgayDangKi] [date] NULL,
+	[LoaiDocGia] [nvarchar](50) NULL,
+	[IsDeleted] [bit] NULL,
+	[NgayXoa] [date] NULL,
+ CONSTRAINT [PK_DOCGIA] PRIMARY KEY CLUSTERED 
+(
+	[MaDocGia] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[KESACH]    Script Date: 3/4/2026 7:22:20 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[KESACH](
+	[MaKeSach] [char](10) NOT NULL,
+	[TenKe] [nvarchar](50) NULL,
+	[MaTheLoai] [char](10) NOT NULL,
+ CONSTRAINT [PK_KESACH] PRIMARY KEY CLUSTERED 
+(
+	[MaKeSach] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[NGUOIQUANLY]    Script Date: 3/4/2026 7:22:20 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[NGUOIQUANLY](
+	[MaNQL] [char](10) NOT NULL,
+	[VaiTro] [nvarchar](50) NULL,
+	[IsDeleted] [bit] NULL,
+ CONSTRAINT [PK_NGUOIQUANLY] PRIMARY KEY CLUSTERED 
+(
+	[MaNQL] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[NHAXUATBAN]    Script Date: 3/4/2026 7:22:20 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[NHAXUATBAN](
+	[MaNXB] [char](10) NOT NULL,
+	[TenNXB] [nvarchar](50) NOT NULL,
+	[DiaChi] [nvarchar](200) NULL,
+	[Email] [varchar](50) NULL,
+	[SoDienThoai] [varchar](50) NULL,
+ CONSTRAINT [PK_Table_1] PRIMARY KEY CLUSTERED 
+(
+	[MaNXB] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[PHIEUMUON]    Script Date: 3/4/2026 7:22:20 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[PHIEUMUON](
+	[MaPM] [char](10) NOT NULL,
+	[NgayMuon] [date] NOT NULL,
+	[NgayTra] [date] NULL,
+	[HenTra] [date] NULL,
+	[TinhTrang] [nvarchar](50) NULL,
+	[MaNQL] [char](10) NULL,
+	[MaThe] [char](10) NULL,
+ CONSTRAINT [PK_PHIEUMUON] PRIMARY KEY CLUSTERED 
+(
+	[MaPM] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[PHIEUNHAP]    Script Date: 3/4/2026 7:22:20 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[PHIEUNHAP](
+	[MaPN] [char](10) NOT NULL,
+	[NgayNhap] [date] NOT NULL,
+	[TongTien] [decimal](15, 2) NULL,
+	[MaNXB] [char](10) NULL,
+	[MaNQL] [char](10) NULL,
+ CONSTRAINT [PK_PHIEUNHAP] PRIMARY KEY CLUSTERED 
+(
+	[MaPN] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[PHIEUPHAT]    Script Date: 3/4/2026 7:22:20 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[PHIEUPHAT](
+	[MaPP] [char](10) NOT NULL,
+	[MaPM] [char](10) NOT NULL,
+	[MaNQL] [char](10) NOT NULL,
+	[NgayLap] [date] NOT NULL,
+	[TongTien] [decimal](10, 2) NOT NULL,
+	[TrangThai] [bit] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[MaPP] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[SACH]    Script Date: 3/4/2026 7:22:20 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[SACH](
+	[MaSach] [char](10) NOT NULL,
+	[TenSach] [nvarchar](200) NOT NULL,
+	[TheLoai] [char](10) NULL,
+	[MaNXB] [char](10) NULL,
+	[NamXB] [int] NULL,
+	[NgonNgu] [nvarchar](50) NULL,
+	[GiaBia] [decimal](10, 2) NULL,
+	[IsDeleted] [bit] NULL,
+ CONSTRAINT [PK_SACH] PRIMARY KEY CLUSTERED 
+(
+	[MaSach] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[SACH_TACGIA]    Script Date: 3/4/2026 7:22:20 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[SACH_TACGIA](
+	[MaTacGia] [char](10) NOT NULL,
+	[MaSach] [char](10) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[MaTacGia] ASC,
+	[MaSach] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[SACHCOPY]    Script Date: 3/4/2026 7:22:20 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[SACHCOPY](
+	[MaVach] [char](20) NOT NULL,
+	[MaSach] [char](10) NOT NULL,
+	[TenSachBanSao] [nvarchar](50) NULL,
+	[TinhTrang] [nvarchar](50) NULL,
+	[GhiChuTinhTrang] [nvarchar](50) NULL,
+	[NgayNhap] [date] NULL,
+	[IsDeleted] [bit] NULL,
+	[MaKeSach] [char](10) NULL,
+ CONSTRAINT [PK_SACHCOPY] PRIMARY KEY CLUSTERED 
+(
+	[MaVach] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[SACHHONG]    Script Date: 3/4/2026 7:22:20 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[SACHHONG](
+	[MaSachHong] [int] NOT NULL,
+	[TenSachHong] [nvarchar](50) NOT NULL,
+	[MaVach] [char](20) NOT NULL,
+	[SoLuong] [int] NULL,
+	[NgayGhiNhan] [date] NULL,
+	[LyDo] [nvarchar](50) NULL,
+ CONSTRAINT [PK_SACHHONG] PRIMARY KEY CLUSTERED 
+(
+	[MaSachHong] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[TACGIA]    Script Date: 3/4/2026 7:22:20 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[TACGIA](
+	[MaTacGia] [char](10) NOT NULL,
+	[TenTacGia] [nvarchar](100) NOT NULL,
+	[QuocTich] [nvarchar](50) NULL,
+	[DiaChi] [nvarchar](100) NULL,
+	[SoDienThoai] [varchar](15) NULL,
+	[Email] [varchar](50) NULL,
+ CONSTRAINT [PK_TACGIA] PRIMARY KEY CLUSTERED 
+(
+	[MaTacGia] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[THELOAI]    Script Date: 3/4/2026 7:22:20 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[THELOAI](
+	[MaTheLoai] [char](10) NOT NULL,
+	[TenTheLoai] [nvarchar](50) NOT NULL,
+ CONSTRAINT [PK_THELOAI] PRIMARY KEY CLUSTERED 
+(
+	[MaTheLoai] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[THETHUVIEN]    Script Date: 3/4/2026 7:22:20 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[THETHUVIEN](
+	[MaThe] [char](10) NOT NULL,
+	[TenThe] [nvarchar](50) NULL,
+	[MaDocGia] [char](10) NULL,
+	[NgayCap] [date] NULL,
+	[NgayHetHan] [date] NULL,
+	[MaNQL] [char](10) NULL,
+ CONSTRAINT [PK_THETHUVIEN] PRIMARY KEY CLUSTERED 
+(
+	[MaThe] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+INSERT [dbo].[CHITIETPHIEUMUON] ([MaPM], [MaCuonSach], [TinhTrangSach]) VALUES (N'PM00000001', N'MV000000000000000001', N'Tốt')
+INSERT [dbo].[CHITIETPHIEUMUON] ([MaPM], [MaCuonSach], [TinhTrangSach]) VALUES (N'PM00000001', N'MV000000000000000004', N'Tốt')
+INSERT [dbo].[CHITIETPHIEUMUON] ([MaPM], [MaCuonSach], [TinhTrangSach]) VALUES (N'PM00000002', N'MV000000000000000006', N'Tốt')
+INSERT [dbo].[CHITIETPHIEUMUON] ([MaPM], [MaCuonSach], [TinhTrangSach]) VALUES (N'PM00000003', N'MV000000000000000007', N'Tốt')
+GO
+INSERT [dbo].[CHITIETPHIEUNHAP] ([MaPN], [MaSach], [SoLuongNhap], [DonGia]) VALUES (N'PN00000001', N'S000000001', 2, CAST(45000.00 AS Decimal(10, 2)))
+INSERT [dbo].[CHITIETPHIEUNHAP] ([MaPN], [MaSach], [SoLuongNhap], [DonGia]) VALUES (N'PN00000002', N'S000000002', 1, CAST(60000.00 AS Decimal(10, 2)))
+GO
+INSERT [dbo].[CHITIETPHIEUPHAT] ([MaCTPP], [MaPP], [MaCuonSach], [LyDo], [SoTien], [TrangThai]) VALUES (N'CTPP000001', N'PP00000001', N'MV000000000000000006', N'Trễ hạn 5 ngày', CAST(50000.00 AS Decimal(10, 2)), 1)
+INSERT [dbo].[CHITIETPHIEUPHAT] ([MaCTPP], [MaPP], [MaCuonSach], [LyDo], [SoTien], [TrangThai]) VALUES (N'CTPP000002', N'PP00000002', N'MV000000000000000001', N'Làm rách bìa sách', CAST(50000.00 AS Decimal(10, 2)), 1)
+INSERT [dbo].[CHITIETPHIEUPHAT] ([MaCTPP], [MaPP], [MaCuonSach], [LyDo], [SoTien], [TrangThai]) VALUES (N'CTPP000003', N'PP00000002', N'MV000000000000000004', N'Làm bẩn nhiều trang', CAST(50000.00 AS Decimal(10, 2)), 1)
+INSERT [dbo].[CHITIETPHIEUPHAT] ([MaCTPP], [MaPP], [MaCuonSach], [LyDo], [SoTien], [TrangThai]) VALUES (N'CTPP000004', N'PP00000003', N'MV000000000000000007', N'Làm mất sách', CAST(100000.00 AS Decimal(10, 2)), 1)
+INSERT [dbo].[CHITIETPHIEUPHAT] ([MaCTPP], [MaPP], [MaCuonSach], [LyDo], [SoTien], [TrangThai]) VALUES (N'CTPP000005', N'PP00000003', N'MV000000000000000007', N'Trễ hạn trả sách (phạt thêm)', CAST(50000.00 AS Decimal(10, 2)), 1)
+GO
+INSERT [dbo].[CONNGUOI] ([MaNguoi], [HoTen], [NgaySinh], [TenDangNhap], [MatKhau], [GioiTinh], [DiaChi], [SoDienThoai], [Email], [TrangThai]) VALUES (N'DG00000001', N'Nguyễn Học Sinh A', CAST(N'2005-09-05' AS Date), N'hsA', N'123456', N'Nam', N'Hà Nội', N'0911111111', N'hsa@gmail.com', N'Hoạt động')
+INSERT [dbo].[CONNGUOI] ([MaNguoi], [HoTen], [NgaySinh], [TenDangNhap], [MatKhau], [GioiTinh], [DiaChi], [SoDienThoai], [Email], [TrangThai]) VALUES (N'DG00000002', N'Trần Sinh Viên B', CAST(N'2001-10-15' AS Date), N'svB', N'123456', N'Nữ', N'Đà Nẵng', N'0912222222', N'svb@gmail.com', N'Hoạt động')
+INSERT [dbo].[CONNGUOI] ([MaNguoi], [HoTen], [NgaySinh], [TenDangNhap], [MatKhau], [GioiTinh], [DiaChi], [SoDienThoai], [Email], [TrangThai]) VALUES (N'DG00000003', N'Lê Giảng Viên C', CAST(N'1975-04-25' AS Date), N'gvC', N'123456', N'Nam', N'Hồ Chí Minh', N'0913333333', N'gvc@gmail.com', N'Hoạt động')
+INSERT [dbo].[CONNGUOI] ([MaNguoi], [HoTen], [NgaySinh], [TenDangNhap], [MatKhau], [GioiTinh], [DiaChi], [SoDienThoai], [Email], [TrangThai]) VALUES (N'DG00000004', N'Phạm Nghiên Cứu D', CAST(N'1995-12-30' AS Date), N'ncD', N'123456', N'Nữ', N'Hà Nội', N'0914444444', N'ncd@gmail.com', N'Hoạt động')
+INSERT [dbo].[CONNGUOI] ([MaNguoi], [HoTen], [NgaySinh], [TenDangNhap], [MatKhau], [GioiTinh], [DiaChi], [SoDienThoai], [Email], [TrangThai]) VALUES (N'DG00000005', N'Hoàng Khách E', CAST(N'1999-07-07' AS Date), N'khE', N'123456', N'Nam', N'Hải Phòng', N'0915555555', N'khe@gmail.com', N'Hoạt động')
+INSERT [dbo].[CONNGUOI] ([MaNguoi], [HoTen], [NgaySinh], [TenDangNhap], [MatKhau], [GioiTinh], [DiaChi], [SoDienThoai], [Email], [TrangThai]) VALUES (N'NV00000001', N'Nguyễn Văn Quản Lý', CAST(N'1985-05-12' AS Date), N'admin', N'admin123', N'Nam', N'Hà Nội', N'0901111111', N'admin@lib.com', N'Hoạt động')
+INSERT [dbo].[CONNGUOI] ([MaNguoi], [HoTen], [NgaySinh], [TenDangNhap], [MatKhau], [GioiTinh], [DiaChi], [SoDienThoai], [Email], [TrangThai]) VALUES (N'NV00000002', N'Trần Thị Thủ Thư', CAST(N'1990-08-22' AS Date), N'thuthu1', N'123456', N'Nữ', N'Hồ Chí Minh', N'0902222222', N'tt1@lib.com', N'Hoạt động')
+INSERT [dbo].[CONNGUOI] ([MaNguoi], [HoTen], [NgaySinh], [TenDangNhap], [MatKhau], [GioiTinh], [DiaChi], [SoDienThoai], [Email], [TrangThai]) VALUES (N'NV00000003', N'Lê Văn Thủ Thư', CAST(N'1992-11-05' AS Date), N'thuthu2', N'123456', N'Nam', N'Đà Nẵng', N'0903333333', N'tt2@lib.com', N'Hoạt động')
+INSERT [dbo].[CONNGUOI] ([MaNguoi], [HoTen], [NgaySinh], [TenDangNhap], [MatKhau], [GioiTinh], [DiaChi], [SoDienThoai], [Email], [TrangThai]) VALUES (N'NV00000004', N'Phạm Thu Kho', CAST(N'1988-02-14' AS Date), N'thukho', N'123456', N'Nữ', N'Hải Phòng', N'0904444444', N'kho@lib.com', N'Hoạt động')
+INSERT [dbo].[CONNGUOI] ([MaNguoi], [HoTen], [NgaySinh], [TenDangNhap], [MatKhau], [GioiTinh], [DiaChi], [SoDienThoai], [Email], [TrangThai]) VALUES (N'NV00000005', N'Hoàng Giám Đốc', CAST(N'1980-01-01' AS Date), N'director', N'123456', N'Nam', N'Hà Nội', N'0905555555', N'gd@lib.com', N'Hoạt động')
+GO
+INSERT [dbo].[DOCGIA] ([MaDocGia], [NgayDangKi], [LoaiDocGia], [IsDeleted], [NgayXoa]) VALUES (N'DG00000001', CAST(N'2023-01-10' AS Date), N'Học sinh', 1, CAST(N'2026-03-04' AS Date))
+INSERT [dbo].[DOCGIA] ([MaDocGia], [NgayDangKi], [LoaiDocGia], [IsDeleted], [NgayXoa]) VALUES (N'DG00000002', CAST(N'2023-02-15' AS Date), N'Sinh viên', 0, NULL)
+INSERT [dbo].[DOCGIA] ([MaDocGia], [NgayDangKi], [LoaiDocGia], [IsDeleted], [NgayXoa]) VALUES (N'DG00000003', CAST(N'2023-03-20' AS Date), N'Giảng viên', 0, NULL)
+INSERT [dbo].[DOCGIA] ([MaDocGia], [NgayDangKi], [LoaiDocGia], [IsDeleted], [NgayXoa]) VALUES (N'DG00000004', CAST(N'2023-04-25' AS Date), N'Nghiên cứu sinh', 0, NULL)
+INSERT [dbo].[DOCGIA] ([MaDocGia], [NgayDangKi], [LoaiDocGia], [IsDeleted], [NgayXoa]) VALUES (N'DG00000005', CAST(N'2023-05-30' AS Date), N'Khách vãng lai', 0, NULL)
+GO
+INSERT [dbo].[KESACH] ([MaKeSach], [TenKe], [MaTheLoai]) VALUES (N'KS00000001', N'Kệ A1 - Văn học VN', N'TL00000001')
+INSERT [dbo].[KESACH] ([MaKeSach], [TenKe], [MaTheLoai]) VALUES (N'KS00000002', N'Kệ A2 - Văn học Nước Ngoài', N'TL00000002')
+INSERT [dbo].[KESACH] ([MaKeSach], [TenKe], [MaTheLoai]) VALUES (N'KS00000003', N'Kệ B1 - Khoa học CNTT', N'TL00000003')
+INSERT [dbo].[KESACH] ([MaKeSach], [TenKe], [MaTheLoai]) VALUES (N'KS00000004', N'Kệ B2 - Lịch sử Địa lý', N'TL00000004')
+INSERT [dbo].[KESACH] ([MaKeSach], [TenKe], [MaTheLoai]) VALUES (N'KS00000005', N'Kệ C1 - Giáo trình Khoa học', N'TL00000005')
+GO
+INSERT [dbo].[NGUOIQUANLY] ([MaNQL], [VaiTro], [IsDeleted]) VALUES (N'NV00000001', N'Quản trị viên', 0)
+INSERT [dbo].[NGUOIQUANLY] ([MaNQL], [VaiTro], [IsDeleted]) VALUES (N'NV00000002', N'Thủ thư', 0)
+INSERT [dbo].[NGUOIQUANLY] ([MaNQL], [VaiTro], [IsDeleted]) VALUES (N'NV00000003', N'Thủ thư', 0)
+INSERT [dbo].[NGUOIQUANLY] ([MaNQL], [VaiTro], [IsDeleted]) VALUES (N'NV00000004', N'Thủ kho', 0)
+INSERT [dbo].[NGUOIQUANLY] ([MaNQL], [VaiTro], [IsDeleted]) VALUES (N'NV00000005', N'Giám đốc', 0)
+GO
+INSERT [dbo].[NHAXUATBAN] ([MaNXB], [TenNXB], [DiaChi], [Email], [SoDienThoai]) VALUES (N'NXB0000001', N'NXB Trẻ', N'161B Lý Chính Thắng, Quận 3, TP.HCM', N'hopthu@nxbtre.com.vn', N'02839316289')
+INSERT [dbo].[NHAXUATBAN] ([MaNXB], [TenNXB], [DiaChi], [Email], [SoDienThoai]) VALUES (N'NXB0000002', N'NXB Kim Đồng', N'55 Quang Trung, Hai Bà Trưng, Hà Nội', N'cskh@nxbkimdong.com.vn', N'1900571595')
+INSERT [dbo].[NHAXUATBAN] ([MaNXB], [TenNXB], [DiaChi], [Email], [SoDienThoai]) VALUES (N'NXB0000003', N'NXB Giáo Dục', N'81 Trần Hưng Đạo, Hoàn Kiếm, Hà Nội', N'nxbgd@moet.edu.vn', N'02438220801')
+INSERT [dbo].[NHAXUATBAN] ([MaNXB], [TenNXB], [DiaChi], [Email], [SoDienThoai]) VALUES (N'NXB0000004', N'NXB Hội Nhà Văn', N'65 Nguyễn Du, Hai Bà Trưng, Hà Nội', N'nxbhoinhavan@gmai.com', N'02438224320')
+INSERT [dbo].[NHAXUATBAN] ([MaNXB], [TenNXB], [DiaChi], [Email], [SoDienThoai]) VALUES (N'NXB0000005', N'NXB Văn Học', N'18 Nguyễn Trường Tộ, Ba Đình, Hà Nội', N'nxbvanhoc@yahoo.com', N'02437161518')
+GO
+INSERT [dbo].[PHIEUMUON] ([MaPM], [NgayMuon], [NgayTra], [HenTra], [TinhTrang], [MaNQL], [MaThe]) VALUES (N'PM00000001', CAST(N'2023-10-01' AS Date), CAST(N'2023-10-10' AS Date), CAST(N'2023-10-15' AS Date), N'Đã trả', N'NV00000002', N'TTV0000001')
+INSERT [dbo].[PHIEUMUON] ([MaPM], [NgayMuon], [NgayTra], [HenTra], [TinhTrang], [MaNQL], [MaThe]) VALUES (N'PM00000002', CAST(N'2023-10-05' AS Date), CAST(N'2023-10-25' AS Date), CAST(N'2023-10-20' AS Date), N'Đã trả quá hạn', N'NV00000003', N'TTV0000002')
+INSERT [dbo].[PHIEUMUON] ([MaPM], [NgayMuon], [NgayTra], [HenTra], [TinhTrang], [MaNQL], [MaThe]) VALUES (N'PM00000003', CAST(N'2023-11-01' AS Date), NULL, CAST(N'2023-11-15' AS Date), N'Đang mượn', N'NV00000002', N'TTV0000003')
+GO
+INSERT [dbo].[PHIEUNHAP] ([MaPN], [NgayNhap], [TongTien], [MaNXB], [MaNQL]) VALUES (N'PN00000001', CAST(N'2023-01-15' AS Date), CAST(90000.00 AS Decimal(15, 2)), N'NXB0000002', N'NV00000004')
+INSERT [dbo].[PHIEUNHAP] ([MaPN], [NgayNhap], [TongTien], [MaNXB], [MaNQL]) VALUES (N'PN00000002', CAST(N'2023-02-10' AS Date), CAST(60000.00 AS Decimal(15, 2)), N'NXB0000005', N'NV00000004')
+GO
+INSERT [dbo].[PHIEUPHAT] ([MaPP], [MaPM], [MaNQL], [NgayLap], [TongTien], [TrangThai]) VALUES (N'PP00000001', N'PM00000002', N'NV00000003', CAST(N'2023-10-25' AS Date), CAST(50000.00 AS Decimal(10, 2)), 1)
+INSERT [dbo].[PHIEUPHAT] ([MaPP], [MaPM], [MaNQL], [NgayLap], [TongTien], [TrangThai]) VALUES (N'PP00000002', N'PM00000001', N'NV00000002', CAST(N'2023-10-10' AS Date), CAST(100000.00 AS Decimal(10, 2)), 0)
+INSERT [dbo].[PHIEUPHAT] ([MaPP], [MaPM], [MaNQL], [NgayLap], [TongTien], [TrangThai]) VALUES (N'PP00000003', N'PM00000003', N'NV00000002', CAST(N'2023-11-20' AS Date), CAST(150000.00 AS Decimal(10, 2)), 1)
+GO
+INSERT [dbo].[SACH] ([MaSach], [TenSach], [TheLoai], [MaNXB], [NamXB], [NgonNgu], [GiaBia], [IsDeleted]) VALUES (N'S000000001', N'Dế Mèn Phiêu Lưu Ký', N'TL00000001', N'NXB0000002', 2020, N'Tiếng Việt', CAST(45000.00 AS Decimal(10, 2)), 1)
+INSERT [dbo].[SACH] ([MaSach], [TenSach], [TheLoai], [MaNXB], [NamXB], [NgonNgu], [GiaBia], [IsDeleted]) VALUES (N'S000000002', N'Số Đỏ', N'TL00000001', N'NXB0000005', 2018, N'Tiếng Việt', CAST(60000.00 AS Decimal(10, 2)), 0)
+INSERT [dbo].[SACH] ([MaSach], [TenSach], [TheLoai], [MaNXB], [NamXB], [NgonNgu], [GiaBia], [IsDeleted]) VALUES (N'S000000003', N'Cho Tôi Xin Một Vé Đi Tuổi Thơ', N'TL00000001', N'NXB0000001', 2015, N'Tiếng Việt', CAST(80000.00 AS Decimal(10, 2)), 0)
+INSERT [dbo].[SACH] ([MaSach], [TenSach], [TheLoai], [MaNXB], [NamXB], [NgonNgu], [GiaBia], [IsDeleted]) VALUES (N'S000000004', N'Đắc Nhân Tâm', N'TL00000006', N'NXB0000001', 2021, N'Tiếng Việt', CAST(120000.00 AS Decimal(10, 2)), 0)
+INSERT [dbo].[SACH] ([MaSach], [TenSach], [TheLoai], [MaNXB], [NamXB], [NgonNgu], [GiaBia], [IsDeleted]) VALUES (N'S000000005', N'Nhà Giả Kim', N'TL00000002', N'NXB0000002', 2019, N'Tiếng Việt', CAST(95000.00 AS Decimal(10, 2)), 0)
+INSERT [dbo].[SACH] ([MaSach], [TenSach], [TheLoai], [MaNXB], [NamXB], [NgonNgu], [GiaBia], [IsDeleted]) VALUES (N'S000000006', N'Clean Code', N'TL00000003', N'NXB0000003', 2012, N'Tiếng Anh', CAST(350000.00 AS Decimal(10, 2)), 0)
+INSERT [dbo].[SACH] ([MaSach], [TenSach], [TheLoai], [MaNXB], [NamXB], [NgonNgu], [GiaBia], [IsDeleted]) VALUES (N'S000000007', N'Lịch Sử Triết Học Phương Tây', N'TL00000004', N'NXB0000003', 2016, N'Tiếng Việt', CAST(250000.00 AS Decimal(10, 2)), 0)
+INSERT [dbo].[SACH] ([MaSach], [TenSach], [TheLoai], [MaNXB], [NamXB], [NgonNgu], [GiaBia], [IsDeleted]) VALUES (N'S000000008', N'Giáo Trình C++', N'TL00000005', N'NXB0000003', 2020, N'Tiếng Việt', CAST(110000.00 AS Decimal(10, 2)), 0)
+GO
+INSERT [dbo].[SACH_TACGIA] ([MaTacGia], [MaSach]) VALUES (N'TG00000001', N'S000000001')
+INSERT [dbo].[SACH_TACGIA] ([MaTacGia], [MaSach]) VALUES (N'TG00000002', N'S000000002')
+INSERT [dbo].[SACH_TACGIA] ([MaTacGia], [MaSach]) VALUES (N'TG00000003', N'S000000003')
+INSERT [dbo].[SACH_TACGIA] ([MaTacGia], [MaSach]) VALUES (N'TG00000004', N'S000000004')
+INSERT [dbo].[SACH_TACGIA] ([MaTacGia], [MaSach]) VALUES (N'TG00000005', N'S000000005')
+INSERT [dbo].[SACH_TACGIA] ([MaTacGia], [MaSach]) VALUES (N'TG00000006', N'S000000006')
+INSERT [dbo].[SACH_TACGIA] ([MaTacGia], [MaSach]) VALUES (N'TG00000007', N'S000000007')
+INSERT [dbo].[SACH_TACGIA] ([MaTacGia], [MaSach]) VALUES (N'TG00000008', N'S000000008')
+GO
+INSERT [dbo].[SACHCOPY] ([MaVach], [MaSach], [TenSachBanSao], [TinhTrang], [GhiChuTinhTrang], [NgayNhap], [IsDeleted], [MaKeSach]) VALUES (N'MV000000000000000001', N'S000000001', N'Dế Mèn - Bản 1', N'Tốt', N'', CAST(N'2023-01-15' AS Date), 0, N'KS00000001')
+INSERT [dbo].[SACHCOPY] ([MaVach], [MaSach], [TenSachBanSao], [TinhTrang], [GhiChuTinhTrang], [NgayNhap], [IsDeleted], [MaKeSach]) VALUES (N'MV000000000000000002', N'S000000001', N'Dế Mèn - Bản 2', N'Tốt', N'', CAST(N'2023-01-15' AS Date), 0, N'KS00000001')
+INSERT [dbo].[SACHCOPY] ([MaVach], [MaSach], [TenSachBanSao], [TinhTrang], [GhiChuTinhTrang], [NgayNhap], [IsDeleted], [MaKeSach]) VALUES (N'MV000000000000000003', N'S000000002', N'Số Đỏ - Bản 1', N'Bình thường', N'Hơi sờn góc', CAST(N'2023-02-10' AS Date), 0, N'KS00000001')
+INSERT [dbo].[SACHCOPY] ([MaVach], [MaSach], [TenSachBanSao], [TinhTrang], [GhiChuTinhTrang], [NgayNhap], [IsDeleted], [MaKeSach]) VALUES (N'MV000000000000000004', N'S000000003', N'Cho Tôi Xin - Bản 1', N'Tốt', N'', CAST(N'2023-03-05' AS Date), 0, N'KS00000001')
+INSERT [dbo].[SACHCOPY] ([MaVach], [MaSach], [TenSachBanSao], [TinhTrang], [GhiChuTinhTrang], [NgayNhap], [IsDeleted], [MaKeSach]) VALUES (N'MV000000000000000005', N'S000000004', N'Đắc Nhân Tâm - Bản 1', N'Cũ', N'Ố vàng', CAST(N'2023-04-20' AS Date), 0, N'KS00000004')
+INSERT [dbo].[SACHCOPY] ([MaVach], [MaSach], [TenSachBanSao], [TinhTrang], [GhiChuTinhTrang], [NgayNhap], [IsDeleted], [MaKeSach]) VALUES (N'MV000000000000000006', N'S000000005', N'Nhà Giả Kim - Bản 1', N'Tốt', N'', CAST(N'2023-05-12' AS Date), 0, N'KS00000002')
+INSERT [dbo].[SACHCOPY] ([MaVach], [MaSach], [TenSachBanSao], [TinhTrang], [GhiChuTinhTrang], [NgayNhap], [IsDeleted], [MaKeSach]) VALUES (N'MV000000000000000007', N'S000000006', N'Clean Code - Bản 1', N'Tốt', N'', CAST(N'2023-06-18' AS Date), 0, N'KS00000003')
+INSERT [dbo].[SACHCOPY] ([MaVach], [MaSach], [TenSachBanSao], [TinhTrang], [GhiChuTinhTrang], [NgayNhap], [IsDeleted], [MaKeSach]) VALUES (N'MV000000000000000008', N'S000000008', N'C++ Đối Tượng - Bản 1', N'Bình thường', N'', CAST(N'2023-07-25' AS Date), 0, N'KS00000005')
+INSERT [dbo].[SACHCOPY] ([MaVach], [MaSach], [TenSachBanSao], [TinhTrang], [GhiChuTinhTrang], [NgayNhap], [IsDeleted], [MaKeSach]) VALUES (N'MV000000000000000009', N'S000000001', N'Dế Mèn - Bản 3', N'Hỏng', N'Mất trang 12-15', CAST(N'2023-01-15' AS Date), 1, N'KS00000001')
+GO
+INSERT [dbo].[SACHHONG] ([MaSachHong], [TenSachHong], [MaVach], [SoLuong], [NgayGhiNhan], [LyDo]) VALUES (1, N'Dế Mèn - Bản 3 bị hỏng', N'MV000000000000000009', 1, CAST(N'2023-11-05' AS Date), N'Mất trang 12-15')
+GO
+INSERT [dbo].[TACGIA] ([MaTacGia], [TenTacGia], [QuocTich], [DiaChi], [SoDienThoai], [Email]) VALUES (N'TG00000001', N'Tô Hoài', N'Việt Nam', N'Hà Nội', N'', N'')
+INSERT [dbo].[TACGIA] ([MaTacGia], [TenTacGia], [QuocTich], [DiaChi], [SoDienThoai], [Email]) VALUES (N'TG00000002', N'Vũ Trọng Phụng', N'Việt Nam', N'Hà Nội', N'', N'')
+INSERT [dbo].[TACGIA] ([MaTacGia], [TenTacGia], [QuocTich], [DiaChi], [SoDienThoai], [Email]) VALUES (N'TG00000003', N'Nguyễn Nhật Ánh', N'Việt Nam', N'Quảng Nam', N'', N'')
+INSERT [dbo].[TACGIA] ([MaTacGia], [TenTacGia], [QuocTich], [DiaChi], [SoDienThoai], [Email]) VALUES (N'TG00000004', N'Dale Carnegie', N'Mỹ', N'Maryville', N'', N'')
+INSERT [dbo].[TACGIA] ([MaTacGia], [TenTacGia], [QuocTich], [DiaChi], [SoDienThoai], [Email]) VALUES (N'TG00000005', N'Paulo Coelho', N'Brazil', N'Rio de Janeiro', N'', N'')
+INSERT [dbo].[TACGIA] ([MaTacGia], [TenTacGia], [QuocTich], [DiaChi], [SoDienThoai], [Email]) VALUES (N'TG00000006', N'Robert C. Martin', N'Mỹ', N'Illinois', N'', N'')
+INSERT [dbo].[TACGIA] ([MaTacGia], [TenTacGia], [QuocTich], [DiaChi], [SoDienThoai], [Email]) VALUES (N'TG00000007', N'Bertrand Russell', N'Anh', N'Wales', N'', N'')
+INSERT [dbo].[TACGIA] ([MaTacGia], [TenTacGia], [QuocTich], [DiaChi], [SoDienThoai], [Email]) VALUES (N'TG00000008', N'Phạm Văn Ất', N'Việt Nam', N'Hà Nội', N'', N'')
+GO
+INSERT [dbo].[THELOAI] ([MaTheLoai], [TenTheLoai]) VALUES (N'TL00000001', N'Văn học trong nước')
+INSERT [dbo].[THELOAI] ([MaTheLoai], [TenTheLoai]) VALUES (N'TL00000002', N'Văn học nước ngoài')
+INSERT [dbo].[THELOAI] ([MaTheLoai], [TenTheLoai]) VALUES (N'TL00000003', N'Khoa học công nghệ')
+INSERT [dbo].[THELOAI] ([MaTheLoai], [TenTheLoai]) VALUES (N'TL00000004', N'Lịch sử - Địa lý')
+INSERT [dbo].[THELOAI] ([MaTheLoai], [TenTheLoai]) VALUES (N'TL00000005', N'Giáo trình - Sách giáo khoa')
+INSERT [dbo].[THELOAI] ([MaTheLoai], [TenTheLoai]) VALUES (N'TL00000006', N'Kinh tế - Quản lý')
+GO
+INSERT [dbo].[THETHUVIEN] ([MaThe], [TenThe], [MaDocGia], [NgayCap], [NgayHetHan], [MaNQL]) VALUES (N'TTV0000001', N'Thẻ Sinh A', N'DG00000001', CAST(N'2023-01-12' AS Date), CAST(N'2024-01-12' AS Date), N'NV00000002')
+INSERT [dbo].[THETHUVIEN] ([MaThe], [TenThe], [MaDocGia], [NgayCap], [NgayHetHan], [MaNQL]) VALUES (N'TTV0000002', N'Thẻ Viên B', N'DG00000002', CAST(N'2023-02-16' AS Date), CAST(N'2024-02-16' AS Date), N'NV00000002')
+INSERT [dbo].[THETHUVIEN] ([MaThe], [TenThe], [MaDocGia], [NgayCap], [NgayHetHan], [MaNQL]) VALUES (N'TTV0000003', N'Thẻ Giảng C', N'DG00000003', CAST(N'2023-03-22' AS Date), CAST(N'2024-03-22' AS Date), N'NV00000003')
+GO
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [UQ__CONNGUOI__55F68FC00EBC5898]    Script Date: 3/4/2026 7:22:20 AM ******/
+ALTER TABLE [dbo].[CONNGUOI] ADD UNIQUE NONCLUSTERED 
+(
+	[TenDangNhap] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[CHITIETPHIEUPHAT] ADD  DEFAULT ((1)) FOR [TrangThai]
+GO
+ALTER TABLE [dbo].[DOCGIA] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[NGUOIQUANLY] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[PHIEUPHAT] ADD  DEFAULT ((1)) FOR [TrangThai]
+GO
+ALTER TABLE [dbo].[SACH] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[SACHCOPY] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[CHITIETPHIEUMUON]  WITH CHECK ADD  CONSTRAINT [FK_CHITIETPHIEUMUON_PHIEUMUON] FOREIGN KEY([MaPM])
+REFERENCES [dbo].[PHIEUMUON] ([MaPM])
+GO
+ALTER TABLE [dbo].[CHITIETPHIEUMUON] CHECK CONSTRAINT [FK_CHITIETPHIEUMUON_PHIEUMUON]
+GO
+ALTER TABLE [dbo].[CHITIETPHIEUMUON]  WITH CHECK ADD  CONSTRAINT [FK_CHITIETPHIEUMUON_SACHCOPY] FOREIGN KEY([MaCuonSach])
+REFERENCES [dbo].[SACHCOPY] ([MaVach])
+GO
+ALTER TABLE [dbo].[CHITIETPHIEUMUON] CHECK CONSTRAINT [FK_CHITIETPHIEUMUON_SACHCOPY]
+GO
+ALTER TABLE [dbo].[CHITIETPHIEUNHAP]  WITH CHECK ADD  CONSTRAINT [FK_CHITIETPHIEUNHAP_PHIEUNHAP] FOREIGN KEY([MaPN])
+REFERENCES [dbo].[PHIEUNHAP] ([MaPN])
+GO
+ALTER TABLE [dbo].[CHITIETPHIEUNHAP] CHECK CONSTRAINT [FK_CHITIETPHIEUNHAP_PHIEUNHAP]
+GO
+ALTER TABLE [dbo].[CHITIETPHIEUNHAP]  WITH CHECK ADD  CONSTRAINT [FK_CHITIETPHIEUNHAP_SACH] FOREIGN KEY([MaSach])
+REFERENCES [dbo].[SACH] ([MaSach])
+GO
+ALTER TABLE [dbo].[CHITIETPHIEUNHAP] CHECK CONSTRAINT [FK_CHITIETPHIEUNHAP_SACH]
+GO
+ALTER TABLE [dbo].[CHITIETPHIEUPHAT]  WITH CHECK ADD FOREIGN KEY([MaCuonSach])
+REFERENCES [dbo].[SACHCOPY] ([MaVach])
+GO
+ALTER TABLE [dbo].[CHITIETPHIEUPHAT]  WITH CHECK ADD FOREIGN KEY([MaPP])
+REFERENCES [dbo].[PHIEUPHAT] ([MaPP])
+GO
+ALTER TABLE [dbo].[DOCGIA]  WITH CHECK ADD  CONSTRAINT [FK_DOCGIA_CONNGUOI] FOREIGN KEY([MaDocGia])
+REFERENCES [dbo].[CONNGUOI] ([MaNguoi])
+GO
+ALTER TABLE [dbo].[DOCGIA] CHECK CONSTRAINT [FK_DOCGIA_CONNGUOI]
+GO
+ALTER TABLE [dbo].[KESACH]  WITH CHECK ADD  CONSTRAINT [FK_KESACH_THELOAI] FOREIGN KEY([MaTheLoai])
+REFERENCES [dbo].[THELOAI] ([MaTheLoai])
+GO
+ALTER TABLE [dbo].[KESACH] CHECK CONSTRAINT [FK_KESACH_THELOAI]
+GO
+ALTER TABLE [dbo].[NGUOIQUANLY]  WITH CHECK ADD  CONSTRAINT [FK_NGQL_CONNGUOI] FOREIGN KEY([MaNQL])
+REFERENCES [dbo].[CONNGUOI] ([MaNguoi])
+GO
+ALTER TABLE [dbo].[NGUOIQUANLY] CHECK CONSTRAINT [FK_NGQL_CONNGUOI]
+GO
+ALTER TABLE [dbo].[PHIEUMUON]  WITH CHECK ADD  CONSTRAINT [FK_PHIEUMUON_NGUOIQUANLY] FOREIGN KEY([MaNQL])
+REFERENCES [dbo].[NGUOIQUANLY] ([MaNQL])
+GO
+ALTER TABLE [dbo].[PHIEUMUON] CHECK CONSTRAINT [FK_PHIEUMUON_NGUOIQUANLY]
+GO
+ALTER TABLE [dbo].[PHIEUMUON]  WITH CHECK ADD  CONSTRAINT [FK_PHIEUMUON_THETHUVIEN] FOREIGN KEY([MaThe])
+REFERENCES [dbo].[THETHUVIEN] ([MaThe])
+GO
+ALTER TABLE [dbo].[PHIEUMUON] CHECK CONSTRAINT [FK_PHIEUMUON_THETHUVIEN]
+GO
+ALTER TABLE [dbo].[PHIEUNHAP]  WITH CHECK ADD  CONSTRAINT [FK_PHIEUNHAP_NGUOIQUANLY] FOREIGN KEY([MaNQL])
+REFERENCES [dbo].[NGUOIQUANLY] ([MaNQL])
+GO
+ALTER TABLE [dbo].[PHIEUNHAP] CHECK CONSTRAINT [FK_PHIEUNHAP_NGUOIQUANLY]
+GO
+ALTER TABLE [dbo].[PHIEUNHAP]  WITH CHECK ADD  CONSTRAINT [FK_PHIEUNHAP_NHAXUATBAN] FOREIGN KEY([MaNXB])
+REFERENCES [dbo].[NHAXUATBAN] ([MaNXB])
+GO
+ALTER TABLE [dbo].[PHIEUNHAP] CHECK CONSTRAINT [FK_PHIEUNHAP_NHAXUATBAN]
+GO
+ALTER TABLE [dbo].[PHIEUPHAT]  WITH CHECK ADD FOREIGN KEY([MaNQL])
+REFERENCES [dbo].[NGUOIQUANLY] ([MaNQL])
+GO
+ALTER TABLE [dbo].[PHIEUPHAT]  WITH CHECK ADD FOREIGN KEY([MaPM])
+REFERENCES [dbo].[PHIEUMUON] ([MaPM])
+GO
+ALTER TABLE [dbo].[SACH]  WITH CHECK ADD  CONSTRAINT [FK_SACH_NXB] FOREIGN KEY([MaNXB])
+REFERENCES [dbo].[NHAXUATBAN] ([MaNXB])
+GO
+ALTER TABLE [dbo].[SACH] CHECK CONSTRAINT [FK_SACH_NXB]
+GO
+ALTER TABLE [dbo].[SACH]  WITH CHECK ADD  CONSTRAINT [FK_SACH_THELOAI] FOREIGN KEY([TheLoai])
+REFERENCES [dbo].[THELOAI] ([MaTheLoai])
+GO
+ALTER TABLE [dbo].[SACH] CHECK CONSTRAINT [FK_SACH_THELOAI]
+GO
+ALTER TABLE [dbo].[SACH_TACGIA]  WITH CHECK ADD  CONSTRAINT [FK_SACHTACGIA_SACH] FOREIGN KEY([MaSach])
+REFERENCES [dbo].[SACH] ([MaSach])
+GO
+ALTER TABLE [dbo].[SACH_TACGIA] CHECK CONSTRAINT [FK_SACHTACGIA_SACH]
+GO
+ALTER TABLE [dbo].[SACH_TACGIA]  WITH CHECK ADD  CONSTRAINT [FK_SACHTACGIA_TACGIA] FOREIGN KEY([MaTacGia])
+REFERENCES [dbo].[TACGIA] ([MaTacGia])
+GO
+ALTER TABLE [dbo].[SACH_TACGIA] CHECK CONSTRAINT [FK_SACHTACGIA_TACGIA]
+GO
+ALTER TABLE [dbo].[SACHCOPY]  WITH CHECK ADD  CONSTRAINT [FK_SACHCOPY_KESACH] FOREIGN KEY([MaKeSach])
+REFERENCES [dbo].[KESACH] ([MaKeSach])
+GO
+ALTER TABLE [dbo].[SACHCOPY] CHECK CONSTRAINT [FK_SACHCOPY_KESACH]
+GO
+ALTER TABLE [dbo].[SACHCOPY]  WITH CHECK ADD  CONSTRAINT [FK_SACHCOPY_SACH] FOREIGN KEY([MaSach])
+REFERENCES [dbo].[SACH] ([MaSach])
+GO
+ALTER TABLE [dbo].[SACHCOPY] CHECK CONSTRAINT [FK_SACHCOPY_SACH]
+GO
+ALTER TABLE [dbo].[SACHHONG]  WITH CHECK ADD  CONSTRAINT [FK_SACHHONG_SACHCOPY] FOREIGN KEY([MaVach])
+REFERENCES [dbo].[SACHCOPY] ([MaVach])
+GO
+ALTER TABLE [dbo].[SACHHONG] CHECK CONSTRAINT [FK_SACHHONG_SACHCOPY]
+GO
+ALTER TABLE [dbo].[THETHUVIEN]  WITH CHECK ADD  CONSTRAINT [FK_THETHUVIEN_DOCGIA] FOREIGN KEY([MaDocGia])
+REFERENCES [dbo].[DOCGIA] ([MaDocGia])
+GO
+ALTER TABLE [dbo].[THETHUVIEN] CHECK CONSTRAINT [FK_THETHUVIEN_DOCGIA]
+GO
+ALTER TABLE [dbo].[THETHUVIEN]  WITH CHECK ADD  CONSTRAINT [FK_THETHUVIEN_NGUOIQUANLY] FOREIGN KEY([MaNQL])
+REFERENCES [dbo].[NGUOIQUANLY] ([MaNQL])
+GO
+ALTER TABLE [dbo].[THETHUVIEN] CHECK CONSTRAINT [FK_THETHUVIEN_NGUOIQUANLY]
+GO
+USE [master]
+GO
+ALTER DATABASE [QuanLyThuVien] SET  READ_WRITE 
+GO

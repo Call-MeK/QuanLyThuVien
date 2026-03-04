@@ -1,0 +1,6 @@
+CREATE TABLE SinhVien (
+    Id VARCHAR(10) PRIMARY KEY,
+    name NVARCHAR(50),
+    mark FLOAT,
+    IdDep VARCHAR(10) FOREIGN KEY REFERENCES Khoa(IdDep)
+);

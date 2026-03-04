@@ -1,0 +1,4 @@
+CREATE TABLE Khoa (
+    IdDep VARCHAR(10) PRIMARY KEY,
+    NameDep NVARCHAR(50)
+);
