@@ -16,14 +16,15 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
     private Color colorBackground = new Color(248, 249, 250);
 
     private JTextField txtMaDG, txtHoTen, txtNgaySinh, txtDienThoai, txtEmail, txtNgayDK;
-    private JComboBox<String> cbGioiTinh, cbTrangThai, cbSearchCriteria;
+    private JTextField txtTrangThai;
+    private JComboBox<String> cbGioiTinh, cbSearchCriteria;
     private JTextField txtSearch;
     private JComboBox<String> cbSearchTrangThai;
     private JPanel pnlSearchInput;
     private CardLayout searchInputLayout;
     private JTable table;
     private DefaultTableModel model;
-    private JButton btnThem, btnSua, btnKhoa, btnMoKhoa, btnXoa, btnLamMoi, btnSearch, btnResetSearch;
+    private JButton btnThem, btnSua, btnKhoa, btnMoKhoa, btnLamMoi, btnSearch, btnResetSearch;
 
     private DocGiaBUS docGiaBUS = new DocGiaBUS();
 
@@ -57,33 +58,40 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         Font fontLabel = new Font(tenFont, Font.BOLD, 14);
         Font fontInput = new Font(tenFont, Font.PLAIN, 14);
 
-        txtMaDG = new JTextField(); txtMaDG.setFont(fontInput);
-        txtHoTen = new JTextField(); txtHoTen.setFont(fontInput);
-        cbGioiTinh = new JComboBox<>(new String[]{"Nam", "Nữ", "Khác"}); cbGioiTinh.setFont(fontInput);
-        txtNgaySinh = new JTextField("2000-01-01"); txtNgaySinh.setFont(fontInput);
+        txtMaDG      = new JTextField(); txtMaDG.setFont(fontInput);
+        txtHoTen     = new JTextField(); txtHoTen.setFont(fontInput);
+        cbGioiTinh   = new JComboBox<>(new String[]{"Nam", "Nữ", "Khác"}); cbGioiTinh.setFont(fontInput);
+        txtNgaySinh  = new JTextField("2000-01-01"); txtNgaySinh.setFont(fontInput);
         txtDienThoai = new JTextField(); txtDienThoai.setFont(fontInput);
-        txtEmail = new JTextField(); txtEmail.setFont(fontInput);
-        txtNgayDK = new JTextField(java.time.LocalDate.now().toString()); txtNgayDK.setFont(fontInput);
-        cbTrangThai = new JComboBox<>(new String[]{"Đang hoạt động", "Hết hạn"});
-        cbTrangThai.setFont(fontInput);
+        txtEmail     = new JTextField(); txtEmail.setFont(fontInput);
+        txtNgayDK    = new JTextField(java.time.LocalDate.now().toString()); txtNgayDK.setFont(fontInput);
 
-        pnlInput.add(createLabel("Mã độc giả:", fontLabel)); pnlInput.add(txtMaDG);
-        pnlInput.add(createLabel("Họ và tên:", fontLabel)); pnlInput.add(txtHoTen);
-        pnlInput.add(createLabel("Giới tính:", fontLabel)); pnlInput.add(cbGioiTinh);
+        // Trạng thái chỉ hiển thị, không cho sửa tay
+        txtTrangThai = new JTextField("Đang hoạt động");
+        txtTrangThai.setFont(fontInput);
+        txtTrangThai.setEditable(false);
+        txtTrangThai.setBackground(new Color(233, 236, 239));
+
+        pnlInput.add(createLabel("Mã độc giả:", fontLabel));            pnlInput.add(txtMaDG);
+        pnlInput.add(createLabel("Họ và tên:", fontLabel));             pnlInput.add(txtHoTen);
+        pnlInput.add(createLabel("Giới tính:", fontLabel));             pnlInput.add(cbGioiTinh);
         pnlInput.add(createLabel("Ngày sinh (YYYY-MM-DD):", fontLabel)); pnlInput.add(txtNgaySinh);
-        pnlInput.add(createLabel("Điện thoại:", fontLabel)); pnlInput.add(txtDienThoai);
-        pnlInput.add(createLabel("Email:", fontLabel)); pnlInput.add(txtEmail);
-        pnlInput.add(createLabel("Ngày đăng ký:", fontLabel)); pnlInput.add(txtNgayDK);
-        pnlInput.add(createLabel("Trạng thái:", fontLabel)); pnlInput.add(cbTrangThai);
+        pnlInput.add(createLabel("Điện thoại:", fontLabel));            pnlInput.add(txtDienThoai);
+        pnlInput.add(createLabel("Email:", fontLabel));                  pnlInput.add(txtEmail);
+        pnlInput.add(createLabel("Ngày đăng ký:", fontLabel));          pnlInput.add(txtNgayDK);
+        pnlInput.add(createLabel("Trạng thái:", fontLabel));            pnlInput.add(txtTrangThai);
 
         // --- THANH TÌM KIẾM ---
         JPanel pnlSearch = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         pnlSearch.setBackground(colorBackground);
         pnlSearch.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        txtSearch = new JTextField(20); txtSearch.setFont(fontInput); txtSearch.setPreferredSize(new Dimension(0, 35));
+        txtSearch = new JTextField(20);
+        txtSearch.setFont(fontInput);
+        txtSearch.setPreferredSize(new Dimension(0, 35));
 
-        cbSearchTrangThai = new JComboBox<>(new String[]{"Hoạt động", "Hết hạn", "Đã khóa"});
+        // Chỉ 2 trạng thái: Đang hoạt động / Đã khóa
+        cbSearchTrangThai = new JComboBox<>(new String[]{"Đang hoạt động", "Đã khóa"});
         cbSearchTrangThai.setFont(fontInput);
         cbSearchTrangThai.setPreferredSize(new Dimension(200, 35));
 
@@ -95,9 +103,13 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         searchInputLayout.show(pnlSearchInput, "TEXT");
 
         cbSearchCriteria = new JComboBox<>(new String[]{"Tất cả", "Mã ĐG", "Họ Tên", "Số Điện Thoại", "Trạng Thái"});
-        cbSearchCriteria.setFont(fontInput); cbSearchCriteria.setPreferredSize(new Dimension(140, 35));
-        btnSearch = createActionButton("Lọc", new Color(13, 110, 253)); btnSearch.setPreferredSize(new Dimension(100, 35));
-        btnResetSearch = createActionButton("Hủy Lọc", new Color(108, 117, 125)); btnResetSearch.setPreferredSize(new Dimension(100, 35));
+        cbSearchCriteria.setFont(fontInput);
+        cbSearchCriteria.setPreferredSize(new Dimension(140, 35));
+
+        btnSearch      = createActionButton("Lọc", new Color(13, 110, 253));
+        btnSearch.setPreferredSize(new Dimension(100, 35));
+        btnResetSearch = createActionButton("Hủy Lọc", new Color(108, 117, 125));
+        btnResetSearch.setPreferredSize(new Dimension(100, 35));
 
         pnlSearch.add(createLabel("🔍 Tìm kiếm:", new Font(tenFont, Font.BOLD, 14)));
         pnlSearch.add(pnlSearchInput);
@@ -127,8 +139,8 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
                     boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if (!isSelected) {
-                    String trangThai = model.getValueAt(row, 5) != null ? model.getValueAt(row, 5).toString() : "";
-                    if (trangThai.equals("Đã khóa")) {
+                    String tt = model.getValueAt(row, 5) != null ? model.getValueAt(row, 5).toString() : "";
+                    if (tt.equals("Đã khóa")) {
                         c.setBackground(new Color(255, 235, 238));
                         c.setForeground(new Color(183, 28, 28));
                     } else {
@@ -145,19 +157,21 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         pnlCenter.add(scrollPane, BorderLayout.CENTER);
         add(pnlCenter, BorderLayout.CENTER);
 
-        // --- NÚT CHỨC NĂNG ---
+        // --- NÚT CHỨC NĂNG (đã bỏ nút Xóa) ---
         JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         pnlButtons.setBackground(colorBackground);
 
-        btnThem = createActionButton("Thêm", new Color(25, 135, 84));
-        btnSua = createActionButton("Cập Nhật", new Color(255, 193, 7)); btnSua.setForeground(Color.BLACK);
-        btnKhoa = createActionButton("Khóa Thẻ", new Color(220, 53, 69));
+        btnThem   = createActionButton("Thêm", new Color(25, 135, 84));
+        btnSua    = createActionButton("Cập Nhật", new Color(255, 193, 7)); btnSua.setForeground(Color.BLACK);
+        btnKhoa   = createActionButton("Khóa Thẻ", new Color(220, 53, 69));
         btnMoKhoa = createActionButton("Mở Khóa", new Color(13, 110, 253));
-        btnXoa = createActionButton("Xóa Hẳn", new Color(134, 19, 19));
         btnLamMoi = createActionButton("Làm Mới", new Color(108, 117, 125));
 
-        pnlButtons.add(btnThem); pnlButtons.add(btnSua); pnlButtons.add(btnKhoa);
-        pnlButtons.add(btnMoKhoa); pnlButtons.add(btnXoa); pnlButtons.add(btnLamMoi);
+        pnlButtons.add(btnThem);
+        pnlButtons.add(btnSua);
+        pnlButtons.add(btnKhoa);
+        pnlButtons.add(btnMoKhoa);
+        pnlButtons.add(btnLamMoi);
         add(pnlButtons, BorderLayout.SOUTH);
     }
 
@@ -178,14 +192,16 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
                     cbGioiTinh.setSelectedItem(model.getValueAt(row, 2) != null ? model.getValueAt(row, 2).toString() : "Khác");
                     txtNgaySinh.setText(model.getValueAt(row, 3) != null ? model.getValueAt(row, 3).toString() : "");
                     txtDienThoai.setText(model.getValueAt(row, 4) != null ? model.getValueAt(row, 4).toString() : "");
-
-                    String tt = model.getValueAt(row, 5) != null ? model.getValueAt(row, 5).toString() : "";
-                    if (!tt.equals("Đã khóa")) {
-                        cbTrangThai.setSelectedItem(tt);
-                    } else {
-                        cbTrangThai.setSelectedIndex(0);
-                    }
-
+                    String trangThai = model.getValueAt(row, 5) != null ? model.getValueAt(row, 5).toString() : "";
+                    txtTrangThai.setText(trangThai);
+// Đổi màu cho dễ nhìn
+if (trangThai.equals("Đã khóa")) {
+    txtTrangThai.setForeground(new Color(183, 28, 28));
+    txtTrangThai.setBackground(new Color(255, 235, 238));
+} else {
+    txtTrangThai.setForeground(new Color(25, 135, 84));
+    txtTrangThai.setBackground(new Color(233, 236, 239));
+}
                     String maDG = txtMaDG.getText();
                     for (DocGiaDTO dg : docGiaBUS.getListDocGia()) {
                         if (dg.getMaDocGia().equals(maDG)) {
@@ -201,26 +217,22 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         // 2. Nút LÀM MỚI
         btnLamMoi.addActionListener(e -> {
             lamMoiForm();
-            docGiaBUS.reloadFromDB(); // Đồng bộ lại với DB
+            docGiaBUS.reloadFromDB();
             loadDataToTable();
         });
 
         // 3. Nút THÊM
         btnThem.addActionListener(e -> {
-            // Gọi hàm validate, truyền rỗng vào vì thêm mới không cần loại trừ mã
-            if (!validateInput("")) {
-                return; 
-            }
-            
+            if (!validateInput("")) return;
+
             String maNQL = BUS.SessionManager.getInstance().getMaNguoi();
-            if (maNQL == null || maNQL.isEmpty()) {
-                maNQL = "NV00000001";
-            }
+            if (maNQL == null || maNQL.isEmpty()) maNQL = "NV00000001";
 
             DocGiaDTO dg = createDocGiaFromForm();
-            String result = docGiaBUS.addDocGia(dg, maNQL); 
+            String result = docGiaBUS.addDocGia(dg, maNQL);
             if (result.equals("Thêm thành công")) {
-                JOptionPane.showMessageDialog(this, "Thêm độc giả và cấp thẻ thư viện thành công!\n\n"
+                JOptionPane.showMessageDialog(this,
+                        "Thêm độc giả và cấp thẻ thư viện thành công!\n\n"
                         + "Tài khoản đăng nhập hệ thống của độc giả:\n"
                         + "- User: " + dg.getMaDocGia() + "\n"
                         + "- Pass mặc định: 12345");
@@ -239,17 +251,13 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 độc giả trong bảng để sửa!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            
-            // Chặn sửa nếu đang bị khóa
             if (docGiaBUS.isDocGiaLocked(maDG)) {
-                JOptionPane.showMessageDialog(this, "Độc giả này đang bị khóa thẻ!\nVui lòng 'Mở Khóa' trước khi cập nhật thông tin.", "Từ chối cập nhật", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        "Độc giả này đang bị khóa thẻ!\nVui lòng 'Mở Khóa' trước khi cập nhật thông tin.",
+                        "Từ chối cập nhật", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-
-            // Gọi hàm validate, truyền mã ĐG vào để không báo lỗi trùng lặp với chính họ
-            if (!validateInput(maDG)) {
-                return;
-            }
+            if (!validateInput(maDG)) return;
 
             DocGiaDTO dg = createDocGiaFromForm();
             String result = docGiaBUS.updateDocGia(dg);
@@ -261,23 +269,26 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
             }
         });
 
-        // 7. Nút XÓA HẲN
-        btnXoa.addActionListener(e -> {
-            if (txtMaDG.getText().trim().isEmpty()) {
+        // 5. Nút KHÓA THẺ
+        btnKhoa.addActionListener(e -> {
+            String maDG = txtMaDG.getText().trim();
+            if (maDG.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 độc giả trong bảng!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            String maDG = txtMaDG.getText().trim();
+            if (docGiaBUS.isDocGiaLocked(maDG)) {
+                JOptionPane.showMessageDialog(this, "Độc giả này đã bị khóa thẻ rồi!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
             int confirm = JOptionPane.showConfirmDialog(this,
-                    "⚠ XÓA HẲN độc giả " + maDG + " khỏi hệ thống?\n" +
-                    "Tất cả dữ liệu liên quan (phiếu mượn, thẻ thư viện, phí phạt) cũng sẽ bị xóa!\n" +
-                    "Hành động này KHÔNG THỂ hoàn tác!",
-                    "Xác nhận xóa vĩnh viễn", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                    "Xác nhận khóa thẻ độc giả " + maDG + "?\n"
+                    + "Độc giả vẫn đăng nhập được nhưng không thể mượn sách mới.",
+                    "Xác nhận khóa", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             if (confirm == JOptionPane.YES_OPTION) {
-                String result = docGiaBUS.deleteDocGia(maDG);
-                if (result.equals("Xóa thành công")) {
-                    JOptionPane.showMessageDialog(this, "Đã xóa vĩnh viễn độc giả " + maDG);
-                    docGiaBUS.reloadFromDB(); // Đồng bộ lại từ DB cho chắc chắn
+                String result = docGiaBUS.softDeleteDocGia(maDG);
+                if (result.equals("Khóa thẻ thành công")) {
+                    JOptionPane.showMessageDialog(this, "Đã khóa thẻ độc giả " + maDG);
+                    docGiaBUS.reloadFromDB();
                     loadDataToTable();
                     lamMoiForm();
                 } else {
@@ -286,7 +297,34 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
             }
         });
 
-        // 8. Đổi tiêu chí tìm kiếm -> chuyển giữa TextField và ComboBox
+        // 6. Nút MỞ KHÓA
+        btnMoKhoa.addActionListener(e -> {
+            String maDG = txtMaDG.getText().trim();
+            if (maDG.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 độc giả trong bảng!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            if (!docGiaBUS.isDocGiaLocked(maDG)) {
+                JOptionPane.showMessageDialog(this, "Độc giả này chưa bị khóa thẻ!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Xác nhận mở khóa thẻ cho độc giả " + maDG + "?",
+                    "Xác nhận mở khóa", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                String result = docGiaBUS.restoreDocGia(maDG);
+                if (result.equals("Mở khóa thành công")) {
+                    JOptionPane.showMessageDialog(this, "Đã mở khóa thẻ cho độc giả " + maDG);
+                    docGiaBUS.reloadFromDB();
+                    loadDataToTable();
+                    lamMoiForm();
+                } else {
+                    JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        // 7. Đổi tiêu chí tìm kiếm
         cbSearchCriteria.addActionListener(e -> {
             String criteria = (String) cbSearchCriteria.getSelectedItem();
             if ("Trạng Thái".equals(criteria)) {
@@ -296,20 +334,16 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
             }
         });
 
-        // 9. Nút LỌC
+        // 8. Nút LỌC
         btnSearch.addActionListener(e -> {
             String criteria = (String) cbSearchCriteria.getSelectedItem();
-            String keyword;
-            if ("Trạng Thái".equals(criteria)) {
-                keyword = (String) cbSearchTrangThai.getSelectedItem();
-            } else {
-                keyword = txtSearch.getText();
-            }
-            ArrayList<DocGiaDTO> ketQua = docGiaBUS.search(keyword, criteria);
-            hienThiKetQua(ketQua);
+            String keyword = "Trạng Thái".equals(criteria)
+                    ? (String) cbSearchTrangThai.getSelectedItem()
+                    : txtSearch.getText();
+            hienThiKetQua(docGiaBUS.search(keyword, criteria));
         });
 
-        // 10. Nút HỦY LỌC
+        // 9. Nút HỦY LỌC
         btnResetSearch.addActionListener(e -> {
             txtSearch.setText("");
             cbSearchCriteria.setSelectedIndex(0);
@@ -325,30 +359,17 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
 
     private void loadDataToTable() {
         ArrayList<DocGiaDTO> listDG = docGiaBUS.getListDocGia();
-        if (listDG != null) {
-            hienThiKetQua(listDG);
-        }
+        if (listDG != null) hienThiKetQua(listDG);
     }
 
     private void hienThiKetQua(ArrayList<DocGiaDTO> danhSach) {
         model.setRowCount(0);
         for (DocGiaDTO dg : danhSach) {
-            String trangThai;
-            if (dg.getIsDeleted() != null && dg.getIsDeleted()) {
-                trangThai = "Đã khóa";
-            } else {
-                trangThai = dg.getTrangThai();
-                if (trangThai != null && trangThai.equals("Đang hoạt động")) {
-                trangThai = "Hoạt động";
-                }
-            }
+            String trangThai = (dg.getIsDeleted() != null && dg.getIsDeleted())
+                    ? "Đã khóa" : "Đang hoạt động";
             model.addRow(new Object[]{
-                dg.getMaDocGia(),
-                dg.getHoTen(),
-                dg.getGioiTinh(),
-                dg.getNgaySinh(),
-                dg.getSoDienThoai(),
-                trangThai
+                dg.getMaDocGia(), dg.getHoTen(), dg.getGioiTinh(),
+                dg.getNgaySinh(), dg.getSoDienThoai(), trangThai
             });
         }
     }
@@ -363,21 +384,19 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         dg.setSoDienThoai(txtDienThoai.getText().trim());
         dg.setEmail(txtEmail.getText().trim());
         dg.setNgayDangKi(txtNgayDK.getText().trim());
-        dg.setTrangThai(cbTrangThai.getSelectedItem().toString());
-
+        dg.setTrangThai("Đang hoạt động");
         dg.setTenDangNhap(txtMaDG.getText().trim());
         dg.setMatKhau("12345");
         dg.setIsDeleted(false);
         dg.setLoaiDocGia("Thường");
         dg.setNgayXoa("");
         dg.setDiaChi("");
-
         return dg;
     }
 
     public void lamMoiForm() {
-        txtMaDG.setText(docGiaBUS.generateMaDocGia()); // Tự động sinh mã
-        txtMaDG.setEditable(false); // Khóa không cho sửa
+        txtMaDG.setText(docGiaBUS.generateMaDocGia());
+        txtMaDG.setEditable(false);
         txtHoTen.setText("");
         txtNgaySinh.setText("2000-01-01");
         txtDienThoai.setText("");
@@ -385,56 +404,64 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         txtNgayDK.setText(java.time.LocalDate.now().toString());
         txtNgayDK.setEditable(false);
         cbGioiTinh.setSelectedIndex(0);
-        cbTrangThai.setSelectedIndex(0);
         txtSearch.setText("");
         cbSearchTrangThai.setSelectedIndex(0);
         table.clearSelection();
+        txtTrangThai.setText("Đang hoạt động");
+txtTrangThai.setForeground(new Color(25, 135, 84));
+txtTrangThai.setBackground(new Color(233, 236, 239));
     }
 
     // ===== TIỆN ÍCH UI =====
     private JLabel createLabel(String text, Font font) {
-        JLabel lbl = new JLabel(text); lbl.setFont(font); lbl.setForeground(new Color(73, 80, 87)); return lbl;
+        JLabel lbl = new JLabel(text);
+        lbl.setFont(font);
+        lbl.setForeground(new Color(73, 80, 87));
+        return lbl;
     }
+
     private void setupTable(JTable t) {
-        t.setRowHeight(32); t.setFont(new Font(tenFont, Font.PLAIN, 14));
+        t.setRowHeight(32);
+        t.setFont(new Font(tenFont, Font.PLAIN, 14));
         t.getTableHeader().setFont(new Font(tenFont, Font.BOLD, 14));
-        t.getTableHeader().setBackground(new Color(233, 236, 239)); t.getTableHeader().setOpaque(false);
-        t.setShowGrid(false); t.setIntercellSpacing(new Dimension(0, 0));
-        t.setShowHorizontalLines(true); t.setGridColor(new Color(222, 226, 230));
+        t.getTableHeader().setBackground(new Color(233, 236, 239));
+        t.getTableHeader().setOpaque(false);
+        t.setShowGrid(false);
+        t.setIntercellSpacing(new Dimension(0, 0));
+        t.setShowHorizontalLines(true);
+        t.setGridColor(new Color(222, 226, 230));
     }
+
     private JButton createActionButton(String text, Color bgColor) {
-        JButton btn = new JButton(text); btn.setFont(new Font(tenFont, Font.BOLD, 14));
-        btn.setForeground(Color.WHITE); btn.setBackground(bgColor);
-        btn.setBorderPainted(false); btn.setFocusPainted(false);
-        btn.setPreferredSize(new Dimension(130, 40)); btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        JButton btn = new JButton(text);
+        btn.setFont(new Font(tenFont, Font.BOLD, 14));
+        btn.setForeground(Color.WHITE);
+        btn.setBackground(bgColor);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setPreferredSize(new Dimension(130, 40));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setOpaque(true);
         return btn;
     }
-    // Hàm kiểm tra tính hợp lệ của Form nhập liệu
+
     private boolean validateInput(String maDG) {
-        String sdt = txtDienThoai.getText().trim();
+        String sdt   = txtDienThoai.getText().trim();
         String email = txtEmail.getText().trim();
         String hoTen = txtHoTen.getText().trim();
 
-        // 1. Không được để trống các trường quan trọng
         if (hoTen.isEmpty() || sdt.isEmpty() || email.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ Họ tên, Số điện thoại và Email!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return false;
         }
-
-        // 2. Validate SĐT (Phải là 10 chữ số, bắt đầu bằng số 0)
         if (!sdt.matches("^0\\d{9}$")) {
             JOptionPane.showMessageDialog(this, "Số điện thoại không hợp lệ!\nVui lòng nhập đúng 10 chữ số và bắt đầu bằng số 0.", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return false;
         }
-
-        // 3. Validate Email
         if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$")) {
             JOptionPane.showMessageDialog(this, "Email không hợp lệ!\nVui lòng nhập đúng định dạng (VD: docgia@gmail.com).", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return false;
         }
-
-        // 4. Kiểm tra trùng lặp SĐT và Email
         if (docGiaBUS.checkDuplicatePhone(sdt, maDG)) {
             JOptionPane.showMessageDialog(this, "Số điện thoại này đã được đăng ký cho độc giả khác!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return false;
@@ -443,7 +470,6 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Email này đã được đăng ký cho độc giả khác!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return false;
         }
-
         return true;
     }
 }
