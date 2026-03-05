@@ -7,7 +7,11 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.List;
 import BUS.SachBUS;
+import BUS.TheLoaiBUS;
+import BUS.NhaXuatBanBUS;
 import DTO.SachDTO;
+import DTO.TheLoaiDTO;
+import DTO.NhaXuatBanDTO;
 
 public class TimKiemSachPanel extends JPanel {
 
@@ -108,14 +112,49 @@ public class TimKiemSachPanel extends JPanel {
         // ==========================================
         // PHẦN DƯỚI: KẾT QUẢ TÌM KIẾM
         // ==========================================
-        String[] cols = { "Mã Sách", "Tên Sách", "Thể Loại", "NXB", "Tình Trạng" };
+        String[] cols = { "Mã Sách", "Tên Sách", "Tác Giả", "Thể Loại", "NXB", "Tình Trạng" };
         DefaultTableModel model = new DefaultTableModel(cols, 0);
 
         // Load dữ liệu sách từ DB
         try {
             List<SachDTO> listSach = new SachBUS().getAll();
+            TheLoaiBUS theLoaiBUS = new TheLoaiBUS();
+            NhaXuatBanBUS nxbBUS = new NhaXuatBanBUS();
+
             for (SachDTO s : listSach) {
-                model.addRow(new Object[] { s.getMaSach(), s.getTenSach(), s.getTheLoai(), s.getMaNXB(), "Sẵn sàng" });
+                // Lấy tên thể loại
+                String tenTheLoai = s.getTheLoai(); // mặc định dùng mã
+                if (tenTheLoai != null) {
+                    TheLoaiDTO tl = theLoaiBUS.getById(tenTheLoai);
+                    if (tl != null && tl.getTenTheLoai() != null) {
+                        tenTheLoai = tl.getTenTheLoai();
+                    }
+                }
+
+                // Lấy chuỗi tên tác giả
+                String tenTacGia = "Không rõ";
+                if (s.getDanhSachTacGia() != null && !s.getDanhSachTacGia().isEmpty()) {
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < s.getDanhSachTacGia().size(); i++) {
+                        sb.append(s.getDanhSachTacGia().get(i).getTenTacGia());
+                        if (i < s.getDanhSachTacGia().size() - 1) {
+                            sb.append(", ");
+                        }
+                    }
+                    tenTacGia = sb.toString();
+                }
+
+                // Lấy tên nhà xuất bản
+                String tenNxb = s.getMaNXB(); // mặc định dùng mã
+                if (tenNxb != null) {
+                    NhaXuatBanDTO nxb = nxbBUS.getById(tenNxb);
+                    if (nxb != null && nxb.getTenNXB() != null) {
+                        tenNxb = nxb.getTenNXB();
+                    }
+                }
+
+                model.addRow(new Object[] { s.getMaSach(), s.getTenSach(), tenTacGia, tenTheLoai, tenNxb,
+                        "Sẵn sàng" });
             }
         } catch (Exception ex) {
             ex.printStackTrace();
