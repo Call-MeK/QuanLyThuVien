@@ -233,29 +233,23 @@ public class LoginFrame extends JFrame {
             }
 
             if (loginSuccess) {
-                if (role.equals("Quản trị viên (Admin)")) {
-                    // Lưu session + truyền mã vào AdminFrame (giống UserHomeFrame)
-                    SessionManager.getInstance().login(loggedInUserId, loggedInUserName, "Admin");
-
-                    JOptionPane.showMessageDialog(this,
-                            "Đăng nhập Admin thành công!\nXin chào " + loggedInUserName,
-                            "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-                    new AdminFrame(loggedInUserId).setVisible(true);
-                } else {
-                    // Lưu session + truyền mã vào UserHomeFrame
-                    SessionManager.getInstance().login(loggedInUserId, loggedInUserName, "DocGia");
-
-                    JOptionPane.showMessageDialog(this,
-                            "Đăng nhập Độc giả thành công!\nXin chào " + loggedInUserName,
-                            "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-                    new UserHomeFrame(loggedInUserId).setVisible(true);
-                }
-                this.dispose();
-            } else {
-                JOptionPane.showMessageDialog(this,
-                        "Sai tên đăng nhập, mật khẩu hoặc sai vai trò!",
-                        "Lỗi", JOptionPane.ERROR_MESSAGE);
-            }
+    if (role.equals("Quản trị viên (Admin)")) {
+        SessionManager.getInstance().login(loggedInUserId, loggedInUserName, "Admin");
+        JOptionPane.showMessageDialog(this, "Đăng nhập Admin thành công!\nXin chào " + loggedInUserName,
+                "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+        new AdminFrame(loggedInUserId).setVisible(true);
+    } else {
+        SessionManager.getInstance().login(loggedInUserId, loggedInUserName, "DocGia");
+        JOptionPane.showMessageDialog(this, "Đăng nhập thành công!\nXin chào " + loggedInUserName,
+                "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+        new UserHomeFrame(loggedInUserId).setVisible(true);
+    }
+    this.dispose();
+} else {
+    JOptionPane.showMessageDialog(this,
+            "Sai tên đăng nhập, mật khẩu hoặc sai vai trò!",
+            "Lỗi", JOptionPane.ERROR_MESSAGE);
+}
         });
 
         rightPanel.add(Box.createVerticalStrut(20));
