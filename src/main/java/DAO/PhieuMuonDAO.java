@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 public class PhieuMuonDAO {
+
     public ArrayList<PhieuMuonDTO> getAll() {
         ArrayList<PhieuMuonDTO> list = new ArrayList<>();
         String sql = "SELECT * FROM PHIEUMUON";
@@ -16,15 +17,14 @@ public class PhieuMuonDAO {
                 Statement st = conn.createStatement();
                 ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
-                PhieuMuonDTO pm = new PhieuMuonDTO(
+                list.add(new PhieuMuonDTO(
                         rs.getString("MaPM"),
                         rs.getString("NgayMuon"),
                         rs.getString("NgayTra"),
                         rs.getString("HenTra"),
                         rs.getString("TinhTrang"),
                         rs.getString("MaNQL"),
-                        rs.getString("MaThe"));
-                list.add(pm);
+                        rs.getString("MaThe")));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -33,25 +33,26 @@ public class PhieuMuonDAO {
     }
 
     public PhieuMuonDTO getById(String MaPM) {
-        PhieuMuonDTO pm = new PhieuMuonDTO();
         String sql = "SELECT * FROM PHIEUMUON WHERE MaPM = ?";
         try (Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                pm = new PhieuMuonDTO(
-                        rs.getString("MaPM"),
-                        rs.getString("NgayMuon"),
-                        rs.getString("NgayTra"),
-                        rs.getString("HenTra"),
-                        rs.getString("TinhTrang"),
-                        rs.getString("MaNQL"),
-                        rs.getString("MaThe"));
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, MaPM);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new PhieuMuonDTO(
+                            rs.getString("MaPM"),
+                            rs.getString("NgayMuon"),
+                            rs.getString("NgayTra"),
+                            rs.getString("HenTra"),
+                            rs.getString("TinhTrang"),
+                            rs.getString("MaNQL"),
+                            rs.getString("MaThe"));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return pm;
+        return null;
     }
 
     public int insert(PhieuMuonDTO pm) {
@@ -107,42 +108,82 @@ public class PhieuMuonDAO {
         try (Connection conn = DatabaseConnection.getConnection();
                 Statement st = conn.createStatement();
                 ResultSet rs = st.executeQuery(sql)) {
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
+            if (rs.next()) return rs.getInt(1);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return 0;
     }
+
+    // Dùng cho admin: lấy tất cả (không lọc theo user)
     public ArrayList<Object[]> getDanhSachSachDangMuon() {
         ArrayList<Object[]> list = new ArrayList<>();
-        // Câu lệnh JOIN 4 bảng để lấy đầy đủ Tên Sách và Thông tin mượn
         String sql = "SELECT pm.MaPM, s.TenSach, pm.NgayMuon, pm.HenTra, pm.TinhTrang " +
                      "FROM PHIEUMUON pm " +
                      "JOIN CHITIETPHIEUMUON ct ON pm.MaPM = ct.MaPM " +
                      "JOIN SACHCOPY sc ON ct.MaCuonSach = sc.MaVach " +
                      "JOIN SACH s ON sc.MaSach = s.MaSach";
-
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
-
             while (rs.next()) {
-                String maPM = rs.getString("MaPM");
-                String tenSach = rs.getString("TenSach");
-                String ngayMuon = rs.getString("NgayMuon");
-                String henTra = rs.getString("HenTra");
-                String trangThai = rs.getString("TinhTrang");
-
-                list.add(new Object[]{maPM, tenSach, ngayMuon, henTra, trangThai});
+                list.add(new Object[]{
+                    rs.getString("MaPM"),
+                    rs.getString("TenSach"),
+                    rs.getString("NgayMuon"),
+                    rs.getString("HenTra"),
+                    rs.getString("TinhTrang")
+                });
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return list;
     }
-   // Tự động sinh mã Phiếu Mượn (VD: PM00000001)
+
+    // Dùng cho user: chỉ lấy phiếu của thẻ đang đăng nhập
+    public ArrayList<Object[]> getDanhSachSachDangMuonByMaThe(String maThe) {
+        ArrayList<Object[]> list = new ArrayList<>();
+        String sql = "SELECT pm.MaPM, s.TenSach, pm.NgayMuon, pm.HenTra, pm.NgayTra, pm.TinhTrang " +
+                     "FROM PHIEUMUON pm " +
+                     "JOIN CHITIETPHIEUMUON ct ON pm.MaPM = ct.MaPM " +
+                     "JOIN SACHCOPY sc ON ct.MaCuonSach = sc.MaVach " +
+                     "JOIN SACH s ON sc.MaSach = s.MaSach " +
+                     "WHERE pm.MaThe = ? AND pm.TinhTrang != 'Đã xóa' " +
+                     "ORDER BY pm.NgayMuon DESC";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, maThe);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String tinhTrang = rs.getString("TinhTrang");
+                    String henTra    = rs.getString("HenTra");
+                    String ngayTra   = rs.getString("NgayTra");
+
+                    // Tự tính "Trễ hạn" nếu đang mượn quá ngày
+                    if ("Đang mượn".equals(tinhTrang) && henTra != null) {
+                        try {
+                            java.time.LocalDate han = java.time.LocalDate.parse(henTra);
+                            if (java.time.LocalDate.now().isAfter(han)) tinhTrang = "Trễ hạn";
+                        } catch (Exception ignored) {}
+                    }
+
+                    list.add(new Object[]{
+                        rs.getString("MaPM"),
+                        rs.getString("TenSach"),
+                        rs.getString("NgayMuon"),
+                        henTra,
+                        (ngayTra == null || ngayTra.isEmpty()) ? "Chưa trả" : ngayTra,
+                        tinhTrang
+                    });
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     public String generateMaPM() {
         String sql = "SELECT MaPM FROM PHIEUMUON ORDER BY MaPM DESC";
         try (Connection conn = DatabaseConnection.getConnection();
