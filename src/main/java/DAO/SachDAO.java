@@ -75,12 +75,11 @@ public class SachDAO {
      */
     public List<Object[]> getDanhSachDayDu() {
         List<Object[]> list = new ArrayList<>();
-        String sql =
+        String sql = 
             "SELECT s.MaSach, s.tenSach, " +
             "       ISNULL(tl.TenTheLoai, s.TheLoai)  AS TenTheLoai, " +
             "       ISNULL(n.TenNXB,      s.MaNXB)    AS TenNXB, " +
             "       s.NamXB, s.NgonNgu, s.GiaBia, " +
-            // Ghép tên tác giả bằng STUFF + FOR XML PATH (tương thích mọi version)
             "       ISNULL(STUFF((" +
             "           SELECT ', ' + tg.TenTacGia " +
             "           FROM TACGIA tg " +
@@ -88,16 +87,17 @@ public class SachDAO {
             "           WHERE st.MaSach = s.MaSach " +
             "           FOR XML PATH(''), TYPE).value('.','NVARCHAR(MAX)'), 1, 2, ''), " +
             "       N'Chưa cập nhật') AS TenTacGia, " +
-            // Đếm bản sao còn dùng được
-            "       (SELECT COUNT(*) FROM SACHCOPY sc2 " +
-            "        WHERE sc2.MaSach = s.MaSach " +
-            "          AND sc2.IsDeleted = 0 " +
-            "          AND sc2.TinhTrang != N'Hỏng') AS SoLuong " +
+            
+            // CHỈ CẦN SỬA ĐÚNG DÒNG NÀY: Lấy thẳng cột SoLuong từ bảng SACH (kí danh là s)
+            "       s.SoLuong " + 
+            
             "FROM SACH s " +
-            "LEFT JOIN THELOAI     tl ON s.TheLoai = tl.MaTheLoai " +
-            "LEFT JOIN NHAXUATBAN  n  ON s.MaNXB   = n.MaNXB " +
+            "LEFT JOIN THELOAI      tl ON s.TheLoai = tl.MaTheLoai " +
+            "LEFT JOIN NHAXUATBAN   n  ON s.MaNXB   = n.MaNXB " +
             "WHERE s.isdeleted = 0 " +
             "ORDER BY s.MaSach";
+            
+        // ... (phần try-catch giữ nguyên) ...
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
