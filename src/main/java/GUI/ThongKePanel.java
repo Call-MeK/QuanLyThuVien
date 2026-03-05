@@ -90,9 +90,7 @@ public class ThongKePanel extends JPanel {
         
         btnXuatPDF.addActionListener(e -> exportToPDF());
 
-        btnXuatExcel.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Chức năng xuất Excel đang được xây dựng!");
-        });
+        btnXuatExcel.addActionListener(e -> exportToExcel());
 
         pnlButtons.add(btnXuatExcel);
         pnlButtons.add(btnXuatPDF);
@@ -126,6 +124,21 @@ public class ThongKePanel extends JPanel {
             PDFExporter.exportTableToPDF(tableDocGia, "BAO CAO TOP 5 DOC GIA MUON NHIEU NHAT");
         } else if (selectedIndex == 2) {
             PDFExporter.exportTableToPDF(tableSach, "BAO CAO TOP 10 SACH DUOC MUON NHIEU NHAT");
+        }
+    }
+    private void exportToExcel() {
+        if (modelTheLoai.getRowCount() == 0 && modelDocGia.getRowCount() == 0 && modelSach.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "Chưa có dữ liệu thống kê! Vui lòng nhấn 'Tải Thống Kê' trước.", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int selectedIndex = tabbedPane.getSelectedIndex();
+        if (selectedIndex == 0) {
+            Utils.ExcelExporter.exportTableToExcel(tableTheLoai, "ThongKe_SachTheoTheLoai");
+        } else if (selectedIndex == 1) {
+            Utils.ExcelExporter.exportTableToExcel(tableDocGia, "ThongKe_Top5DocGia");
+        } else if (selectedIndex == 2) {
+            Utils.ExcelExporter.exportTableToExcel(tableSach, "ThongKe_Top10Sach");
         }
     }
 
