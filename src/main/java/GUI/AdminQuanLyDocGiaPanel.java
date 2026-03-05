@@ -30,6 +30,7 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
     public AdminQuanLyDocGiaPanel() {
         initComponents();
         initEvents();
+        lamMoiForm();
         loadDataToTable();
     }
 
@@ -206,14 +207,24 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
 
         // 3. Nút THÊM
         btnThem.addActionListener(e -> {
-            if (txtMaDG.getText().trim().isEmpty() || txtHoTen.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng nhập ít nhất Mã độc giả và Họ tên!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
-                return;
+            // Gọi hàm validate, truyền rỗng vào vì thêm mới không cần loại trừ mã
+            if (!validateInput("")) {
+                return; 
             }
+            
+            String maNQL = BUS.SessionManager.getInstance().getMaNguoi();
+            if (maNQL == null || maNQL.isEmpty()) {
+                maNQL = "NV00000001";
+            }
+
             DocGiaDTO dg = createDocGiaFromForm();
-            String result = docGiaBUS.addDocGia(dg);
+            String result = docGiaBUS.addDocGia(dg, maNQL); 
             if (result.equals("Thêm thành công")) {
-                JOptionPane.showMessageDialog(this, "Thêm độc giả thành công!\nTài khoản đăng nhập mặc định là Mã ĐG.\nMật khẩu: 12345");
+                JOptionPane.showMessageDialog(this, "Thêm độc giả và cấp thẻ thư viện thành công!\n\n"
+                        + "Tài khoản đăng nhập hệ thống của độc giả:\n"
+                        + "- User: " + dg.getMaDocGia() + "\n"
+                        + "- Pass mặc định: 12345");
+                docGiaBUS.reloadFromDB();
                 loadDataToTable();
                 lamMoiForm();
             } else {
@@ -223,10 +234,23 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
 
         // 4. Nút CẬP NHẬT
         btnSua.addActionListener(e -> {
-            if (txtMaDG.getText().trim().isEmpty()) {
+            String maDG = txtMaDG.getText().trim();
+            if (maDG.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 độc giả trong bảng để sửa!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            
+            // Chặn sửa nếu đang bị khóa
+            if (docGiaBUS.isDocGiaLocked(maDG)) {
+                JOptionPane.showMessageDialog(this, "Độc giả này đang bị khóa thẻ!\nVui lòng 'Mở Khóa' trước khi cập nhật thông tin.", "Từ chối cập nhật", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Gọi hàm validate, truyền mã ĐG vào để không báo lỗi trùng lặp với chính họ
+            if (!validateInput(maDG)) {
+                return;
+            }
+
             DocGiaDTO dg = createDocGiaFromForm();
             String result = docGiaBUS.updateDocGia(dg);
             if (result.equals("Cập nhật thành công")) {
@@ -237,51 +261,7 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
             }
         });
 
-        // 5. Nút KHÓA THẺ
-        btnKhoa.addActionListener(e -> {
-            if (txtMaDG.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 độc giả trong bảng!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            String maDG = txtMaDG.getText().trim();
-            int confirm = JOptionPane.showConfirmDialog(this,
-                    "Bạn có chắc chắn muốn khóa thẻ độc giả " + maDG + "?",
-                    "Xác nhận khóa", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                String result = docGiaBUS.softDeleteDocGia(maDG);
-                if (result.equals("Khóa thẻ thành công")) {
-                    JOptionPane.showMessageDialog(this, "Đã khóa thẻ độc giả!");
-                    loadDataToTable();
-                    lamMoiForm();
-                } else {
-                    JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-
-        // 6. Nút MỞ KHÓA
-        btnMoKhoa.addActionListener(e -> {
-            if (txtMaDG.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 độc giả đã khóa trong bảng!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            String maDG = txtMaDG.getText().trim();
-            int confirm = JOptionPane.showConfirmDialog(this,
-                    "Bạn có muốn mở khóa thẻ độc giả " + maDG + "?",
-                    "Xác nhận mở khóa", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                String result = docGiaBUS.restoreDocGia(maDG);
-                if (result.equals("Mở khóa thành công")) {
-                    JOptionPane.showMessageDialog(this, "Đã mở khóa thẻ độc giả!");
-                    loadDataToTable();
-                    lamMoiForm();
-                } else {
-                    JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-
-        // 7. Nút XÓA HẲN - ĐÃ SỬA: reload từ DB sau khi xóa để chắc chắn đồng bộ
+        // 7. Nút XÓA HẲN
         btnXoa.addActionListener(e -> {
             if (txtMaDG.getText().trim().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 độc giả trong bảng!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
@@ -393,13 +373,14 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
     }
 
     public void lamMoiForm() {
-        txtMaDG.setText("");
-        txtMaDG.setEditable(true);
+        txtMaDG.setText(docGiaBUS.generateMaDocGia()); // Tự động sinh mã
+        txtMaDG.setEditable(false); // Khóa không cho sửa
         txtHoTen.setText("");
         txtNgaySinh.setText("2000-01-01");
         txtDienThoai.setText("");
         txtEmail.setText("");
         txtNgayDK.setText(java.time.LocalDate.now().toString());
+        txtNgayDK.setEditable(false);
         cbGioiTinh.setSelectedIndex(0);
         cbTrangThai.setSelectedIndex(0);
         txtSearch.setText("");
@@ -425,5 +406,41 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         btn.setPreferredSize(new Dimension(130, 40)); btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setOpaque(true);
         return btn;
+    }
+    // Hàm kiểm tra tính hợp lệ của Form nhập liệu
+    private boolean validateInput(String maDG) {
+        String sdt = txtDienThoai.getText().trim();
+        String email = txtEmail.getText().trim();
+        String hoTen = txtHoTen.getText().trim();
+
+        // 1. Không được để trống các trường quan trọng
+        if (hoTen.isEmpty() || sdt.isEmpty() || email.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ Họ tên, Số điện thoại và Email!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+
+        // 2. Validate SĐT (Phải là 10 chữ số, bắt đầu bằng số 0)
+        if (!sdt.matches("^0\\d{9}$")) {
+            JOptionPane.showMessageDialog(this, "Số điện thoại không hợp lệ!\nVui lòng nhập đúng 10 chữ số và bắt đầu bằng số 0.", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+
+        // 3. Validate Email
+        if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$")) {
+            JOptionPane.showMessageDialog(this, "Email không hợp lệ!\nVui lòng nhập đúng định dạng (VD: docgia@gmail.com).", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+
+        // 4. Kiểm tra trùng lặp SĐT và Email
+        if (docGiaBUS.checkDuplicatePhone(sdt, maDG)) {
+            JOptionPane.showMessageDialog(this, "Số điện thoại này đã được đăng ký cho độc giả khác!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+        if (docGiaBUS.checkDuplicateEmail(email, maDG)) {
+            JOptionPane.showMessageDialog(this, "Email này đã được đăng ký cho độc giả khác!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+
+        return true;
     }
 }
