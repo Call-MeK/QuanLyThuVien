@@ -17,6 +17,7 @@ public class SachDTO {
     private String MaNXB;
     private int NamXB;
     private String NgonNgu;
+    private int SoLuong; // Thêm dòng này
 
     private Float GiaBia;
     private Boolean isDeleted;
@@ -104,6 +105,13 @@ public class SachDTO {
 
     public void setIsDeleted(Boolean isDeleted) {
         this.isDeleted = isDeleted;
+    }
+    public int getSoLuong() {
+        return SoLuong;
+    }
+
+    public void setSoLuong(int SoLuong) {
+        this.SoLuong = SoLuong;
     }
 
     public ArrayList<TacGiaDTO> getDanhSachTacGia() {
