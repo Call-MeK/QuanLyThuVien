@@ -7,6 +7,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 import BUS.*;
 import DTO.*;
 
@@ -25,6 +27,8 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
     private JTable table;
     private DefaultTableModel model;
     private JButton btnThem, btnCapNhat, btnThuTien, btnHuy, btnLamMoi, btnSearch, btnResetSearch;
+    // Thêm các nút mới
+    private JButton btnRefresh, btnImport, btnExport, btnSave; 
 
     private PhieuPhatBUS phieuPhatBUS = new PhieuPhatBUS();
 
@@ -39,10 +43,35 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         setBackground(colorBackground);
         setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
 
+        // --- HEADER BÊN TRÊN (Chứa Tiêu đề + Nút Làm Mới Icon) ---
+        JPanel pnlHeader = new JPanel(new BorderLayout());
+        pnlHeader.setBackground(colorBackground);
+
         JLabel lblTitle = new JLabel("Quản Lý Phiếu Phạt");
         lblTitle.setFont(new Font(tenFont, Font.BOLD, 24));
         lblTitle.setForeground(new Color(33, 37, 41));
-        add(lblTitle, BorderLayout.NORTH);
+        pnlHeader.add(lblTitle, BorderLayout.WEST);
+
+        // Nút Làm Mới bằng Icon
+        btnRefresh = new JButton();
+        btnRefresh.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnRefresh.setContentAreaFilled(false); 
+        btnRefresh.setBorderPainted(false);
+        btnRefresh.setFocusPainted(false);
+        btnRefresh.setToolTipText("Làm mới dữ liệu (F5)"); 
+        btnRefresh.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/Images/refresh.png"));
+            Image img = icon.getImage().getScaledInstance(28, 28, Image.SCALE_SMOOTH);
+            btnRefresh.setIcon(new ImageIcon(img));
+            btnRefresh.setPressedIcon(new ImageIcon(img.getScaledInstance(24, 24, Image.SCALE_SMOOTH)));
+            btnRefresh.setRolloverEnabled(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        pnlHeader.add(btnRefresh, BorderLayout.EAST);
+        add(pnlHeader, BorderLayout.NORTH);
 
         JPanel pnlCenter = new JPanel(new BorderLayout(0, 15));
         pnlCenter.setBackground(colorBackground);
@@ -175,11 +204,20 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         btnCapNhat.setForeground(Color.BLACK);
         btnThuTien = createActionButton("Xác Nhận Thu", new Color(13, 110, 253));
         btnHuy = createActionButton("Hủy Phiếu", new Color(220, 53, 69));
-        btnLamMoi = createActionButton("Làm Mới", new Color(108, 117, 125));
+        // Đã gỡ nút btnLamMoi ở dưới để dùng nút icon ở trên
+        
+        btnImport = createActionButton("Import", new Color(33, 115, 70)); 
+        btnSave = createActionButton("Save", new Color(111, 66, 193));
+        btnExport = createActionButton("Export", new Color(33, 115, 70));
 
-        pnlButtons.add(btnThem); pnlButtons.add(btnCapNhat);
-        pnlButtons.add(btnThuTien); pnlButtons.add(btnHuy);
-        pnlButtons.add(btnLamMoi);
+        pnlButtons.add(btnImport); 
+        pnlButtons.add(btnSave);
+        pnlButtons.add(btnExport);
+        pnlButtons.add(btnThem); 
+        pnlButtons.add(btnCapNhat);
+        pnlButtons.add(btnThuTien); 
+        pnlButtons.add(btnHuy);
+        
         add(pnlButtons, BorderLayout.SOUTH);
 
         txtMaPhieuPhat.setText(phieuPhatBUS.generateMaPP());
@@ -237,8 +275,8 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
             }
         });
 
-        // 2. LÀM MỚI
-        btnLamMoi.addActionListener(e -> {
+        // 2. LÀM MỚI (Icon trên cùng)
+        btnRefresh.addActionListener(e -> {
             lamMoiForm();
             phieuPhatBUS.reloadFromDB();
             loadDataToTable();
@@ -403,6 +441,94 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
             cbSearchTrangThai.setSelectedIndex(0);
             searchInputLayout.show(pnlSearchInput, "TEXT");
             loadDataToTable();
+        });
+        
+        // 10. Nút IMPORT EXCEL
+        btnImport.addActionListener(e -> {
+            Utils.ExcelImporter.importExcelToTable(table, model);
+        });
+
+        // 11. Nút EXPORT EXCEL
+        btnExport.addActionListener(e -> {
+            if (model.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(this, "Không có dữ liệu để xuất!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            Utils.ExcelExporter.exportTableToExcel(table, "DanhSach_PhieuPhat");
+        });
+        
+        // 12. Nút SAVE (Dành cho Import Excel)
+        // 12. Nút SAVE (Dành cho Import Excel)
+        btnSave.addActionListener(e -> {
+            int rowCount = table.getRowCount();
+            if (rowCount == 0) {
+                JOptionPane.showMessageDialog(this, "Bảng đang trống, không có dữ liệu để lưu!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int confirm = JOptionPane.showConfirmDialog(this, 
+                    "Lưu toàn bộ " + rowCount + " dòng trên bảng vào Database?", 
+                    "Xác nhận", JOptionPane.YES_NO_OPTION);
+            
+            if (confirm == JOptionPane.YES_OPTION) {
+                int successCount = 0;
+                int failCount = 0;
+                
+                String maNQL = SessionManager.getInstance().getMaNguoi();
+                if (maNQL == null || maNQL.isEmpty()) maNQL = "NV00000001";
+
+                for (int i = 0; i < rowCount; i++) {
+                    try {
+                        // Cột 0: Mã Phạt, 1: Mã Phiếu Mượn, 2: Ngày Lập, 3: Lý Do, 4: Tổng Tiền, 5: Trạng Thái
+                        String maPP = model.getValueAt(i, 0).toString().trim();
+                        String maPM = model.getValueAt(i, 1).toString().trim();
+                        String ngayLap = model.getValueAt(i, 2).toString().trim();
+                        String lyDo = model.getValueAt(i, 3).toString().trim();
+                        String tongTien = model.getValueAt(i, 4).toString().trim().replace(",", "");
+                        String trangThaiStr = model.getValueAt(i, 5).toString().trim();
+                        
+                        int trangThai = trangThaiStr.equals("Đã thanh toán") ? 1 : (trangThaiStr.equals("Đã hủy") ? 2 : 0);
+
+                        // Tạo Phiếu Phạt
+                        PhieuPhatDTO pp = new PhieuPhatDTO();
+                        pp.setMaPP(maPP);
+                        pp.setMaPM(maPM);
+                        pp.setMaNQL(maNQL);
+                        pp.setNgayLap(ngayLap.isEmpty() ? java.time.LocalDate.now().toString() : ngayLap);
+                        pp.setTongTien(tongTien);
+                        pp.setTrangThai(trangThai);
+
+                        // Tạo 1 dòng Chi Tiết Phiếu Phạt giả định (Vì Excel chỉ có 1 dòng tổng)
+                        ChiTietPhieuPhatDTO ctpp = new ChiTietPhieuPhatDTO();
+                        ctpp.setMaCTPP("CT" + maPP.substring(2));
+                        ctpp.setMaPP(maPP);
+                        ctpp.setMaCuonSach("MV000000000000000001"); // Mã sách mặc định do Excel ko có
+                        ctpp.setLyDo(lyDo);
+                        ctpp.setSoTien(tongTien);
+
+                        ArrayList<ChiTietPhieuPhatDTO> dsChiTiet = new ArrayList<>();
+                        dsChiTiet.add(ctpp);
+
+                        // Gọi BUS lưu vào Database
+                        String result = phieuPhatBUS.taoPhieuPhat(pp, dsChiTiet);
+                        if (result.contains("thành công")) {
+                            successCount++;
+                        } else {
+                            failCount++; 
+                        }
+                    } catch (Exception ex) {
+                        failCount++;
+                    }
+                }
+
+                JOptionPane.showMessageDialog(this, 
+                        "Lưu hoàn tất!\n- Thành công: " + successCount + " phiếu\n- Bỏ qua (Trùng mã/Lỗi): " + failCount + " phiếu", 
+                        "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                
+                // Load lại bảng
+                phieuPhatBUS.reloadFromDB();
+                loadDataToTable();
+            }
         });
     }
 

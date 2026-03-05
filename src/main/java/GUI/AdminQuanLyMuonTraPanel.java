@@ -8,6 +8,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 import BUS.*;
 import DTO.*;
 
@@ -24,7 +26,9 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
     private CardLayout searchInputLayout;
     private JTable table;
     private DefaultTableModel model;
+    
     private JButton btnThem, btnTra, btnXoa, btnLamMoi, btnSearch, btnResetSearch;
+    private JButton btnImport, btnExport, btnSave;
 
     private PhieuMuonBUS phieuMuonBUS       = new PhieuMuonBUS();
     private TheThuVienBUS theThuVienBUS     = new TheThuVienBUS();
@@ -42,10 +46,33 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         setBackground(colorBackground);
         setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
 
+        JPanel pnlHeader = new JPanel(new BorderLayout());
+        pnlHeader.setBackground(colorBackground);
+
         JLabel lblTitle = new JLabel("Quản Lý Mượn - Trả Sách");
         lblTitle.setFont(new Font(tenFont, Font.BOLD, 24));
         lblTitle.setForeground(new Color(33, 37, 41));
-        add(lblTitle, BorderLayout.NORTH);
+        pnlHeader.add(lblTitle, BorderLayout.WEST);
+
+        btnLamMoi = new JButton();
+        btnLamMoi.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnLamMoi.setContentAreaFilled(false); 
+        btnLamMoi.setBorderPainted(false);
+        btnLamMoi.setFocusPainted(false);
+        btnLamMoi.setToolTipText("Làm mới dữ liệu (F5)"); 
+        btnLamMoi.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/Images/refresh.png"));
+            Image img = icon.getImage().getScaledInstance(28, 28, Image.SCALE_SMOOTH);
+            btnLamMoi.setIcon(new ImageIcon(img));
+            btnLamMoi.setPressedIcon(new ImageIcon(img.getScaledInstance(24, 24, Image.SCALE_SMOOTH)));
+            btnLamMoi.setRolloverEnabled(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        pnlHeader.add(btnLamMoi, BorderLayout.EAST);
+        add(pnlHeader, BorderLayout.NORTH);
 
         JPanel pnlCenter = new JPanel(new BorderLayout(0, 15));
         pnlCenter.setBackground(colorBackground);
@@ -168,9 +195,18 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         btnThem   = createActionButton("Lập Phiếu", new Color(25, 135, 84));
         btnTra    = createActionButton("Xác Nhận Trả", new Color(13, 110, 253));
         btnXoa    = createActionButton("Xóa Phiếu", new Color(220, 53, 69));
-        btnLamMoi = createActionButton("Làm Mới", new Color(108, 117, 125));
+        
+        btnImport = createActionButton("Import", new Color(33, 115, 70)); 
+        btnSave = createActionButton("Save", new Color(111, 66, 193));
+        btnExport = createActionButton("Export", new Color(33, 115, 70));
 
-        pnlButtons.add(btnThem); pnlButtons.add(btnTra); pnlButtons.add(btnXoa); pnlButtons.add(btnLamMoi);
+        pnlButtons.add(btnImport); 
+        pnlButtons.add(btnSave);
+        pnlButtons.add(btnExport);
+        pnlButtons.add(btnThem); 
+        pnlButtons.add(btnTra); 
+        pnlButtons.add(btnXoa); 
+        
         add(pnlButtons, BorderLayout.SOUTH);
     }
 
@@ -201,7 +237,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
                     txtTrangThai.setText(tt);
                     capNhatMauTrangThai(tt);
 
-                    // Tự tìm ngược MaDocGia từ MaThe để hiện lên ô MaDG
+                  
                     TheThuVienDTO the = theThuVienBUS.getById(maThe);
                     txtMaDG.setText(the != null ? the.getMaDocGia() : "");
                 }
@@ -236,7 +272,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
             }
         });
 
-        // 4. LÀM MỚI
+        // 4. LÀM MỚI (Nút Icon trên cùng)
         btnLamMoi.addActionListener(e -> { lamMoiForm(); loadDataToTable(); });
 
         // 5. LẬP PHIẾU MỚI
@@ -245,7 +281,6 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
             String maThe  = txtMaThe.getText().trim();
             String maSach = txtMaSach.getText().trim();
 
-            // Kiểm tra dữ liệu đầu vào
             if (maDG.isEmpty() || maSach.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
                         "Vui lòng nhập Mã độc giả và Mã cuốn sách!",
@@ -253,7 +288,6 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
                 return;
             }
 
-            // Kiểm tra lại thẻ (phòng trường hợp chưa focus out)
             if (maThe.isEmpty()) {
                 TheThuVienDTO the = theThuVienBUS.getByMaDocGia(maDG);
                 if (the == null) {
@@ -266,7 +300,6 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
                 txtMaThe.setText(maThe);
             }
 
-            // ✅ Kiểm tra độc giả có bị khóa không
             if (docGiaBUS.isDocGiaLocked(maDG)) {
                 JOptionPane.showMessageDialog(this,
                         "Độc giả " + maDG + " đang bị khóa thẻ!\n"
@@ -406,6 +439,70 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
             searchInputLayout.show(pnlSearchInput, "TEXT");
             loadDataToTable();
         });
+        
+        // 10. Nút IMPORT EXCEL
+        btnImport.addActionListener(e -> {
+            Utils.ExcelImporter.importExcelToTable(table, model);
+        });
+
+        // 11. Nút EXPORT EXCEL
+        btnExport.addActionListener(e -> {
+            if (model.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(this, "Không có dữ liệu để xuất!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            Utils.ExcelExporter.exportTableToExcel(table, "DanhSach_PhieuMuon");
+        });
+        
+        // 12. Nút SAVE 
+        btnSave.addActionListener(e -> {
+            int rowCount = table.getRowCount();
+            if (rowCount == 0) {
+                JOptionPane.showMessageDialog(this, "Bảng đang trống, không có dữ liệu để lưu!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int confirm = JOptionPane.showConfirmDialog(this, 
+                    "Lưu toàn bộ " + rowCount + " dòng trên bảng vào Database?", 
+                    "Xác nhận", JOptionPane.YES_NO_OPTION);
+            
+            if (confirm == JOptionPane.YES_OPTION) {
+                int successCount = 0;
+                int failCount = 0;
+                
+                String maNQL = BUS.SessionManager.getInstance().getMaNguoi();
+                if (maNQL == null || maNQL.isEmpty()) maNQL = "NV00000001";
+
+                for (int i = 0; i < rowCount; i++) {
+                    PhieuMuonDTO pm = new PhieuMuonDTO();
+                    
+                    pm.setMaPM(model.getValueAt(i, 0).toString().trim());
+                    pm.setMaThe(model.getValueAt(i, 1).toString().trim());
+                    pm.setMaNQL(maNQL); 
+                    pm.setNgayMuon(model.getValueAt(i, 2).toString().trim());
+                    pm.setHenTra(model.getValueAt(i, 3).toString().trim());
+                    
+                    String ngayTra = model.getValueAt(i, 4).toString().trim();
+                    pm.setNgayTra(ngayTra.equals("Chưa trả") ? "" : ngayTra);
+                    
+                    pm.setTinhTrang(model.getValueAt(i, 5).toString().trim());
+
+                    String result = phieuMuonBUS.insert(pm);
+                    if (result.contains("thành công")) {
+                        successCount++;
+                    } else {
+                        failCount++; 
+                    }
+                }
+
+                JOptionPane.showMessageDialog(this, 
+                        "Lưu hoàn tất!\n- Thành công: " + successCount + " phiếu\n- Bỏ qua (Trùng mã/Lỗi): " + failCount + " phiếu", 
+                        "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                
+                phieuMuonBUS.getAll(); 
+                loadDataToTable();
+            }
+        });
     }
 
     // ==========================================================
@@ -490,7 +587,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         txtTrangThai.setText("Đang mượn");
         capNhatMauTrangThai("Đang mượn");
         table.clearSelection();
-        theThuVienBUS.getAll(); // refresh cache thẻ
+        theThuVienBUS.getAll(); 
     }
 
     // ===== TIỆN ÍCH UI =====

@@ -25,7 +25,7 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
     private JTable table;
     private DefaultTableModel model;
     private JButton btnThem, btnSua, btnKhoa, btnMoKhoa, btnLamMoi, btnSearch, btnResetSearch;
-
+    private JButton btnImport, btnExport, btnSave;
     private DocGiaBUS docGiaBUS = new DocGiaBUS();
 
     public AdminQuanLyDocGiaPanel() {
@@ -40,11 +40,36 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         setBackground(colorBackground);
         setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
 
+        // --- HEADER BÊN TRÊN 
+        JPanel pnlHeader = new JPanel(new BorderLayout());
+        pnlHeader.setBackground(colorBackground);
+
         JLabel lblTitle = new JLabel("Quản Lý Thông Tin Độc Giả");
         lblTitle.setFont(new Font(tenFont, Font.BOLD, 24));
         lblTitle.setForeground(new Color(33, 37, 41));
-        add(lblTitle, BorderLayout.NORTH);
+        pnlHeader.add(lblTitle, BorderLayout.WEST);
 
+        btnLamMoi = new JButton();
+        btnLamMoi.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnLamMoi.setContentAreaFilled(false); 
+        btnLamMoi.setBorderPainted(false);
+        btnLamMoi.setFocusPainted(false);
+        btnLamMoi.setToolTipText("Làm mới dữ liệu (F5)"); 
+        btnLamMoi.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/Images/refresh.png"));
+            Image img = icon.getImage().getScaledInstance(28, 28, Image.SCALE_SMOOTH);
+            btnLamMoi.setIcon(new ImageIcon(img));
+            btnLamMoi.setPressedIcon(new ImageIcon(img.getScaledInstance(24, 24, Image.SCALE_SMOOTH)));
+            btnLamMoi.setRolloverEnabled(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        pnlHeader.add(btnLamMoi, BorderLayout.EAST);
+        add(pnlHeader, BorderLayout.NORTH);
+
+        // --- PHẦN GIỮA ---
         JPanel pnlCenter = new JPanel(new BorderLayout(0, 15));
         pnlCenter.setBackground(colorBackground);
 
@@ -72,14 +97,14 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         txtTrangThai.setEditable(false);
         txtTrangThai.setBackground(new Color(233, 236, 239));
 
-        pnlInput.add(createLabel("Mã độc giả:", fontLabel));            pnlInput.add(txtMaDG);
-        pnlInput.add(createLabel("Họ và tên:", fontLabel));             pnlInput.add(txtHoTen);
-        pnlInput.add(createLabel("Giới tính:", fontLabel));             pnlInput.add(cbGioiTinh);
+        pnlInput.add(createLabel("Mã độc giả:", fontLabel));             pnlInput.add(txtMaDG);
+        pnlInput.add(createLabel("Họ và tên:", fontLabel));              pnlInput.add(txtHoTen);
+        pnlInput.add(createLabel("Giới tính:", fontLabel));              pnlInput.add(cbGioiTinh);
         pnlInput.add(createLabel("Ngày sinh (YYYY-MM-DD):", fontLabel)); pnlInput.add(txtNgaySinh);
-        pnlInput.add(createLabel("Điện thoại:", fontLabel));            pnlInput.add(txtDienThoai);
+        pnlInput.add(createLabel("Điện thoại:", fontLabel));             pnlInput.add(txtDienThoai);
         pnlInput.add(createLabel("Email:", fontLabel));                  pnlInput.add(txtEmail);
-        pnlInput.add(createLabel("Ngày đăng ký:", fontLabel));          pnlInput.add(txtNgayDK);
-        pnlInput.add(createLabel("Trạng thái:", fontLabel));            pnlInput.add(txtTrangThai);
+        pnlInput.add(createLabel("Ngày đăng ký:", fontLabel));           pnlInput.add(txtNgayDK);
+        pnlInput.add(createLabel("Trạng thái:", fontLabel));             pnlInput.add(txtTrangThai);
 
         // --- THANH TÌM KIẾM ---
         JPanel pnlSearch = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
@@ -90,7 +115,6 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         txtSearch.setFont(fontInput);
         txtSearch.setPreferredSize(new Dimension(0, 35));
 
-        // Chỉ 2 trạng thái: Đang hoạt động / Đã khóa
         cbSearchTrangThai = new JComboBox<>(new String[]{"Đang hoạt động", "Đã khóa"});
         cbSearchTrangThai.setFont(fontInput);
         cbSearchTrangThai.setPreferredSize(new Dimension(200, 35));
@@ -157,7 +181,7 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         pnlCenter.add(scrollPane, BorderLayout.CENTER);
         add(pnlCenter, BorderLayout.CENTER);
 
-        // --- NÚT CHỨC NĂNG (đã bỏ nút Xóa) ---
+        // --- NÚT CHỨC NĂNG BÊN DƯỚI ---
         JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         pnlButtons.setBackground(colorBackground);
 
@@ -165,13 +189,18 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         btnSua    = createActionButton("Cập Nhật", new Color(255, 193, 7)); btnSua.setForeground(Color.BLACK);
         btnKhoa   = createActionButton("Khóa Thẻ", new Color(220, 53, 69));
         btnMoKhoa = createActionButton("Mở Khóa", new Color(13, 110, 253));
-        btnLamMoi = createActionButton("Làm Mới", new Color(108, 117, 125));
-
+        
+        btnImport = createActionButton("Import", new Color(33, 115, 70)); 
+        btnSave = createActionButton("Save", new Color(111, 66, 193));
+        btnExport = createActionButton("Export", new Color(33, 115, 70));
+        
+        pnlButtons.add(btnImport); 
+        pnlButtons.add(btnSave);
+        pnlButtons.add(btnExport);
         pnlButtons.add(btnThem);
         pnlButtons.add(btnSua);
         pnlButtons.add(btnKhoa);
         pnlButtons.add(btnMoKhoa);
-        pnlButtons.add(btnLamMoi);
         add(pnlButtons, BorderLayout.SOUTH);
     }
 
@@ -194,14 +223,16 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
                     txtDienThoai.setText(model.getValueAt(row, 4) != null ? model.getValueAt(row, 4).toString() : "");
                     String trangThai = model.getValueAt(row, 5) != null ? model.getValueAt(row, 5).toString() : "";
                     txtTrangThai.setText(trangThai);
-// Đổi màu cho dễ nhìn
-if (trangThai.equals("Đã khóa")) {
-    txtTrangThai.setForeground(new Color(183, 28, 28));
-    txtTrangThai.setBackground(new Color(255, 235, 238));
-} else {
-    txtTrangThai.setForeground(new Color(25, 135, 84));
-    txtTrangThai.setBackground(new Color(233, 236, 239));
-}
+                    
+                    // Đổi màu cho dễ nhìn
+                    if (trangThai.equals("Đã khóa")) {
+                        txtTrangThai.setForeground(new Color(183, 28, 28));
+                        txtTrangThai.setBackground(new Color(255, 235, 238));
+                    } else {
+                        txtTrangThai.setForeground(new Color(25, 135, 84));
+                        txtTrangThai.setBackground(new Color(233, 236, 239));
+                    }
+                    
                     String maDG = txtMaDG.getText();
                     for (DocGiaDTO dg : docGiaBUS.getListDocGia()) {
                         if (dg.getMaDocGia().equals(maDG)) {
@@ -214,7 +245,7 @@ if (trangThai.equals("Đã khóa")) {
             }
         });
 
-        // 2. Nút LÀM MỚI
+        // 2. Nút LÀM MỚI (Icon trên cùng)
         btnLamMoi.addActionListener(e -> {
             lamMoiForm();
             docGiaBUS.reloadFromDB();
@@ -351,6 +382,75 @@ if (trangThai.equals("Đã khóa")) {
             searchInputLayout.show(pnlSearchInput, "TEXT");
             loadDataToTable();
         });
+        
+        // 11. Nút IMPORT EXCEL
+        btnImport.addActionListener(e -> {
+            Utils.ExcelImporter.importExcelToTable(table, model);
+        });
+
+        // 12. Nút EXPORT EXCEL
+        btnExport.addActionListener(e -> {
+            if (model.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(this, "Không có dữ liệu để xuất!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            Utils.ExcelExporter.exportTableToExcel(table, "DanhSach_DocGia");
+        });
+        
+        // 13. Nút SAVE 
+        btnSave.addActionListener(e -> {
+            int rowCount = table.getRowCount();
+            if (rowCount == 0) {
+                JOptionPane.showMessageDialog(this, "Bảng đang trống, không có dữ liệu để lưu!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int confirm = JOptionPane.showConfirmDialog(this, 
+                    "Lưu toàn bộ " + rowCount + " dòng trên bảng vào Database?", 
+                    "Xác nhận", JOptionPane.YES_NO_OPTION);
+            
+            if (confirm == JOptionPane.YES_OPTION) {
+                int successCount = 0;
+                int failCount = 0;
+                
+                String maNQL = BUS.SessionManager.getInstance().getMaNguoi();
+                if (maNQL == null || maNQL.isEmpty()) maNQL = "NV00000001";
+
+                for (int i = 0; i < rowCount; i++) {
+                    DocGiaDTO dg = new DocGiaDTO();
+                    
+                    dg.setMaDocGia(model.getValueAt(i, 0).toString().trim());
+                    dg.setHoTen(model.getValueAt(i, 1).toString().trim());
+                    dg.setGioiTinh(model.getValueAt(i, 2).toString().trim());
+                    dg.setNgaySinh(model.getValueAt(i, 3).toString().trim());
+                    dg.setSoDienThoai(model.getValueAt(i, 4).toString().trim());
+                    
+                    dg.setMaNguoi(dg.getMaDocGia());
+                    dg.setTenDangNhap(dg.getMaDocGia());
+                    dg.setMatKhau("12345"); // Pass mặc định
+                    dg.setTrangThai("Đang hoạt động");
+                    dg.setIsDeleted(false);
+                    dg.setLoaiDocGia("Thường");
+                    dg.setEmail("");
+                    dg.setNgayDangKi(java.time.LocalDate.now().toString());
+
+                    String result = docGiaBUS.addDocGia(dg, maNQL);
+                    if (result.equals("Thêm thành công")) {
+                        successCount++;
+                    } else {
+                        failCount++; 
+                    }
+                }
+
+                JOptionPane.showMessageDialog(this, 
+                        "Lưu hoàn tất!\n- Thành công: " + successCount + " dòng\n- Bỏ qua (Trùng mã/Lỗi): " + failCount + " dòng", 
+                        "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                
+                docGiaBUS.reloadFromDB();
+                loadDataToTable();
+            }
+        });
+        
     }
 
     // ==========================================================
@@ -408,8 +508,8 @@ if (trangThai.equals("Đã khóa")) {
         cbSearchTrangThai.setSelectedIndex(0);
         table.clearSelection();
         txtTrangThai.setText("Đang hoạt động");
-txtTrangThai.setForeground(new Color(25, 135, 84));
-txtTrangThai.setBackground(new Color(233, 236, 239));
+        txtTrangThai.setForeground(new Color(25, 135, 84));
+        txtTrangThai.setBackground(new Color(233, 236, 239));
     }
 
     // ===== TIỆN ÍCH UI =====
