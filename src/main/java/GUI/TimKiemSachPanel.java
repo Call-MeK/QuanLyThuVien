@@ -5,6 +5,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import BUS.SachBUS;
 import BUS.TheLoaiBUS;
@@ -17,6 +19,7 @@ public class TimKiemSachPanel extends JPanel {
 
     private String tenFont = "Segoe UI";
     private JTable table;
+    private DefaultTableModel model;
     private JButton btnXemChiTiet;
 
     public TimKiemSachPanel() {
@@ -49,10 +52,10 @@ public class TimKiemSachPanel extends JPanel {
         searchBoxPanel.setBackground(Color.WHITE);
         searchBoxPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JTextField txtSearch = new JTextField(40);
+        final JTextField txtSearch = new JTextField(40);
         txtSearch.setPreferredSize(new Dimension(400, 35));
         txtSearch.setFont(new Font(tenFont, Font.PLAIN, 14));
-        String placeholderText = " Nhập tiêu đề, tác giả, thể loại";
+        final String placeholderText = " Nhập tiêu đề, tác giả, thể loại";
         txtSearch.setText(placeholderText);
         txtSearch.setForeground(Color.GRAY);
         txtSearch.addFocusListener(new FocusAdapter() {
@@ -71,7 +74,7 @@ public class TimKiemSachPanel extends JPanel {
             }
         });
 
-        JButton btnSearch = new JButton("Tìm kiếm");
+        final JButton btnSearch = new JButton("Tìm kiếm");
         btnSearch.setPreferredSize(new Dimension(100, 35));
         btnSearch.setFont(new Font(tenFont, Font.BOLD, 13));
         btnSearch.setBackground(new Color(13, 110, 253));
@@ -91,7 +94,7 @@ public class TimKiemSachPanel extends JPanel {
         JLabel lblFilter = new JLabel("Lọc theo:");
         lblFilter.setFont(new Font(tenFont, Font.PLAIN, 14));
 
-        JComboBox<String> cbType = new JComboBox<>(new String[] {
+        final JComboBox<String> cbType = new JComboBox<>(new String[] {
                 "Tất cả", "Văn học - Tiểu thuyết", "Khoa học - Công nghệ", "Lịch sử - Địa lý"
         });
         cbType.setPreferredSize(new Dimension(200, 30));
@@ -113,11 +116,76 @@ public class TimKiemSachPanel extends JPanel {
         // PHẦN DƯỚI: KẾT QUẢ TÌM KIẾM
         // ==========================================
         String[] cols = { "Mã Sách", "Tên Sách", "Tác Giả", "Thể Loại", "NXB", "Tình Trạng" };
-        DefaultTableModel model = new DefaultTableModel(cols, 0);
+        model = new DefaultTableModel(cols, 0);
 
-        // Load dữ liệu sách từ DB
+        loadData("", "Tất cả");
+
+        // Gắn sự kiện tìm kiếm
+        btnSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String kw = txtSearch.getText();
+                if (kw.equals(placeholderText)) {
+                    kw = "";
+                }
+                loadData(kw, cbType.getSelectedItem().toString());
+            }
+        });
+
+        cbType.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String kw = txtSearch.getText();
+                if (kw.equals(placeholderText)) {
+                    kw = "";
+                }
+                loadData(kw, cbType.getSelectedItem().toString());
+            }
+        });
+
+        // Bắt sự kiện nhấn enter ở trường nhập text
+        txtSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btnSearch.doClick();
+            }
+        });
+
+        table = new JTable(model);
+        table.setRowHeight(30);
+        table.getTableHeader().setFont(new Font(tenFont, Font.BOLD, 14));
+        table.getTableHeader().setBackground(new Color(241, 245, 249));
+        table.setFont(new Font(tenFont, Font.PLAIN, 14));
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.getViewport().setBackground(Color.WHITE);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240)));
+
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottomPanel.setBackground(Color.WHITE);
+
+        btnXemChiTiet = new JButton("Xem Chi Tiết / Mượn");
+        btnXemChiTiet.setBackground(new Color(34, 197, 94));
+        btnXemChiTiet.setForeground(Color.WHITE);
+        btnXemChiTiet.setFont(new Font(tenFont, Font.BOLD, 13));
+        btnXemChiTiet.setFocusPainted(false);
+        bottomPanel.add(btnXemChiTiet);
+
+        add(topPanel, BorderLayout.NORTH);
+        add(scrollPane, BorderLayout.CENTER);
+        add(bottomPanel, BorderLayout.SOUTH);
+    }
+
+    private void loadData(String keyword, String theLoaiFilter) {
+        model.setRowCount(0); // clear data
         try {
-            List<SachDTO> listSach = new SachBUS().getAll();
+            List<SachDTO> listSach;
+            if (keyword == null || keyword.trim().isEmpty()) {
+                listSach = new SachBUS().getAll();
+            } else {
+                listSach = new SachBUS().search(keyword);
+            }
+
             TheLoaiBUS theLoaiBUS = new TheLoaiBUS();
             NhaXuatBanBUS nxbBUS = new NhaXuatBanBUS();
 
@@ -128,6 +196,13 @@ public class TimKiemSachPanel extends JPanel {
                     TheLoaiDTO tl = theLoaiBUS.getById(tenTheLoai);
                     if (tl != null && tl.getTenTheLoai() != null) {
                         tenTheLoai = tl.getTenTheLoai();
+                    }
+                }
+
+                // Lọc theo combobox thể loại
+                if (!theLoaiFilter.equals("Tất cả")) {
+                    if (tenTheLoai == null || !tenTheLoai.equals(theLoaiFilter)) {
+                        continue;
                     }
                 }
 
@@ -159,30 +234,6 @@ public class TimKiemSachPanel extends JPanel {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-        table = new JTable(model);
-        table.setRowHeight(30);
-        table.getTableHeader().setFont(new Font(tenFont, Font.BOLD, 14));
-        table.getTableHeader().setBackground(new Color(241, 245, 249));
-        table.setFont(new Font(tenFont, Font.PLAIN, 14));
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.getViewport().setBackground(Color.WHITE);
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240)));
-
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        bottomPanel.setBackground(Color.WHITE);
-
-        btnXemChiTiet = new JButton("Xem Chi Tiết / Mượn");
-        btnXemChiTiet.setBackground(new Color(34, 197, 94));
-        btnXemChiTiet.setForeground(Color.WHITE);
-        btnXemChiTiet.setFont(new Font(tenFont, Font.BOLD, 13));
-        btnXemChiTiet.setFocusPainted(false);
-        bottomPanel.add(btnXemChiTiet);
-
-        add(topPanel, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
-        add(bottomPanel, BorderLayout.SOUTH);
     }
 
     // GETTER ĐỂ BẮT SỰ KIỆN TỪ USER HOME FRAME
