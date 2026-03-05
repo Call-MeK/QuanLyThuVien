@@ -192,4 +192,44 @@ public class PhieuPhatDAO {
         }
         return "PP00000001";
     }
+    
+   // Lấy danh sách phiếu phạt HIỂN THỊ LÊN GUI dành riêng cho 1 Độc Giả (User)
+    public ArrayList<Object[]> getDanhSachHienThiGUIByMaDocGia(String maDocGia) {
+        ArrayList<Object[]> list = new ArrayList<>();
+        // Truy vấn nối 4 bảng: PhieuPhat -> ChiTietPhieuPhat -> PhieuMuon -> TheThuVien
+        String sql = "SELECT p.MaPP, p.MaPM, p.NgayLap, "
+                + "c.LyDo, p.TongTien, p.TrangThai "
+                + "FROM PHIEUPHAT p "
+                + "LEFT JOIN CHITIETPHIEUPHAT c ON p.MaPP = c.MaPP AND c.TrangThai = 1 "
+                + "JOIN PHIEUMUON pm ON p.MaPM = pm.MaPM "
+                + "JOIN THETHUVIEN t ON pm.MaThe = t.MaThe "
+                + "WHERE t.MaDocGia = ? AND p.TrangThai < 2 "
+                + "ORDER BY p.NgayLap DESC";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, maDocGia); // Truyền mã độc giả đang đăng nhập vào đây
+            ResultSet rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                String maPP = rs.getString("MaPP");
+                String maPM = rs.getString("MaPM");
+                String ngayLap = rs.getString("NgayLap");
+                String lyDo = rs.getString("LyDo");
+                if (lyDo == null) lyDo = "Chưa có chi tiết";
+
+                double tien = rs.getDouble("TongTien");
+                String soTien = String.format("%,.0f", tien);
+
+                int tt = rs.getInt("TrangThai");
+                String trangThai = (tt == 1) ? "Đã thanh toán" : "Chưa thanh toán";
+
+                list.add(new Object[]{maPP, maPM, ngayLap, lyDo, soTien, trangThai});
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }

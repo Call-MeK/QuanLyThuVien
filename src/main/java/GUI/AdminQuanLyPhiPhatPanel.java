@@ -8,7 +8,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import BUS.*;
-import BUS.SessionManager;
 import DTO.*;
 
 public class AdminQuanLyPhiPhatPanel extends JPanel {
@@ -18,6 +17,7 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
 
     private JTextField txtMaPhieuPhat, txtMaPhieuMuon, txtSoTien;
     private JComboBox<String> cbLyDo, cbSearchCriteria;
+    private JComboBox<String> cbMaCuonSach; // Đã đổi sang JComboBox
     private JTextField txtSearch;
     private JComboBox<String> cbSearchTrangThai;
     private JPanel pnlSearchInput;
@@ -48,7 +48,7 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         pnlCenter.setBackground(colorBackground);
 
         // --- FORM NHẬP LIỆU ---
-        JPanel pnlInput = new JPanel(new GridLayout(2, 4, 15, 15));
+        JPanel pnlInput = new JPanel(new GridLayout(3, 4, 15, 15));
         pnlInput.setBackground(Color.WHITE);
         pnlInput.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(222, 226, 230), 1, true),
@@ -59,17 +59,32 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
 
         txtMaPhieuPhat = new JTextField(); txtMaPhieuPhat.setFont(fontInput);
         txtMaPhieuPhat.setEditable(false);
+        
         txtMaPhieuMuon = new JTextField(); txtMaPhieuMuon.setFont(fontInput);
+        
+        cbMaCuonSach = new JComboBox<>(); 
+        cbMaCuonSach.setFont(fontInput);
+        
         cbLyDo = new JComboBox<>(new String[]{
             "Trả sách trễ hạn", "Làm rách/bẩn sách", "Làm mất sách", "Lý do khác"
         });
         cbLyDo.setFont(fontInput);
+        
         txtSoTien = new JTextField("0"); txtSoTien.setFont(fontInput);
 
+        // Hàng 1
         pnlInput.add(createLabel("Mã phiếu phạt:", fontLabel)); pnlInput.add(txtMaPhieuPhat);
         pnlInput.add(createLabel("Mã phiếu mượn:", fontLabel)); pnlInput.add(txtMaPhieuMuon);
+        
+        // Hàng 2
+        pnlInput.add(createLabel("Mã cuốn sách:", fontLabel));  
+        pnlInput.add(cbMaCuonSach);
         pnlInput.add(createLabel("Lý do phạt:", fontLabel));     pnlInput.add(cbLyDo);
+        
+        // Hàng 3
         pnlInput.add(createLabel("Số tiền (VNĐ):", fontLabel)); pnlInput.add(txtSoTien);
+        pnlInput.add(new JLabel("")); // Cột trống để cân bằng layout
+        pnlInput.add(new JLabel("")); // Cột trống để cân bằng layout
 
         // --- THANH TÌM KIẾM ---
         JPanel pnlSearch = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
@@ -174,6 +189,26 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
     // SỰ KIỆN
     // ==========================================================
     private void initEvents() {
+        
+        // Sự kiện: Khi gõ xong Mã Phiếu Mượn và ấn Enter -> Tải danh sách sách
+        txtMaPhieuMuon.addActionListener(e -> {
+            String maPM = txtMaPhieuMuon.getText().trim();
+            if (!maPM.isEmpty()) {
+                // Gọi BUS để lấy danh sách
+                ArrayList<String> dsMaSach = phieuPhatBUS.getDanhSachMaSachByMaPM(maPM);
+                cbMaCuonSach.removeAllItems(); // Xóa dữ liệu cũ
+                
+                if (dsMaSach.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Không tìm thấy cuốn sách nào thuộc mã phiếu mượn này!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    // Đổ dữ liệu mới vào ComboBox
+                    for (String ma : dsMaSach) {
+                        cbMaCuonSach.addItem(ma);
+                    }
+                    JOptionPane.showMessageDialog(this, "Đã tải xong danh sách sách của phiếu " + maPM);
+                }
+            }
+        });
 
         // 1. Click bảng -> đổ dữ liệu lên form
         table.addMouseListener(new MouseAdapter() {
@@ -184,6 +219,7 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
                     txtMaPhieuPhat.setText(safeGet(row, 0));
                     txtMaPhieuMuon.setText(safeGet(row, 1));
                     txtMaPhieuMuon.setEditable(false);
+                    cbMaCuonSach.removeAllItems(); // Bảng chính không hiện mã sách, nên reset tạm
 
                     String lyDo = safeGet(row, 3);
                     boolean found = false;
@@ -214,6 +250,10 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Vui lòng nhập mã phiếu mượn!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            if (cbMaCuonSach.getSelectedItem() == null) {
+                JOptionPane.showMessageDialog(this, "Chưa có mã cuốn sách! Hãy gõ Mã phiếu mượn và ấn Enter để tải sách.", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             double soTien = parseSoTien();
             if (soTien <= 0) return;
 
@@ -238,7 +278,10 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
             ChiTietPhieuPhatDTO ctpp = new ChiTietPhieuPhatDTO();
             ctpp.setMaCTPP("CT" + maPP.substring(2));
             ctpp.setMaPP(maPP);
-            ctpp.setMaCuonSach("");
+            
+            // Lấy mã cuốn sách từ JComboBox
+            ctpp.setMaCuonSach(cbMaCuonSach.getSelectedItem().toString());
+            
             ctpp.setLyDo(lyDo);
             ctpp.setSoTien(String.valueOf(soTien));
 
@@ -384,6 +427,7 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
     private void lamMoiForm() {
         txtMaPhieuPhat.setText(phieuPhatBUS.generateMaPP());
         txtMaPhieuMuon.setText(""); txtMaPhieuMuon.setEditable(true);
+        cbMaCuonSach.removeAllItems(); // Làm trống JComboBox
         cbLyDo.setSelectedIndex(0);
         txtSoTien.setText("0");
         txtSearch.setText(""); cbSearchTrangThai.setSelectedIndex(0);
