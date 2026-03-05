@@ -89,24 +89,50 @@ public class ChiTietSachPanel extends JPanel {
         add(mainContent, BorderLayout.CENTER);
 
         // --- BÊN DƯỚI: Các nút chức năng ---
+       // --- BÊN DƯỚI: Các nút chức năng ---
         JPanel panelButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         panelButtons.setBackground(new Color(248, 250, 252));
 
+        // 1. Làm đẹp Nút Quay Lại (Màu Xám Slate)
         btnQuayLai = new JButton("Quay Lại");
         btnQuayLai.setFont(new Font(tenFont, Font.BOLD, 14));
-        btnQuayLai.setBackground(new Color(148, 163, 184));
+        btnQuayLai.setBackground(new Color(100, 116, 139));
         btnQuayLai.setForeground(Color.WHITE);
+        btnQuayLai.setFocusPainted(false);
+        btnQuayLai.setBorderPainted(false);
+        btnQuayLai.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        btnQuayLai.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnQuayLai.setBackground(new Color(71, 85, 105)); // Đậm hơn khi Hover
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnQuayLai.setBackground(new Color(100, 116, 139)); // Trả lại màu gốc
+            }
+        });
 
+        // 2. Làm đẹp Nút Đăng Ký Mượn Sách (Màu Xanh Indigo)
         btnMuonSach = new JButton("Đăng Ký Mượn Sách");
         btnMuonSach.setFont(new Font(tenFont, Font.BOLD, 14));
-        btnMuonSach.setBackground(new Color(14, 165, 233));
+        btnMuonSach.setBackground(new Color(99, 102, 241));
         btnMuonSach.setForeground(Color.WHITE);
+        btnMuonSach.setFocusPainted(false);
+        btnMuonSach.setBorderPainted(false);
+        btnMuonSach.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        btnMuonSach.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnMuonSach.setBackground(new Color(79, 70, 229)); // Đậm hơn khi Hover
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnMuonSach.setBackground(new Color(99, 102, 241)); // Trả lại màu gốc
+            }
+        });
 
         panelButtons.add(btnQuayLai);
         panelButtons.add(btnMuonSach);
         add(panelButtons, BorderLayout.SOUTH);
     }
-
     // Hàm tạo Label tiện ích
     private JLabel createLabel(String text, int size, int style, Color color) {
         JLabel label = new JLabel(text);
