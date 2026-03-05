@@ -11,8 +11,12 @@ public class DocGiaBUS {
     public DocGiaBUS() {
         docGiaDAO = new DocGiaDAO();
         listdocGia = docGiaDAO.getAll();
+// BẢO HIỂM CHỐNG LỖI CRASH GIAO DIỆN
+        if (listdocGia == null) {
+            listdocGia = new ArrayList<>(); 
+            System.out.println("CẢNH BÁO: docGiaDAO.getAll() đang bị lỗi và trả về null!");
+        }
     }
-
     public String generateMaDocGia() {
         return docGiaDAO.generateMaDocGia();
     }
@@ -25,8 +29,12 @@ public class DocGiaBUS {
         return listdocGia;
     }
 
+   // Cập nhật luôn hàm reload
     public void reloadFromDB() {
         listdocGia = docGiaDAO.getAll();
+        if (listdocGia == null) {
+            listdocGia = new ArrayList<>();
+        }
     }
 
     public boolean hasMaDocGia(String maDocGia) {
@@ -144,7 +152,7 @@ public class DocGiaBUS {
             String ma = dg.getMaDocGia() != null ? dg.getMaDocGia().toLowerCase() : "";
             String ten = dg.getHoTen() != null ? dg.getHoTen().toLowerCase() : "";
             String sdt = dg.getSoDienThoai() != null ? dg.getSoDienThoai().toLowerCase() : "";
-            
+            String email = dg.getEmail() != null ? dg.getEmail().toLowerCase() : "";
             // Lấy chính xác trạng thái từ CSDL (Đang hoạt động, Đã khóa, Đã xóa, Hết hạn...)
             String trangThai = dg.getTrangThai() != null ? dg.getTrangThai().toLowerCase() : "";
 
@@ -164,6 +172,9 @@ public class DocGiaBUS {
                     break;
                 case "Số Điện Thoại": 
                     match = sdt.contains(lowerKeyword); 
+                    break;
+                case "Email":  // <--- THÊM CASE NÀY VÀO 
+                    match = email.contains(lowerKeyword); 
                     break;
                 case "Trạng Thái": 
                     // Khi lọc trạng thái, so sánh BẰNG để chính xác (ví dụ "Đã khóa" không được nhầm với "Đã xóa")

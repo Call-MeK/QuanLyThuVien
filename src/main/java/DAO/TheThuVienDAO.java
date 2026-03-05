@@ -1,21 +1,13 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DAO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-
 import DTO.TheThuVienDTO;
 
-/**
- *
- * @author Admin
- */
 public class TheThuVienDAO {
+
     public ArrayList<TheThuVienDTO> getAll() {
         Connection conn = DatabaseConnection.getConnection();
         String sql = "SELECT * FROM THETHUVIEN";
@@ -24,59 +16,44 @@ public class TheThuVienDAO {
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                TheThuVienDTO the = new TheThuVienDTO(
-                        rs.getString("MaThe"),
-                        rs.getString("TenThe"),
-                        rs.getString("MaDocGia"),
-                        rs.getString("NgayCap"),
-                        rs.getString("NgayHetHan"),
-                        rs.getString("MaNQL"));
-                list.add(the);
+                list.add(mapRow(rs));
             }
-            rs.close();
-            stmt.close();
+            rs.close(); stmt.close();
             return list;
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                conn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        } catch (Exception e) { e.printStackTrace(); }
+        finally { try { conn.close(); } catch (Exception e) { e.printStackTrace(); } }
         return null;
     }
 
-    public TheThuVienDTO getById(String MaThe) {
+    public TheThuVienDTO getById(String maThe) {
         Connection conn = DatabaseConnection.getConnection();
-        String sql = "SELECT * FROM THETHUVIEN WHERE MaThe = ?";
+        String sql = "SELECT * FROM THETHUVIEN WHERE RTRIM(MaThe) = ?";
         try {
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, MaThe);
+            stmt.setString(1, maThe.trim());
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                TheThuVienDTO the = new TheThuVienDTO(
-                        rs.getString("MaThe"),
-                        rs.getString("TenThe"),
-                        rs.getString("MaDocGia"),
-                        rs.getString("NgayCap"),
-                        rs.getString("NgayHetHan"),
-                        rs.getString("MaNQL"));
-                return the;
-            }
-            rs.close();
-            stmt.close();
-            return null;
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                conn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+            if (rs.next()) return mapRow(rs);
+            rs.close(); stmt.close();
+        } catch (Exception e) { e.printStackTrace(); }
+        finally { try { conn.close(); } catch (Exception e) { e.printStackTrace(); } }
+        return null;
+    }
+
+    /**
+     * ✅ Method còn thiếu — tìm thẻ theo MaDocGia.
+     * Dùng RTRIM để xử lý kiểu CHAR có khoảng trắng thừa.
+     */
+    public TheThuVienDTO getByMaDocGia(String maDocGia) {
+        Connection conn = DatabaseConnection.getConnection();
+        String sql = "SELECT * FROM THETHUVIEN WHERE RTRIM(MaDocGia) = ?";
+        try {
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, maDocGia.trim());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) return mapRow(rs);
+            rs.close(); stmt.close();
+        } catch (Exception e) { e.printStackTrace(); }
+        finally { try { conn.close(); } catch (Exception e) { e.printStackTrace(); } }
         return null;
     }
 
@@ -94,21 +71,14 @@ public class TheThuVienDAO {
             int result = stmt.executeUpdate();
             stmt.close();
             return result > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                conn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        } catch (Exception e) { e.printStackTrace(); }
+        finally { try { conn.close(); } catch (Exception e) { e.printStackTrace(); } }
         return false;
     }
 
     public boolean update(TheThuVienDTO the) {
         Connection conn = DatabaseConnection.getConnection();
-        String sql = "UPDATE THETHUVIEN SET TenThe = ?, MaDocGia = ?, NgayCap = ?, NgayHetHan = ?, MaNQL = ? WHERE MaThe = ?";
+        String sql = "UPDATE THETHUVIEN SET TenThe=?, MaDocGia=?, NgayCap=?, NgayHetHan=?, MaNQL=? WHERE RTRIM(MaThe)=?";
         try {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, the.getTenThe());
@@ -116,40 +86,37 @@ public class TheThuVienDAO {
             stmt.setString(3, the.getNgayCap());
             stmt.setString(4, the.getNgayHetHan());
             stmt.setString(5, the.getMaNQL());
-            stmt.setString(6, the.getMaThe());
+            stmt.setString(6, the.getMaThe().trim());
             int result = stmt.executeUpdate();
             stmt.close();
             return result > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                conn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        } catch (Exception e) { e.printStackTrace(); }
+        finally { try { conn.close(); } catch (Exception e) { e.printStackTrace(); } }
         return false;
     }
 
-    public boolean delete(String MaThe) {
+    public boolean delete(String maThe) {
         Connection conn = DatabaseConnection.getConnection();
-        String sql = "DELETE FROM THETHUVIEN WHERE MaThe = ?";
+        String sql = "DELETE FROM THETHUVIEN WHERE RTRIM(MaThe) = ?";
         try {
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, MaThe);
+            stmt.setString(1, maThe.trim());
             int result = stmt.executeUpdate();
             stmt.close();
             return result > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                conn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        } catch (Exception e) { e.printStackTrace(); }
+        finally { try { conn.close(); } catch (Exception e) { e.printStackTrace(); } }
         return false;
+    }
+
+    // ===== Helper =====
+    private TheThuVienDTO mapRow(ResultSet rs) throws Exception {
+        return new TheThuVienDTO(
+                rs.getString("MaThe")      != null ? rs.getString("MaThe").trim()      : "",
+                rs.getString("TenThe")     != null ? rs.getString("TenThe").trim()     : "",
+                rs.getString("MaDocGia")   != null ? rs.getString("MaDocGia").trim()   : "",
+                rs.getString("NgayCap")    != null ? rs.getString("NgayCap")           : "",
+                rs.getString("NgayHetHan") != null ? rs.getString("NgayHetHan")        : "",
+                rs.getString("MaNQL")      != null ? rs.getString("MaNQL").trim()      : "");
     }
 }
