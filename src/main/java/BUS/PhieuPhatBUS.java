@@ -27,6 +27,10 @@ public class PhieuPhatBUS {
     public PhieuPhatDTO getById(String maPP) { return phieuPhatDAO.getById(maPP); }
     public ArrayList<ChiTietPhieuPhatDTO> getChiTiet(String maPP) { return chiTietDAO.getByMaPP(maPP); }
     public ArrayList<Object[]> getDanhSachHienThiGUI() { return phieuPhatDAO.getDanhSachHienThiGUI(); }
+    // Lọc phiếu phạt theo Mã Độc Giả (Dành cho User GUI)
+    public ArrayList<Object[]> getDanhSachHienThiGUIByMaDocGia(String maDocGia) { 
+        return phieuPhatDAO.getDanhSachHienThiGUIByMaDocGia(maDocGia); 
+    }
     public String generateMaPP() { return phieuPhatDAO.generateMaPP(); }
 
     // Kiểm tra phiếu đã thanh toán chưa (dùng chung cho các hàm)
@@ -90,7 +94,7 @@ public class PhieuPhatBUS {
             ChiTietPhieuPhatDTO ctMoi = new ChiTietPhieuPhatDTO();
             ctMoi.setMaCTPP(maCTPP);
             ctMoi.setMaPP(maPP);
-            ctMoi.setMaCuonSach("");
+            ctMoi.setMaCuonSach("MV000000000000000001");
             ctMoi.setLyDo(lyDoMoi);
             ctMoi.setSoTien(String.valueOf(soTienMoi));
             String addResult = chiTietDAO.addWithMessage(ctMoi);
@@ -156,4 +160,7 @@ public class PhieuPhatBUS {
         }
         return result;
     }
+    public ArrayList<String> getDanhSachMaSachByMaPM(String maPM) {
+    return chiTietDAO.getDanhSachMaSachByMaPM(maPM);
+}
 }

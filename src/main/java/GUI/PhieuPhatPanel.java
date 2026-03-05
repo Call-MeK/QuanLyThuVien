@@ -144,21 +144,56 @@ public class PhieuPhatPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn một phiếu phạt trên bảng để xem!",
                         "Thông báo", JOptionPane.WARNING_MESSAGE);
             } else {
-                // ĐÃ SỬA: Đúng index cột mới
                 int modelRow = table.convertRowIndexToModel(row);
                 String maPhat = table.getModel().getValueAt(modelRow, 0).toString();
                 String ngayLap = table.getModel().getValueAt(modelRow, 2).toString();
-                String lyDo = table.getModel().getValueAt(modelRow, 3).toString();
-                String soTien = table.getModel().getValueAt(modelRow, 4).toString();
                 String trangThai = table.getModel().getValueAt(modelRow, 5).toString();
-                JOptionPane.showMessageDialog(this,
-                        "Mã Phiếu Phạt: " + maPhat
-                        + "\nNgày lập: " + ngayLap
-                        + "\nLý do vi phạm: " + lyDo
-                        + "\nSố tiền phạt: " + soTien + " VNĐ"
-                        + "\nTrạng thái: " + trangThai,
-                        "Chi Tiết Phiếu Phạt",
-                        JOptionPane.INFORMATION_MESSAGE);
+
+                // Lấy chi tiết CÓ TÊN SÁCH từ Database (cần import BUS.ChiTietPhieuPhatBUS ở đầu file nếu chưa có)
+                BUS.ChiTietPhieuPhatBUS chiTietBUS = new BUS.ChiTietPhieuPhatBUS();
+                ArrayList<Object[]> dsChiTiet = chiTietBUS.getChiTietCoTenSachByMaPP(maPhat);
+
+                // Dựng chuỗi hiển thị chi tiết
+                StringBuilder sb = new StringBuilder();
+                sb.append("--- THÔNG TIN CHUNG ---\n");
+                sb.append("Mã Phiếu Phạt: ").append(maPhat).append("\n");
+                sb.append("Ngày lập: ").append(ngayLap).append("\n");
+                sb.append("Trạng thái: ").append(trangThai).append("\n\n");
+                
+                sb.append("--- DANH SÁCH CUỐN SÁCH BỊ PHẠT ---\n");
+                if (dsChiTiet.isEmpty()) {
+                    sb.append("Chưa có dữ liệu chi tiết cuốn sách nào.\n");
+                } else {
+                    double tongTien = 0;
+                    for (int i = 0; i < dsChiTiet.size(); i++) {
+                        Object[] ct = dsChiTiet.get(i);
+                        // ct[0]: Mã sách, ct[1]: Tên sách, ct[2]: Lý do, ct[3]: Số tiền (dạng chuỗi có dấu phẩy)
+                        sb.append(i + 1).append(". Sách: ").append(ct[1]).append(" (Mã vạch: ").append(ct[0]).append(")\n");
+                        sb.append("   - Lỗi vi phạm: ").append(ct[2]).append("\n");
+                        sb.append("   - Phạt: ").append(ct[3]).append(" VNĐ\n\n");
+                        
+                        // Tính tổng tiền (phải xóa dấu phẩy mới parse sang số được)
+                        String tienChuoi = ct[3].toString().replace(",", "");
+                        try {
+                            tongTien += Double.parseDouble(tienChuoi);
+                        } catch(Exception ex) {}
+                    }
+                    sb.append("----------------------------\n");
+                    sb.append("TỔNG TIỀN PHẠT: ").append(String.format("%,.0f", tongTien)).append(" VNĐ");
+                }
+
+                // Hiển thị lên màn hình
+                JTextArea textArea = new JTextArea(sb.toString());
+                textArea.setFont(new Font(tenFont, Font.PLAIN, 14));
+                textArea.setEditable(false);
+                textArea.setBackground(new Color(248, 249, 250));
+                textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+                
+                JScrollPane scrollMsg = new JScrollPane(textArea);
+                scrollMsg.setPreferredSize(new Dimension(450, 300));
+
+                JOptionPane.showMessageDialog(this, scrollMsg,
+                        "Chi Tiết Phiếu Phạt", JOptionPane.INFORMATION_MESSAGE);
             }
         });
 
@@ -207,7 +242,21 @@ public class PhieuPhatPanel extends JPanel {
     public void loadDataToTable() {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.setRowCount(0);
-        ArrayList<Object[]> dsHienThi = phieuPhatBUS.getDanhSachHienThiGUI();
+        
+        // Lấy mã Độc giả đang đăng nhập từ Session
+        String maDocGiaDangNhap = BUS.SessionManager.getInstance().getMaNguoi();
+        
+        ArrayList<Object[]> dsHienThi;
+        
+        // Kiểm tra xem có người đăng nhập không
+        if (maDocGiaDangNhap != null && !maDocGiaDangNhap.isEmpty()) {
+            // Chỉ lấy phiếu phạt của người này
+            dsHienThi = phieuPhatBUS.getDanhSachHienThiGUIByMaDocGia(maDocGiaDangNhap); 
+        } else {
+            // Nếu lỗi session (không có ai đăng nhập), cho mảng rỗng để không hiện gì cả
+            dsHienThi = new ArrayList<>();
+        }
+
         for (Object[] row : dsHienThi) {
             model.addRow(row);
         }
