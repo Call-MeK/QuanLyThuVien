@@ -15,12 +15,8 @@ public class ChiTietPhieuPhatDAO {
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, ct.getMaCTPP());
             ps.setString(2, ct.getMaPP());
-            // MaCuonSach: nếu rỗng thì set NULL (tránh lỗi FK)
-            if (ct.getMaCuonSach() == null || ct.getMaCuonSach().trim().isEmpty()) {
-                ps.setNull(3, java.sql.Types.VARCHAR);
-            } else {
-                ps.setString(3, ct.getMaCuonSach());
-            }
+            // MaCuonSach: NOT NULL trong DB nên dùng chuỗi rỗng
+            ps.setString(3, ct.getMaCuonSach() != null ? ct.getMaCuonSach() : "");
             ps.setString(4, ct.getLyDo());
             ps.setString(5, ct.getSoTien());
             int rows = ps.executeUpdate();
@@ -91,11 +87,7 @@ public class ChiTietPhieuPhatDAO {
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, ct.getLyDo());
             ps.setString(2, ct.getSoTien());
-            if (ct.getMaCuonSach() == null || ct.getMaCuonSach().trim().isEmpty()) {
-                ps.setNull(3, java.sql.Types.VARCHAR);
-            } else {
-                ps.setString(3, ct.getMaCuonSach());
-            }
+            ps.setString(3, ct.getMaCuonSach() != null ? ct.getMaCuonSach() : "");
             ps.setString(4, ct.getMaCTPP());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -130,5 +122,53 @@ public class ChiTietPhieuPhatDAO {
             e.printStackTrace();
         }
         return false;
+    }
+    // Thêm hàm lấy danh sách mã sách
+public ArrayList<String> getDanhSachMaSachByMaPM(String maPM) {
+    ArrayList<String> dsMaSach = new ArrayList<>();
+    // Truy vấn vào bảng CHITIETPHIEUMUON để lấy các cuốn sách thuộc phiếu mượn này
+    String sql = "SELECT MaCuonSach FROM CHITIETPHIEUMUON WHERE MaPM = ?";
+    try {
+        Connection conn = DatabaseConnection.getConnection(); // Dùng class kết nối DB của bạn
+        PreparedStatement pst = conn.prepareStatement(sql);
+        pst.setString(1, maPM);
+        ResultSet rs = pst.executeQuery();
+        while (rs.next()) {
+            dsMaSach.add(rs.getString("MaCuonSach"));
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return dsMaSach;
+}
+// Lấy thông tin CHI TIẾT CÓ KÈM TÊN SÁCH để hiển thị lên bảng (GUI)
+    public ArrayList<Object[]> getChiTietCoTenSachByMaPP(String maPP) {
+        ArrayList<Object[]> list = new ArrayList<>();
+        // Nối bảng CHITIETPHIEUPHAT -> SACHCOPY -> SACH để lấy Tên Sách
+        String sql = "SELECT c.MaCuonSach, s.TenSach, c.LyDo, c.SoTien "
+                   + "FROM CHITIETPHIEUPHAT c "
+                   + "JOIN SACHCOPY sc ON c.MaCuonSach = sc.MaVach "
+                   + "JOIN SACH s ON sc.MaSach = s.MaSach "
+                   + "WHERE c.MaPP = ? AND c.TrangThai = 1";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, maPP);
+            ResultSet rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                String maSach = rs.getString("MaCuonSach");
+                String tenSach = rs.getString("TenSach");
+                String lyDo = rs.getString("LyDo");
+                double tien = rs.getDouble("SoTien");
+                String soTien = String.format("%,.0f", tien);
+                
+                // Mảng Object này dùng để nạp thẳng vào cái Bảng (JTable) trên giao diện
+                list.add(new Object[]{maSach, tenSach, lyDo, soTien});
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

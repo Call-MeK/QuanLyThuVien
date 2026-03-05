@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-
 public class UserHomeFrame extends JFrame {
     
     // Các thành phần chính của giao diện
@@ -203,7 +202,7 @@ public class UserHomeFrame extends JFrame {
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel title = new JLabel("Thư Viện Online", SwingConstants.LEFT);
-        title.setFont(new Font(tenFont, Font.ITALIC, 26));
+        title.setFont(new Font(tenFont, Font.ITALIC | Font.BOLD, 28)); // Chỉnh font to và đậm hơn
         title.setForeground(new Color(15, 23, 42)); 
         panel.add(title, BorderLayout.NORTH);
 
@@ -230,20 +229,36 @@ public class UserHomeFrame extends JFrame {
         }
         centerPanel.add(banner, BorderLayout.NORTH);
 
-        JPanel booksArea = new JPanel(new BorderLayout(0, 10));
+        JPanel booksArea = new JPanel(new BorderLayout(0, 15)); // Tăng khoảng cách
         booksArea.setBackground(new Color(248, 250, 252));
         
         JLabel subtitle = new JLabel("Sách Gợi Ý Cho Bạn");
-        subtitle.setFont(new Font(tenFont, Font.BOLD, 18));
+        subtitle.setFont(new Font(tenFont, Font.BOLD, 20)); // Font to hơn
+        subtitle.setForeground(new Color(30, 41, 59));
         booksArea.add(subtitle, BorderLayout.NORTH);
 
-        JPanel booksList = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 5));
+        JPanel booksList = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10)); // Thêm margin
         booksList.setBackground(new Color(248, 250, 252));
 
-        booksList.add(createBookCard("Đắc Nhân Tâm", "Dale Carnegie", "Kỹ năng"));
-        booksList.add(createBookCard("Nhà Giả Kim", "Paulo Coelho", "Tiểu thuyết"));
-        booksList.add(createBookCard("Sapiens", "Yuval Noah Harari", "Lịch sử"));
-        booksList.add(createBookCard("Tuổi Trẻ Đáng Giá", "Rosie Nguyễn", "Tự lực"));
+        // ==========================================
+        // LẤY DỮ LIỆU SÁCH TỪ DATABASE (SQL SERVER)
+        // ==========================================
+        BUS.SachBUS sachBUS = new BUS.SachBUS();
+        java.util.List<DTO.SachDTO> dsSach = sachBUS.getAll();
+
+        if (dsSach != null && !dsSach.isEmpty()) {
+            int count = 0;
+            for (DTO.SachDTO sach : dsSach) {
+                if (count >= 5) break; // Chỉ lấy 5 cuốn đầu tiên làm gợi ý
+                booksList.add(createBookCard(sach)); // Gọi hàm createBookCard mới
+                count++;
+            }
+        } else {
+            JLabel lblEmpty = new JLabel("Hiện chưa có sách nào trong thư viện (Database đang trống).");
+            lblEmpty.setFont(new Font(tenFont, Font.ITALIC, 14));
+            lblEmpty.setForeground(Color.RED);
+            booksList.add(lblEmpty);
+        }
 
         JScrollPane scroll = new JScrollPane(booksList);
         scroll.setBorder(null); 
@@ -261,38 +276,82 @@ public class UserHomeFrame extends JFrame {
 
     // --- CÁC HÀM TIỆN ÍCH ---
 
-    private JPanel createBookCard(String title, String author, String category) {
+    // Truyền thẳng đối tượng SachDTO vào thay vì các String rời rạc
+    private JPanel createBookCard(DTO.SachDTO sach) {
+        String title = sach.getTenSach() != null ? sach.getTenSach() : "Chưa cập nhật tên";
+        String category = sach.getTheLoai() != null ? sach.getTheLoai() : "Khác";
+        String namXB = String.valueOf(sach.getNamXB());
+
         JPanel card = new JPanel(new BorderLayout(0, 5));
         card.setBackground(Color.WHITE);
-        card.setPreferredSize(new Dimension(160, 220)); 
-        card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+        card.setPreferredSize(new Dimension(180, 250)); // Cho thẻ to ra 1 chút
+        // Viền thẻ sách màu xám nhạt, trông thanh lịch hơn
+        card.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)
+        ));
 
         JLabel cover = new JLabel("Hình Ảnh", SwingConstants.CENTER);
         cover.setOpaque(true);
-        cover.setBackground(new Color(230, 230, 230));
-        cover.setPreferredSize(new Dimension(100, 120)); 
+        cover.setBackground(new Color(241, 245, 249));
+        cover.setForeground(new Color(148, 163, 184));
+        cover.setPreferredSize(new Dimension(100, 130)); 
 
-        JPanel info = new JPanel(new GridLayout(3, 1));
+        JPanel info = new JPanel(new GridLayout(3, 1, 0, 2));
         info.setBackground(Color.WHITE);
-        info.add(new JLabel(" " + title));
-        info.add(new JLabel(" " + author));
-        info.add(new JLabel(" " + category));
+        
+        // CHỈNH FONT VÀ MÀU SẮC CHO CHỮ THẬT ĐẸP
+        JLabel lblTitle = new JLabel(" " + title);
+        lblTitle.setFont(new Font(tenFont, Font.BOLD, 14)); // Tên sách in đậm
+        lblTitle.setForeground(new Color(15, 23, 42)); // Màu xám đen tuyền
+        
+        JLabel lblCategory = new JLabel(" Thể loại: " + category);
+        lblCategory.setFont(new Font(tenFont, Font.PLAIN, 12));
+        lblCategory.setForeground(new Color(100, 116, 139)); // Màu xám nhạt
+        
+        JLabel lblYear = new JLabel(" Năm XB: " + namXB);
+        lblYear.setFont(new Font(tenFont, Font.ITALIC, 12));
+        lblYear.setForeground(new Color(100, 116, 139));
 
+        info.add(lblTitle);
+        info.add(lblCategory);
+        info.add(lblYear);
+
+        // ==========================================
+        // LÀM ĐẸP NÚT "CHI TIẾT"
+        // ==========================================
         JButton btn = new JButton("Chi Tiết");
-        btn.setBackground(new Color(14, 165, 233));
-        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font(tenFont, Font.BOLD, 13));
+        btn.setBackground(new Color(99, 102, 241)); // Màu nền: Xanh Indigo cực đẹp
+        btn.setForeground(Color.WHITE); // Chữ trắng
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Đổi con trỏ thành bàn tay
 
+        // Hiệu ứng Hover: Di chuột vào thì nút đổi màu đậm hơn
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(new Color(79, 70, 229)); // Màu Indigo đậm
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(new Color(99, 102, 241)); // Trả lại màu gốc
+            }
+        });
+
+        // Sự kiện khi bấm nút Chi Tiết: Đổ dữ liệu thật vào panel Chi Tiết
         btn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 panelChiTietSach.setThongTinSach(
                     title, 
-                    author, 
+                    "Nhiều tác giả", // Do database Sach chưa join bảng Tác Giả
                     category, 
-                    "NXB Mặc Định", 
-                    "2023", 
+                    sach.getMaNXB(), 
+                    namXB, 
                     "Sẵn sàng", 
-                    "Mô tả chi tiết của sách " + title + " sẽ được tải từ CSDL."
+                    "Mã sách: " + sach.getMaSach() + "\nGiá bìa: " + sach.getGiaBia() + " VNĐ\nNgôn ngữ: " + sach.getNgonNgu()
                 );
                 
                 cardLayout.show(mainContentPanel, "ChiTietSach");
@@ -306,6 +365,7 @@ public class UserHomeFrame extends JFrame {
         return card;
     }
 
+    // ĐÂY LÀ HÀM TẠO NÚT BỊ THIẾU ĐÃ ĐƯỢC BỔ SUNG LẠI
     private JButton createMenuButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font(tenFont, Font.PLAIN, 14)); 
@@ -322,14 +382,6 @@ public class UserHomeFrame extends JFrame {
             public void mouseExited(MouseEvent evt) { button.setBackground(new Color(30, 41, 59)); }
         });
         return button;
-    }
-    
-    private JPanel createPlaceholderPanel(String text) {
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel label = new JLabel(text, SwingConstants.CENTER);
-        label.setFont(new Font(tenFont, Font.PLAIN, 20)); 
-        panel.add(label, BorderLayout.CENTER);
-        return panel;
     }
 
     public static void main(String args[]) {

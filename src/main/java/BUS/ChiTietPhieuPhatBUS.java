@@ -74,4 +74,9 @@ public class ChiTietPhieuPhatBUS {
         }
         return null;
     }
+    // Thêm hàm này vào class ChiTietPhieuPhatBUS
+    public ArrayList<Object[]> getChiTietCoTenSachByMaPP(String maPP) {
+        // Tùy theo cách bạn khai báo biến DAO trong file này (có thể là chiTietDAO hoặc chiTietPhieuPhatDAO)
+        return ctppDAO.getChiTietCoTenSachByMaPP(maPP); 
+    }
 }

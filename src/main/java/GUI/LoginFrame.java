@@ -104,16 +104,69 @@ public class LoginFrame extends JFrame {
 
         JLabel lblPassword = new JLabel("Mật khẩu:");
         lblPassword.setFont(labelFont);
-        JPasswordField txtPassword = new JPasswordField();
+
+        JPanel passPanel = new JPanel(new BorderLayout(5, 0));
+        passPanel.setBackground(Color.WHITE);
+        final JPasswordField txtPassword = new JPasswordField();
         txtPassword.setFont(inputFont);
-        txtPassword.setPreferredSize(new Dimension(300, 40));
+        txtPassword.setPreferredSize(new Dimension(250, 40));
         txtPassword.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(206, 212, 218), 1, true),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 
+        final JToggleButton btnTogglePass = new JToggleButton();
+        btnTogglePass.setBackground(Color.WHITE);
+        btnTogglePass.setFocusPainted(false);
+        btnTogglePass.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        btnTogglePass.setPreferredSize(new Dimension(60, 40));
+        btnTogglePass.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        ImageIcon iconS = null;
+        ImageIcon iconH = null;
+        try {
+            ImageIcon sIcon = new ImageIcon(getClass().getResource("/Images/showpassword.jpg"));
+            iconS = new ImageIcon(sIcon.getImage().getScaledInstance(30, 20, Image.SCALE_SMOOTH));
+
+            ImageIcon hIcon = new ImageIcon(getClass().getResource("/Images/hidepassword.jpg"));
+            iconH = new ImageIcon(hIcon.getImage().getScaledInstance(30, 20, Image.SCALE_SMOOTH));
+
+            btnTogglePass.setIcon(iconS);
+        } catch (Exception e) {
+            btnTogglePass.setText("Hiện");
+        }
+
+        final ImageIcon iconShow = iconS;
+        final ImageIcon iconHide = iconH;
+
+        btnTogglePass.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                if (btnTogglePass.isSelected()) {
+                    txtPassword.setEchoChar((char) 0); // Hiển thị mật khẩu
+                    if (iconHide != null) {
+                        btnTogglePass.setIcon(iconHide);
+                        btnTogglePass.setText("");
+                    } else {
+                        btnTogglePass.setText("Ẩn");
+                    }
+                } else {
+                    txtPassword.setEchoChar('•'); // Ẩn mật khẩu (ký tự mặc định)
+                    if (iconShow != null) {
+                        btnTogglePass.setIcon(iconShow);
+                        btnTogglePass.setText("");
+                    } else {
+                        btnTogglePass.setText("Hiện");
+                    }
+                }
+            }
+        });
+
+        passPanel.add(txtPassword, BorderLayout.CENTER);
+        passPanel.add(btnTogglePass, BorderLayout.EAST);
+
         JLabel lblRole = new JLabel("Vai trò:");
         lblRole.setFont(labelFont);
-        JComboBox<String> cbRole = new JComboBox<>(new String[]{"Độc giả (User)", "Quản trị viên (Admin)"});
+        JComboBox<String> cbRole = new JComboBox<String>(new String[] { "Độc giả (User)", "Quản trị viên (Admin)" });
         cbRole.setFont(inputFont);
         cbRole.setBackground(Color.WHITE);
         cbRole.setPreferredSize(new Dimension(300, 40));
@@ -121,7 +174,7 @@ public class LoginFrame extends JFrame {
         formPanel.add(lblUsername);
         formPanel.add(txtUsername);
         formPanel.add(lblPassword);
-        formPanel.add(txtPassword);
+        formPanel.add(passPanel);
         formPanel.add(lblRole);
         formPanel.add(cbRole);
 
@@ -136,8 +189,13 @@ public class LoginFrame extends JFrame {
         btnLogin.setMaximumSize(new Dimension(350, 45));
 
         btnLogin.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent evt) { btnLogin.setBackground(new Color(11, 94, 215)); }
-            public void mouseExited(MouseEvent evt) { btnLogin.setBackground(colorPrimary); }
+            public void mouseEntered(MouseEvent evt) {
+                btnLogin.setBackground(new Color(11, 94, 215));
+            }
+
+            public void mouseExited(MouseEvent evt) {
+                btnLogin.setBackground(colorPrimary);
+            }
         });
 
         // ==========================================
