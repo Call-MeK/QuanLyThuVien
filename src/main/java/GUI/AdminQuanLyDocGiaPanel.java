@@ -125,7 +125,7 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         pnlCenter.add(pnlTopCenter, BorderLayout.NORTH);
 
         // --- BẢNG ---
-        String[] columns = {"Mã ĐG", "Họ Tên", "Giới Tính", "Ngày Sinh", "Điện Thoại", "Trạng Thái"};
+        String[] columns = {"Mã ĐG", "Họ Tên", "Giới Tính", "Ngày Sinh", "Điện Thoại", "EMail", "Trạng Thái"};
         model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -212,7 +212,6 @@ if (trangThai.equals("Đã khóa")) {
                     String maDG = txtMaDG.getText();
                     for (DocGiaDTO dg : docGiaBUS.getListDocGia()) {
                         if (dg.getMaDocGia().equals(maDG)) {
-                            txtEmail.setText(dg.getEmail() != null ? dg.getEmail() : "");
                             txtNgayDK.setText(dg.getNgayDangKi() != null ? dg.getNgayDangKi() : "");
                             break;
                         }
