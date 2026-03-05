@@ -11,20 +11,19 @@ import java.util.List;
 
 public class SachDAO {
 
-    public List<SachDTO> getAll() {
+   public List<SachDTO> getAll() {
         List<SachDTO> list = new ArrayList<>();
+        // Lấy tất cả các cột, bao gồm cả cột SoLuong chúng ta mới thêm
         String sql = "SELECT * FROM SACH WHERE isdeleted = 0";
+        
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-<<<<<<< HEAD
-
-           while (rs.next()) {
-                SachDTO sach = new SachDTO(
-=======
+            
+            // THIẾU VÒNG LẶP NÀY:
             while (rs.next()) {
-                list.add(new SachDTO(
->>>>>>> 2a3a00c0405edaaab1bc3e7a745e34edd8a5df24
+                // Khởi tạo đối tượng SachDTO từ dữ liệu dòng hiện tại
+                SachDTO sach = new SachDTO(
                         rs.getString("MaSach"),
                         rs.getString("tenSach"),
                         rs.getString("TheLoai"),
@@ -33,22 +32,20 @@ public class SachDAO {
                         rs.getString("NgonNgu"),
                         rs.getFloat("GiaBia"),
                         rs.getBoolean("isdeleted"),
-<<<<<<< HEAD
-                        new ArrayList<TacGiaDTO>()
+                        new ArrayList<>() // Danh sách tác giả tạm thời để trống
                 );
                 
-                // THÊM DÒNG NÀY ĐỂ LẤY SỐ LƯỢNG TỪ DATABASE
-                sach.setSoLuong(rs.getInt("SoLuong")); 
+                // Lấy giá trị SoLuong từ database và gán vào DTO
+                sach.setSoLuong(rs.getInt("SoLuong"));
                 
+                // Thêm vào danh sách trả về
                 list.add(sach);
-=======
-                        new ArrayList<>()));
->>>>>>> 2a3a00c0405edaaab1bc3e7a745e34edd8a5df24
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { 
+            e.printStackTrace(); 
+        }
         return list;
     }
-
     public SachDTO getById(String maSach) {
         String sql = "SELECT * FROM SACH WHERE MaSach = ? AND isdeleted = 0";
         try (Connection con = DatabaseConnection.getConnection();
