@@ -142,4 +142,20 @@ public class PhieuMuonDAO {
         }
         return list;
     }
+   // Tự động sinh mã Phiếu Mượn (VD: PM00000001)
+    public String generateMaPM() {
+        String sql = "SELECT MaPM FROM PHIEUMUON ORDER BY MaPM DESC";
+        try (Connection conn = DatabaseConnection.getConnection();
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            if (rs.next()) {
+                String lastMa = rs.getString("MaPM");
+                int num = Integer.parseInt(lastMa.substring(2)) + 1;
+                return String.format("PM%08d", num);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "PM00000001";
+    }
 }

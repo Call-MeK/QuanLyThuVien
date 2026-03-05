@@ -3,6 +3,7 @@ package GUI;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import BUS.*;
 import DTO.*;
@@ -19,8 +20,13 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
     private DefaultTableModel model;
     private JButton btnThem, btnTra, btnGiaHan, btnLamMoi, btnSearch, btnResetSearch;
 
+    private PhieuMuonBUS phieuMuonBUS = new PhieuMuonBUS();
+
     public AdminQuanLyMuonTraPanel() {
         initComponents();
+        initEvents();
+        lamMoiForm();
+        loadDataToTable();
     }
 
     private void initComponents() {
@@ -46,18 +52,21 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         Font fontLabel = new Font(tenFont, Font.BOLD, 14);
         Font fontInput = new Font(tenFont, Font.PLAIN, 14);
 
-        txtMaPhieu = new JTextField(); txtMaPhieu.setFont(fontInput);
+        txtMaPhieu = new JTextField(); txtMaPhieu.setFont(fontInput); txtMaPhieu.setEditable(false);
         txtMaDG = new JTextField(); txtMaDG.setFont(fontInput);
         txtMaSach = new JTextField(); txtMaSach.setFont(fontInput);
-        txtNgayMuon = new JTextField("dd/MM/yyyy"); txtNgayMuon.setFont(fontInput); txtNgayMuon.setForeground(Color.GRAY);
-        txtHanTra = new JTextField("dd/MM/yyyy"); txtHanTra.setFont(fontInput); txtHanTra.setForeground(Color.GRAY);
-        txtNgayTra = new JTextField(); txtNgayTra.setFont(fontInput);
-        cbTrangThai = new JComboBox<>(new String[]{"Đang mượn", "Đã trả", "Trễ hạn"}); cbTrangThai.setFont(fontInput);
-        txtTienPhat = new JTextField("0"); txtTienPhat.setFont(fontInput);
+        txtNgayMuon = new JTextField(); txtNgayMuon.setFont(fontInput); txtNgayMuon.setEditable(false);
+        txtHanTra = new JTextField(); txtHanTra.setFont(fontInput); txtHanTra.setEditable(false);
+        txtNgayTra = new JTextField(); txtNgayTra.setFont(fontInput); txtNgayTra.setEditable(false);
+        
+        cbTrangThai = new JComboBox<>(new String[]{"Đang mượn", "Đã trả", "Trễ hạn"}); 
+        cbTrangThai.setFont(fontInput); cbTrangThai.setEnabled(false);
+        
+        txtTienPhat = new JTextField("0"); txtTienPhat.setFont(fontInput); txtTienPhat.setEditable(false);
 
         pnlInput.add(createLabel("Mã phiếu:", fontLabel)); pnlInput.add(txtMaPhieu);
-        pnlInput.add(createLabel("Mã độc giả:", fontLabel)); pnlInput.add(txtMaDG);
-        pnlInput.add(createLabel("Mã sách:", fontLabel)); pnlInput.add(txtMaSach);
+        pnlInput.add(createLabel("Mã thẻ độc giả:", fontLabel)); pnlInput.add(txtMaDG);
+        pnlInput.add(createLabel("Mã cuốn sách:", fontLabel)); pnlInput.add(txtMaSach);
         pnlInput.add(createLabel("Ngày mượn:", fontLabel)); pnlInput.add(txtNgayMuon);
         pnlInput.add(createLabel("Hạn trả:", fontLabel)); pnlInput.add(txtHanTra);
         pnlInput.add(createLabel("Ngày trả thực:", fontLabel)); pnlInput.add(txtNgayTra);
@@ -89,19 +98,13 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         pnlCenter.add(pnlTopCenter, BorderLayout.NORTH);
 
         // --- BẢNG ---
-        String[] columns = {"Mã Phiếu", "Mã Độc Giả", "Mã Sách", "Ngày Mượn", "Hạn Trả", "Trạng Thái"};
-        model = new DefaultTableModel(columns, 0);
+        String[] columns = {"Mã Phiếu", "Mã Thẻ (ĐG)", "Ngày Mượn", "Hạn Trả", "Ngày Trả", "Trạng Thái"};
+        model = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
         table = new JTable(model);
         setupTable(table);
-
-        try {
-            ArrayList<PhieuMuonDTO> listPM = new PhieuMuonBUS().getAll();
-            for (PhieuMuonDTO pm : listPM) {
-                model.addRow(new Object[]{pm.getMaPM(), pm.getMaThe(), pm.getMaNQL(), pm.getNgayMuon(), pm.getHenTra(), pm.getTinhTrang()});
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230), 1));
@@ -121,25 +124,92 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         add(pnlButtons, BorderLayout.SOUTH);
     }
 
-    // ===== GETTER =====
-    public JTextField getTxtMaPhieu() { return txtMaPhieu; }
-    public JTextField getTxtMaDG() { return txtMaDG; }
-    public JTextField getTxtMaSach() { return txtMaSach; }
-    public JTextField getTxtNgayMuon() { return txtNgayMuon; }
-    public JTextField getTxtHanTra() { return txtHanTra; }
-    public JTextField getTxtNgayTra() { return txtNgayTra; }
-    public JComboBox<String> getCbTrangThai() { return cbTrangThai; }
-    public JTextField getTxtTienPhat() { return txtTienPhat; }
-    public JTable getTable() { return table; }
-    public DefaultTableModel getModel() { return model; }
-    public JButton getBtnThem() { return btnThem; }
-    public JButton getBtnTra() { return btnTra; }
-    public JButton getBtnGiaHan() { return btnGiaHan; }
-    public JButton getBtnLamMoi() { return btnLamMoi; }
-    public JButton getBtnSearch() { return btnSearch; }
-    public JButton getBtnResetSearch() { return btnResetSearch; }
+    private void initEvents() {
+        btnLamMoi.addActionListener(e -> {
+            lamMoiForm();
+            loadDataToTable();
+        });
 
-    // ===== TIỆN ÍCH =====
+        btnThem.addActionListener(e -> {
+            String maThe = txtMaDG.getText().trim();
+            String maSach = txtMaSach.getText().trim();
+
+            if (maThe.isEmpty() || maSach.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập Mã thẻ độc giả và Mã cuốn sách!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            String maNQL = SessionManager.getInstance().getMaNguoi();
+            if (maNQL == null || maNQL.isEmpty()) {
+                maNQL = "NQL0000001";
+            }
+
+            PhieuMuonDTO pm = new PhieuMuonDTO();
+            pm.setMaPM(txtMaPhieu.getText().trim());
+            pm.setMaThe(maThe);
+            pm.setMaNQL(maNQL);
+            pm.setNgayMuon(txtNgayMuon.getText().trim());
+            pm.setHenTra(txtHanTra.getText().trim());
+            pm.setNgayTra(""); 
+            pm.setTinhTrang("Đang mượn");
+
+            String resultPM = phieuMuonBUS.insert(pm);
+            if (resultPM.contains("thành công")) {
+                try {
+                    ChiTietPhieuMuonDTO ctpm = new ChiTietPhieuMuonDTO();
+                    ctpm.setMaPM(pm.getMaPM());
+                    ctpm.setMaCuonSach(maSach);
+                    ctpm.setTinhTrangSach("Bình thường"); 
+                    
+                    BUS.ChiTietPhieuMuonBUS chiTietBUS = new BUS.ChiTietPhieuMuonBUS();
+                    chiTietBUS.add(ctpm); 
+                    
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+                JOptionPane.showMessageDialog(this, "Lập phiếu mượn thành công!");
+                lamMoiForm();
+                loadDataToTable();
+            } else {
+                JOptionPane.showMessageDialog(this, resultPM, "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+    }
+
+    private void loadDataToTable() {
+        model.setRowCount(0);
+        try {
+            ArrayList<PhieuMuonDTO> listPM = phieuMuonBUS.getAll();
+            for (PhieuMuonDTO pm : listPM) {
+                model.addRow(new Object[]{
+                    pm.getMaPM(), 
+                    pm.getMaThe(), 
+                    pm.getNgayMuon(), 
+                    pm.getHenTra(), 
+                    pm.getNgayTra() == null || pm.getNgayTra().isEmpty() ? "Chưa trả" : pm.getNgayTra(), 
+                    pm.getTinhTrang()
+                });
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void lamMoiForm() {
+        txtMaPhieu.setText(phieuMuonBUS.generateMaPM());
+        txtMaDG.setText("");
+        txtMaSach.setText("");
+        
+        LocalDate today = LocalDate.now();
+        txtNgayMuon.setText(today.toString()); 
+        txtHanTra.setText(today.plusDays(14).toString()); 
+        
+        txtNgayTra.setText("");
+        cbTrangThai.setSelectedIndex(0);
+        table.clearSelection();
+    }
+
     private JLabel createLabel(String text, Font font) {
         JLabel lbl = new JLabel(text); lbl.setFont(font); lbl.setForeground(new Color(73, 80, 87)); return lbl;
     }

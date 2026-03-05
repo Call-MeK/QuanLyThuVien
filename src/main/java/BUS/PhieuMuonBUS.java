@@ -149,4 +149,8 @@ public class PhieuMuonBUS {
     public ArrayList<Object[]> getDanhSachSachDangMuon() {
         return pmDAO.getDanhSachSachDangMuon();
     }
+   // Tự động sinh mã
+    public String generateMaPM() {
+        return pmDAO.generateMaPM();
+    }
 }
