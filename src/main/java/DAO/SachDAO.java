@@ -28,7 +28,7 @@ public class SachDAO {
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
-            while (rs.next()) {
+           while (rs.next()) {
                 SachDTO sach = new SachDTO(
                         rs.getString("MaSach"),
                         rs.getString("tenSach"),
@@ -40,6 +40,10 @@ public class SachDAO {
                         rs.getBoolean("isdeleted"),
                         new ArrayList<TacGiaDTO>()
                 );
+                
+                // THÊM DÒNG NÀY ĐỂ LẤY SỐ LƯỢNG TỪ DATABASE
+                sach.setSoLuong(rs.getInt("SoLuong")); 
+                
                 list.add(sach);
             }
         } catch (Exception e) {
