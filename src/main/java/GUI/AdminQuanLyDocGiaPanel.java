@@ -139,7 +139,7 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
                     boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if (!isSelected) {
-                    String tt = model.getValueAt(row, 5) != null ? model.getValueAt(row, 5).toString() : "";
+                    String tt = model.getValueAt(row, 6) != null ? model.getValueAt(row, 5).toString() : "";
                     if (tt.equals("Đã khóa")) {
                         c.setBackground(new Color(255, 235, 238));
                         c.setForeground(new Color(183, 28, 28));
@@ -173,7 +173,12 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         pnlButtons.add(btnMoKhoa);
         pnlButtons.add(btnLamMoi);
         add(pnlButtons, BorderLayout.SOUTH);
+        
+    // Thêm "Email" vào mảng này
+    cbSearchCriteria = new JComboBox<>(new String[]{"Tất cả", "Mã ĐG", "Họ Tên", "Số Điện Thoại", "Email", "Trạng Thái"});
     }
+    // Thêm "Email" vào trước "Trạng Thái"
+String[] columns = {"Mã ĐG", "Họ Tên", "Giới Tính", "Ngày Sinh", "Điện Thoại", "Email", "Trạng Thái"};
 
     // ==========================================================
     // KHU VỰC XỬ LÝ SỰ KIỆN
@@ -192,7 +197,9 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
                     cbGioiTinh.setSelectedItem(model.getValueAt(row, 2) != null ? model.getValueAt(row, 2).toString() : "Khác");
                     txtNgaySinh.setText(model.getValueAt(row, 3) != null ? model.getValueAt(row, 3).toString() : "");
                     txtDienThoai.setText(model.getValueAt(row, 4) != null ? model.getValueAt(row, 4).toString() : "");
-                    String trangThai = model.getValueAt(row, 5) != null ? model.getValueAt(row, 5).toString() : "";
+                    // THÊM LẤY EMAIL TỪ CỘT SỐ 5:
+                    txtEmail.setText(model.getValueAt(row, 5) != null ? model.getValueAt(row, 5).toString() : "");
+                    String trangThai = model.getValueAt(row, 6) != null ? model.getValueAt(row, 5).toString() : "";
                     txtTrangThai.setText(trangThai);
 // Đổi màu cho dễ nhìn
 if (trangThai.equals("Đã khóa")) {
@@ -225,8 +232,14 @@ if (trangThai.equals("Đã khóa")) {
         btnThem.addActionListener(e -> {
             if (!validateInput("")) return;
 
-            String maNQL = BUS.SessionManager.getInstance().getMaNguoi();
-            if (maNQL == null || maNQL.isEmpty()) maNQL = "NV00000001";
+            String maNQL = "NV00000001"; // Mã mặc định an toàn
+            try {
+                if (BUS.SessionManager.getInstance() != null && BUS.SessionManager.getInstance().getMaNguoi() != null) {
+                    maNQL = BUS.SessionManager.getInstance().getMaNguoi();
+                }
+            } catch (Exception ex) {
+                // Bỏ qua lỗi nếu chưa đăng nhập
+            }
 
             DocGiaDTO dg = createDocGiaFromForm();
             String result = docGiaBUS.addDocGia(dg, maNQL);
@@ -243,7 +256,6 @@ if (trangThai.equals("Đã khóa")) {
                 JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         });
-
         // 4. Nút CẬP NHẬT
         btnSua.addActionListener(e -> {
             String maDG = txtMaDG.getText().trim();
@@ -362,14 +374,16 @@ if (trangThai.equals("Đã khóa")) {
         if (listDG != null) hienThiKetQua(listDG);
     }
 
-    private void hienThiKetQua(ArrayList<DocGiaDTO> danhSach) {
+   private void hienThiKetQua(ArrayList<DocGiaDTO> danhSach) {
         model.setRowCount(0);
         for (DocGiaDTO dg : danhSach) {
             String trangThai = (dg.getIsDeleted() != null && dg.getIsDeleted())
                     ? "Đã khóa" : "Đang hoạt động";
             model.addRow(new Object[]{
                 dg.getMaDocGia(), dg.getHoTen(), dg.getGioiTinh(),
-                dg.getNgaySinh(), dg.getSoDienThoai(), trangThai
+                dg.getNgaySinh(), dg.getSoDienThoai(), 
+                dg.getEmail(), // <--- Bổ sung dòng này
+                trangThai
             });
         }
     }
