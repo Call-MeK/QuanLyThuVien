@@ -187,6 +187,8 @@ public class LoginFrame extends JFrame {
         btnLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLogin.setMaximumSize(new Dimension(350, 45));
+        
+        this.getRootPane().setDefaultButton(btnLogin);
 
         btnLogin.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent evt) {
