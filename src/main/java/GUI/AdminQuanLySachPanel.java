@@ -79,10 +79,18 @@ public class AdminQuanLySachPanel extends JPanel {
         table = new JTable(model);
         setupTable(table);
 
-        try {
+       try {
             List<SachDTO> listSach = new SachBUS().getAll();
             for (SachDTO s : listSach) {
-                model.addRow(new Object[]{s.getMaSach(), s.getTenSach(), s.getTheLoai(), s.getTheLoai(), s.getNamXB(), s.getMaNXB()});
+                // Đã sắp xếp lại đúng thứ tự: Mã | Tên | Tác Giả | Thể Loại | Số Lượng | NXB
+                model.addRow(new Object[]{
+                    s.getMaSach(), 
+                    s.getTenSach(), 
+                    "Nhiều tác giả", // Tạm để String vì DanhSachTacGia cần xử lý vòng lặp riêng
+                    s.getTheLoai(), 
+                    s.getSoLuong(),  // Đã sửa thành getSoLuong()
+                    s.getMaNXB()
+                });
             }
         } catch (Exception ex) {
             ex.printStackTrace();
