@@ -108,17 +108,29 @@ public class SachDangMuonPanel extends JPanel {
         scrollPane.getViewport().setBackground(Color.WHITE);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240)));
 
-        // ==========================================
+// ==========================================
         // PHẦN DƯỚI: CÁC NÚT CHỨC NĂNG
         // ==========================================
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
         bottomPanel.setBackground(Color.WHITE);
         
+        // --- Làm đẹp nút XEM CHI TIẾT ---
         btnXemChiTiet = new JButton("Xem Chi Tiết");
-        btnXemChiTiet.setBackground(new Color(100, 116, 139)); 
-        btnXemChiTiet.setForeground(Color.WHITE);
         btnXemChiTiet.setFont(new Font(tenFont, Font.BOLD, 13));
+        btnXemChiTiet.setBackground(new Color(99, 102, 241)); // Màu Xanh Indigo
+        btnXemChiTiet.setForeground(Color.WHITE);
         btnXemChiTiet.setFocusPainted(false);
+        btnXemChiTiet.setBorderPainted(false);
+        btnXemChiTiet.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        btnXemChiTiet.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnXemChiTiet.setBackground(new Color(79, 70, 229));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnXemChiTiet.setBackground(new Color(99, 102, 241));
+            }
+        });
         
         btnXemChiTiet.addActionListener(e -> {
             int row = table.getSelectedRow();
@@ -136,11 +148,23 @@ public class SachDangMuonPanel extends JPanel {
             }
         });
 
+        // --- Làm đẹp nút TRẢ SÁCH ---
         btnTraSach = new JButton("Trả Sách");
-        btnTraSach.setBackground(new Color(34, 197, 94)); 
-        btnTraSach.setForeground(Color.WHITE);
         btnTraSach.setFont(new Font(tenFont, Font.BOLD, 13));
+        btnTraSach.setBackground(new Color(16, 185, 129)); // Màu Xanh Ngọc (Emerald)
+        btnTraSach.setForeground(Color.WHITE);
         btnTraSach.setFocusPainted(false);
+        btnTraSach.setBorderPainted(false);
+        btnTraSach.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        btnTraSach.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnTraSach.setBackground(new Color(5, 150, 105)); // Đậm hơn
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnTraSach.setBackground(new Color(16, 185, 129));
+            }
+        });
         
         btnTraSach.addActionListener(e -> {
             int row = table.getSelectedRow();
@@ -161,7 +185,6 @@ public class SachDangMuonPanel extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
     }
-
     // =======================================================
     // HÀM KẾT NỐI DATA VÀ ĐỔ LÊN BẢNG
     // =======================================================
