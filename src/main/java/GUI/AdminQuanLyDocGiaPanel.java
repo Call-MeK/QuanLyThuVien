@@ -83,7 +83,7 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
 
         txtSearch = new JTextField(20); txtSearch.setFont(fontInput); txtSearch.setPreferredSize(new Dimension(0, 35));
 
-        cbSearchTrangThai = new JComboBox<>(new String[]{"Đang hoạt động", "Hết hạn", "Đã khóa"});
+        cbSearchTrangThai = new JComboBox<>(new String[]{"Hoạt động", "Hết hạn", "Đã khóa"});
         cbSearchTrangThai.setFont(fontInput);
         cbSearchTrangThai.setPreferredSize(new Dimension(200, 35));
 
@@ -338,6 +338,9 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
                 trangThai = "Đã khóa";
             } else {
                 trangThai = dg.getTrangThai();
+                if (trangThai != null && trangThai.equals("Đang hoạt động")) {
+                trangThai = "Hoạt động";
+                }
             }
             model.addRow(new Object[]{
                 dg.getMaDocGia(),
