@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import BUS.SessionManager;
 
 public class AdminFrame extends JFrame {
 
@@ -11,15 +12,31 @@ public class AdminFrame extends JFrame {
     private JPanel panelContent;
     private CardLayout cardLayout;
 
-    // Cấu hình UI
     private String tenFont = "Segoe UI";
     private Color colorMenuBg = new Color(33, 37, 41);
     private Color colorMenuHover = new Color(52, 58, 64);
     private Color colorBackground = new Color(248, 249, 250);
     private Color colorPrimary = new Color(13, 110, 253);
 
-    public AdminFrame() {
+    private String maNVDangNhap = ""; // Biến hứng mã nhân viên (giống maDocGiaDangNhap bên UserHomeFrame)
+
+    // CONSTRUCTOR NHẬN MÃ TỪ LOGIN (giống UserHomeFrame)
+    public AdminFrame(String maNV) {
+        this.maNVDangNhap = maNV;
         initComponents();
+    }
+
+    // Constructor không tham số (để code cũ không bị lỗi, dùng session)
+    public AdminFrame() {
+        if (SessionManager.getInstance().isLoggedIn()) {
+            this.maNVDangNhap = SessionManager.getInstance().getMaNguoi();
+        }
+        initComponents();
+    }
+
+    // Getter để các panel con lấy mã NV nếu cần
+    public String getMaNVDangNhap() {
+        return maNVDangNhap;
     }
 
     private void initComponents() {
@@ -38,12 +55,26 @@ public class AdminFrame extends JFrame {
         panelMenu.setPreferredSize(new Dimension(240, 0));
         panelMenu.setLayout(new BoxLayout(panelMenu, BoxLayout.Y_AXIS));
 
+        // Tiêu đề ADMIN
         JLabel lblTitle = new JLabel("ADMIN", SwingConstants.CENTER);
         lblTitle.setFont(new Font(tenFont, Font.BOLD, 22));
         lblTitle.setForeground(colorPrimary);
         lblTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lblTitle.setBorder(BorderFactory.createEmptyBorder(35, 0, 35, 0));
+        lblTitle.setBorder(BorderFactory.createEmptyBorder(20, 0, 5, 0));
+
+        // Hiển thị tên + mã người đăng nhập
+        String tenHienThi = SessionManager.getInstance().isLoggedIn()
+                ? SessionManager.getInstance().getHoTen()
+                : maNVDangNhap;
+
+        JLabel lblAdminName = new JLabel(tenHienThi, SwingConstants.CENTER);
+        lblAdminName.setFont(new Font(tenFont, Font.PLAIN, 13));
+        lblAdminName.setForeground(new Color(173, 181, 189));
+        lblAdminName.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblAdminName.setBorder(BorderFactory.createEmptyBorder(0, 0, 25, 0));
+
         panelMenu.add(lblTitle);
+        panelMenu.add(lblAdminName);
 
         JButton btnTrangChu = createMenuButton("Trang Chủ");
         JButton btnQuanLySach = createMenuButton("Quản Lý Sách");
@@ -52,6 +83,7 @@ public class AdminFrame extends JFrame {
         JButton btnQuanLyNhapSach = createMenuButton("Quản Lý Nhập Sách");
         JButton btnQuanLyPhiPhat = createMenuButton("Quản Lý Phí Phạt");
         JButton btnThongKe = createMenuButton("Thống Kê");
+        JButton btnThongTinCN = createMenuButton("Thông Tin Cá Nhân");
 
         panelMenu.add(btnTrangChu);
         panelMenu.add(Box.createVerticalStrut(5));
@@ -66,6 +98,8 @@ public class AdminFrame extends JFrame {
         panelMenu.add(btnQuanLyPhiPhat);
         panelMenu.add(Box.createVerticalStrut(5));
         panelMenu.add(btnThongKe);
+        panelMenu.add(Box.createVerticalStrut(5));
+        panelMenu.add(btnThongTinCN);
 
         panelMenu.add(Box.createVerticalGlue());
 
@@ -80,7 +114,7 @@ public class AdminFrame extends JFrame {
         add(scrollMenu, BorderLayout.WEST);
 
         // ==========================================
-        // 2. VÙNG NỘI DUNG (CARDLAYOUT) - GỌI CLASS RIÊNG
+        // 2. VÙNG NỘI DUNG (CARDLAYOUT)
         // ==========================================
         cardLayout = new CardLayout();
         panelContent = new JPanel(cardLayout);
@@ -93,6 +127,13 @@ public class AdminFrame extends JFrame {
         panelContent.add(new AdminQuanLyNhapSachPanel(), "CardNhapSach");
         panelContent.add(new AdminQuanLyPhiPhatPanel(), "CardPhiPhat");
         panelContent.add(new ThongKePanel(), "CardThongKe");
+        AdminThongTinCaNhanPanel panelThongTinCN = new AdminThongTinCaNhanPanel();
+        panelContent.add(panelThongTinCN, "CardThongTinCN");
+
+        // Truyền mã NV cho panel thông tin (giống cách UserHomeFrame truyền cho ThongTinCaNhanPanel)
+        if (!maNVDangNhap.isEmpty()) {
+            panelThongTinCN.loadData(maNVDangNhap);
+        }
 
         add(panelContent, BorderLayout.CENTER);
 
@@ -106,16 +147,18 @@ public class AdminFrame extends JFrame {
         btnQuanLyNhapSach.addActionListener(e -> cardLayout.show(panelContent, "CardNhapSach"));
         btnQuanLyPhiPhat.addActionListener(e -> cardLayout.show(panelContent, "CardPhiPhat"));
         btnThongKe.addActionListener(e -> cardLayout.show(panelContent, "CardThongKe"));
+        btnThongTinCN.addActionListener(e -> cardLayout.show(panelContent, "CardThongTinCN"));
 
+        // Đăng xuất: clear session + quay lại login
         btnDangXuat.addActionListener(e -> {
             UIManager.put("OptionPane.messageFont", new Font(tenFont, Font.PLAIN, 15));
             UIManager.put("OptionPane.buttonFont", new Font(tenFont, Font.BOLD, 14));
-            int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn đăng xuất?", "Xác nhận",
-                    JOptionPane.YES_NO_OPTION);
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Bạn có chắc chắn muốn đăng xuất?",
+                    "Xác nhận", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                // Đóng form Admin
+                SessionManager.getInstance().logout(); // Xóa session
                 dispose();
-                // Mở lại form Đăng nhập
                 new LoginFrame().setVisible(true);
             }
         });
@@ -151,6 +194,7 @@ public class AdminFrame extends JFrame {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ex) { }
-        SwingUtilities.invokeLater(() -> new AdminFrame().setVisible(true));
+        // Test: truyền mã tạm
+        SwingUtilities.invokeLater(() -> new AdminFrame("NV00000001").setVisible(true));
     }
 }

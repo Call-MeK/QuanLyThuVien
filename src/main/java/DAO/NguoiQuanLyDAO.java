@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DAO;
 
 import DTO.NguoiQuanLyDTO;
@@ -10,10 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
-/**
- *
- * @author Admin
- */
 public class NguoiQuanLyDAO {
     public ArrayList<NguoiQuanLyDTO> getAll() {
         ArrayList<NguoiQuanLyDTO> list = new ArrayList<>();
@@ -48,11 +40,7 @@ public class NguoiQuanLyDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            try {
-                conn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            try { conn.close(); } catch (Exception e) { e.printStackTrace(); }
         }
         return null;
     }
@@ -68,7 +56,7 @@ public class NguoiQuanLyDAO {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, MaNguoiQuanLy);
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
+            if (rs.next()) {
                 NguoiQuanLyDTO nql = new NguoiQuanLyDTO(
                         rs.getString("MaNQL"),
                         rs.getString("VaiTro"),
@@ -83,19 +71,16 @@ public class NguoiQuanLyDAO {
                         rs.getString("SoDienThoai"),
                         rs.getString("Email"),
                         rs.getString("TrangThai"));
+                rs.close();
+                stmt.close();
                 return nql;
             }
             rs.close();
             stmt.close();
-            return null;
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            try {
-                conn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            try { conn.close(); } catch (Exception e) { e.printStackTrace(); }
         }
         return null;
     }
@@ -106,10 +91,8 @@ public class NguoiQuanLyDAO {
         String sql2 = "INSERT INTO CONNGUOI (MaNguoi, HoTen, NgaySinh, TenDangNhap, MatKhau, GioiTinh, DiaChi, SoDienThoai, Email, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try {
             conn.setAutoCommit(false);
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, nql.getMaNQL());
-            stmt.setString(2, nql.getVaiTro());
-            stmt.setBoolean(3, nql.getIsDeleted());
+
+            // CONNGUOI trước vì NGUOIQUANLY tham chiếu tới CONNGUOI
             PreparedStatement stmt2 = conn.prepareStatement(sql2);
             stmt2.setString(1, nql.getMaNguoi());
             stmt2.setString(2, nql.getHoTen());
@@ -121,50 +104,55 @@ public class NguoiQuanLyDAO {
             stmt2.setString(8, nql.getSoDienThoai());
             stmt2.setString(9, nql.getEmail());
             stmt2.setString(10, nql.getTrangThai());
-            int result = stmt.executeUpdate();
             int result2 = stmt2.executeUpdate();
+
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, nql.getMaNQL());
+            stmt.setString(2, nql.getVaiTro());
+            stmt.setBoolean(3, nql.getIsDeleted());
+            int result = stmt.executeUpdate();
+
             conn.commit();
             stmt.close();
             stmt2.close();
             return result > 0 && result2 > 0;
         } catch (Exception e) {
             e.printStackTrace();
-            try {
-                conn.rollback();
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
+            try { conn.rollback(); } catch (Exception e2) { e2.printStackTrace(); }
         } finally {
-            try {
-                conn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            try { conn.close(); } catch (Exception e) { e.printStackTrace(); }
         }
         return false;
     }
 
+    // ĐÃ SỬA: Đúng thứ tự parameter cho bảng CONNGUOI
     public boolean update(NguoiQuanLyDTO nql) {
         Connection conn = DatabaseConnection.getConnection();
         String sql = "UPDATE NGUOIQUANLY SET VaiTro = ?, IsDeleted = ? WHERE MaNQL = ?";
         String sql2 = "UPDATE CONNGUOI SET HoTen = ?, NgaySinh = ?, TenDangNhap = ?, MatKhau = ?, GioiTinh = ?, DiaChi = ?, SoDienThoai = ?, Email = ?, TrangThai = ? WHERE MaNguoi = ?";
         try {
             conn.setAutoCommit(false);
+
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, nql.getVaiTro());
             stmt.setBoolean(2, nql.getIsDeleted());
             stmt.setString(3, nql.getMaNQL());
+
+            // ĐÃ SỬA: Đúng thứ tự
+            // SQL: HoTen=1, NgaySinh=2, TenDangNhap=3, MatKhau=4, GioiTinh=5,
+            //      DiaChi=6, SoDienThoai=7, Email=8, TrangThai=9, WHERE MaNguoi=10
             PreparedStatement stmt2 = conn.prepareStatement(sql2);
-            stmt2.setString(1, nql.getMaNguoi());
-            stmt2.setString(2, nql.getHoTen());
-            stmt2.setString(3, nql.getNgaySinh());
-            stmt2.setString(4, nql.getTenDangNhap());
-            stmt2.setString(5, nql.getMatKhau());
-            stmt2.setString(6, nql.getGioiTinh());
-            stmt2.setString(7, nql.getDiaChi());
-            stmt2.setString(8, nql.getSoDienThoai());
-            stmt2.setString(9, nql.getEmail());
-            stmt2.setString(10, nql.getTrangThai());
+            stmt2.setString(1, nql.getHoTen());         // HoTen
+            stmt2.setString(2, nql.getNgaySinh());      // NgaySinh
+            stmt2.setString(3, nql.getTenDangNhap());   // TenDangNhap
+            stmt2.setString(4, nql.getMatKhau());       // MatKhau
+            stmt2.setString(5, nql.getGioiTinh());      // GioiTinh
+            stmt2.setString(6, nql.getDiaChi());        // DiaChi
+            stmt2.setString(7, nql.getSoDienThoai());   // SoDienThoai
+            stmt2.setString(8, nql.getEmail());         // Email
+            stmt2.setString(9, nql.getTrangThai());     // TrangThai
+            stmt2.setString(10, nql.getMaNguoi());      // WHERE MaNguoi = ?
+
             int result = stmt.executeUpdate();
             int result2 = stmt2.executeUpdate();
             conn.commit();
@@ -173,17 +161,9 @@ public class NguoiQuanLyDAO {
             return result > 0 && result2 > 0;
         } catch (Exception e) {
             e.printStackTrace();
-            try {
-                conn.rollback();
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
+            try { conn.rollback(); } catch (Exception e2) { e2.printStackTrace(); }
         } finally {
-            try {
-                conn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            try { conn.close(); } catch (Exception e) { e.printStackTrace(); }
         }
         return false;
     }
@@ -201,11 +181,7 @@ public class NguoiQuanLyDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            try {
-                conn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            try { conn.close(); } catch (Exception e) { e.printStackTrace(); }
         }
         return false;
     }
