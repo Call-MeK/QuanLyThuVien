@@ -133,27 +133,6 @@ public class AdminQuanLySachPanel extends JPanel {
         };
         table = new JTable(model);
         setupTable(table);
-
-<<<<<<< HEAD
-       try {
-            List<SachDTO> listSach = new SachBUS().getAll();
-            for (SachDTO s : listSach) {
-                // Đã sắp xếp lại đúng thứ tự: Mã | Tên | Tác Giả | Thể Loại | Số Lượng | NXB
-                model.addRow(new Object[]{
-                    s.getMaSach(), 
-                    s.getTenSach(), 
-                    "Nhiều tác giả", // Tạm để String vì DanhSachTacGia cần xử lý vòng lặp riêng
-                    s.getTheLoai(), 
-                    s.getSoLuong(),  // Đã sửa thành getSoLuong()
-                    s.getMaNXB()
-                });
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-=======
->>>>>>> 2a3a00c0405edaaab1bc3e7a745e34edd8a5df24
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230), 1));
         pnlCenter.add(scrollPane, BorderLayout.CENTER);
