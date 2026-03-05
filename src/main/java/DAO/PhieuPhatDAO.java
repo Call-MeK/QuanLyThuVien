@@ -8,8 +8,7 @@ public class PhieuPhatDAO {
 
     // TrangThai: 0 = Chưa thanh toán, 1 = Đã thanh toán, 2 = Đã hủy
 
-    // 1. Thêm phiếu phạt (mặc định TrangThai = 0 = Chưa thanh toán)
-    public boolean add(PhieuPhatDTO pp) {
+    public String add(PhieuPhatDTO pp) {
         String sql = "INSERT INTO PHIEUPHAT (MaPP, MaPM, MaNQL, NgayLap, TongTien, TrangThai) VALUES (?, ?, ?, ?, ?, 0)";
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -18,14 +17,14 @@ public class PhieuPhatDAO {
             ps.setString(3, pp.getMaNQL());
             ps.setDate(4, java.sql.Date.valueOf(pp.getNgayLap()));
             ps.setDouble(5, Double.parseDouble(pp.getTongTien()));
-            return ps.executeUpdate() > 0;
+            int rows = ps.executeUpdate();
+            return rows > 0 ? "OK" : "Không có dòng nào được thêm";
         } catch (Exception e) {
             e.printStackTrace();
+            return "Lỗi DB: " + e.getMessage();
         }
-        return false;
     }
 
-    // 2. Lấy tất cả phiếu phạt CHƯA BỊ HỦY (TrangThai = 0 hoặc 1)
     public ArrayList<PhieuPhatDTO> getAll() {
         ArrayList<PhieuPhatDTO> list = new ArrayList<>();
         String sql = "SELECT * FROM PHIEUPHAT WHERE TrangThai < 2 ORDER BY NgayLap DESC";
@@ -48,7 +47,6 @@ public class PhieuPhatDAO {
         return list;
     }
 
-    // 3. Tìm theo mã (chỉ tìm phiếu chưa hủy)
     public PhieuPhatDTO getById(String maPP) {
         String sql = "SELECT * FROM PHIEUPHAT WHERE MaPP = ? AND TrangThai < 2";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -70,7 +68,6 @@ public class PhieuPhatDAO {
         return null;
     }
 
-    // 4. Cập nhật thông tin phiếu phạt
     public boolean update(PhieuPhatDTO pp) {
         String sql = "UPDATE PHIEUPHAT SET MaPM=?, MaNQL=?, NgayLap=?, TongTien=? WHERE MaPP=?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -87,7 +84,7 @@ public class PhieuPhatDAO {
         return false;
     }
 
-    // 5. Hủy phiếu (TrangThai = 2)
+    // Hủy phiếu: CHỈ hủy phiếu CHƯA thanh toán (0 -> 2)
     public boolean delete(String maPP) {
         String sql = "UPDATE PHIEUPHAT SET TrangThai = 2 WHERE MaPP = ? AND TrangThai = 0";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -100,7 +97,7 @@ public class PhieuPhatDAO {
         return false;
     }
 
-    // 6. Xác nhận thanh toán (TrangThai: 0 -> 1)
+    // Xác nhận thanh toán: CHỈ phiếu CHƯA thanh toán (0 -> 1)
     public boolean thanhToan(String maPP) {
         String sql = "UPDATE PHIEUPHAT SET TrangThai = 1 WHERE MaPP = ? AND TrangThai = 0";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -113,7 +110,6 @@ public class PhieuPhatDAO {
         return false;
     }
 
-    // 7. Lấy danh sách hiển thị GUI (JOIN lấy lý do từ chi tiết)
     public ArrayList<Object[]> getDanhSachHienThiGUI() {
         ArrayList<Object[]> list = new ArrayList<>();
         String sql = "SELECT p.MaPP, p.MaPM, p.NgayLap, "
@@ -146,14 +142,48 @@ public class PhieuPhatDAO {
         return list;
     }
 
-    // 8. Sinh mã phiếu phạt tự động
+    // Lấy danh sách BAO GỒM phiếu đã hủy (dùng cho tìm kiếm)
+    public ArrayList<Object[]> getDanhSachBaoGomDaHuy() {
+        ArrayList<Object[]> list = new ArrayList<>();
+        String sql = "SELECT p.MaPP, p.MaPM, p.NgayLap, "
+                + "c.LyDo, p.TongTien, p.TrangThai "
+                + "FROM PHIEUPHAT p "
+                + "LEFT JOIN CHITIETPHIEUPHAT c ON p.MaPP = c.MaPP AND c.TrangThai = 1 "
+                + "ORDER BY p.NgayLap DESC";
+        try (Connection conn = DatabaseConnection.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                String maPP = rs.getString("MaPP");
+                String maPM = rs.getString("MaPM");
+                String ngayLap = rs.getString("NgayLap");
+                String lyDo = rs.getString("LyDo");
+                if (lyDo == null) lyDo = "Chưa có chi tiết";
+
+                double tien = rs.getDouble("TongTien");
+                String soTien = String.format("%,.0f", tien);
+
+                int tt = rs.getInt("TrangThai");
+                String trangThai;
+                if (tt == 1) trangThai = "Đã thanh toán";
+                else if (tt == 2) trangThai = "Đã hủy";
+                else trangThai = "Chưa thanh toán";
+
+                list.add(new Object[]{maPP, maPM, ngayLap, lyDo, soTien, trangThai});
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     public String generateMaPP() {
         String sql = "SELECT MaPP FROM PHIEUPHAT ORDER BY MaPP DESC";
         try (Connection conn = DatabaseConnection.getConnection();
                 Statement st = conn.createStatement();
                 ResultSet rs = st.executeQuery(sql)) {
             if (rs.next()) {
-                String lastMa = rs.getString("MaPP"); // VD: PP00000003
+                String lastMa = rs.getString("MaPP");
                 int num = Integer.parseInt(lastMa.substring(2)) + 1;
                 return String.format("PP%08d", num);
             }

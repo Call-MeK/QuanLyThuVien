@@ -8,6 +8,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import BUS.*;
+import BUS.SessionManager;
 import DTO.*;
 
 public class AdminQuanLyPhiPhatPanel extends JPanel {
@@ -23,7 +24,7 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
     private CardLayout searchInputLayout;
     private JTable table;
     private DefaultTableModel model;
-    private JButton btnThem, btnThuTien, btnHuy, btnLamMoi, btnSearch, btnResetSearch;
+    private JButton btnThem, btnCapNhat, btnThuTien, btnHuy, btnLamMoi, btnSearch, btnResetSearch;
 
     private PhieuPhatBUS phieuPhatBUS = new PhieuPhatBUS();
 
@@ -57,7 +58,7 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         Font fontInput = new Font(tenFont, Font.PLAIN, 14);
 
         txtMaPhieuPhat = new JTextField(); txtMaPhieuPhat.setFont(fontInput);
-        txtMaPhieuPhat.setEditable(false); // Mã tự sinh
+        txtMaPhieuPhat.setEditable(false);
         txtMaPhieuMuon = new JTextField(); txtMaPhieuMuon.setFont(fontInput);
         cbLyDo = new JComboBox<>(new String[]{
             "Trả sách trễ hạn", "Làm rách/bẩn sách", "Làm mất sách", "Lý do khác"
@@ -78,7 +79,7 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         txtSearch = new JTextField(20); txtSearch.setFont(fontInput);
         txtSearch.setPreferredSize(new Dimension(0, 35));
 
-        cbSearchTrangThai = new JComboBox<>(new String[]{"Chưa thanh toán", "Đã thanh toán"});
+        cbSearchTrangThai = new JComboBox<>(new String[]{"Chưa thanh toán", "Đã thanh toán", "Đã hủy"});
         cbSearchTrangThai.setFont(fontInput);
         cbSearchTrangThai.setPreferredSize(new Dimension(200, 35));
 
@@ -89,9 +90,7 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         pnlSearchInput.add(cbSearchTrangThai, "COMBO");
         searchInputLayout.show(pnlSearchInput, "TEXT");
 
-        cbSearchCriteria = new JComboBox<>(new String[]{
-            "Tất cả", "Mã Phạt", "Mã Phiếu Mượn", "Trạng Thái"
-        });
+        cbSearchCriteria = new JComboBox<>(new String[]{"Tất cả", "Mã Phạt", "Mã Phiếu Mượn", "Trạng Thái"});
         cbSearchCriteria.setFont(fontInput);
         cbSearchCriteria.setPreferredSize(new Dimension(150, 35));
 
@@ -122,7 +121,6 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         table = new JTable(model);
         setupTable(table);
 
-        // Tô màu theo trạng thái
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -136,6 +134,9 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
                     } else if (tt.equals("Chưa thanh toán")) {
                         c.setBackground(new Color(255, 243, 224));
                         c.setForeground(new Color(230, 81, 0));
+                    } else if (tt.equals("Đã hủy")) {
+                        c.setBackground(new Color(238, 238, 238));
+                        c.setForeground(new Color(158, 158, 158));
                     } else {
                         c.setBackground(Color.WHITE);
                         c.setForeground(Color.BLACK);
@@ -155,20 +156,22 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         pnlButtons.setBackground(colorBackground);
 
         btnThem = createActionButton("Lập Phiếu Phạt", new Color(25, 135, 84));
+        btnCapNhat = createActionButton("Cập Nhật", new Color(255, 193, 7));
+        btnCapNhat.setForeground(Color.BLACK);
         btnThuTien = createActionButton("Xác Nhận Thu", new Color(13, 110, 253));
         btnHuy = createActionButton("Hủy Phiếu", new Color(220, 53, 69));
         btnLamMoi = createActionButton("Làm Mới", new Color(108, 117, 125));
 
-        pnlButtons.add(btnThem); pnlButtons.add(btnThuTien);
-        pnlButtons.add(btnHuy); pnlButtons.add(btnLamMoi);
+        pnlButtons.add(btnThem); pnlButtons.add(btnCapNhat);
+        pnlButtons.add(btnThuTien); pnlButtons.add(btnHuy);
+        pnlButtons.add(btnLamMoi);
         add(pnlButtons, BorderLayout.SOUTH);
 
-        // Sinh mã mặc định
         txtMaPhieuPhat.setText(phieuPhatBUS.generateMaPP());
     }
 
     // ==========================================================
-    // KHU VỰC XỬ LÝ SỰ KIỆN
+    // SỰ KIỆN
     // ==========================================================
     private void initEvents() {
 
@@ -182,7 +185,6 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
                     txtMaPhieuMuon.setText(safeGet(row, 1));
                     txtMaPhieuMuon.setEditable(false);
 
-                    // Set lý do vào combo nếu khớp
                     String lyDo = safeGet(row, 3);
                     boolean found = false;
                     for (int i = 0; i < cbLyDo.getItemCount(); i++) {
@@ -199,31 +201,27 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
             }
         });
 
-        // 2. Nút LÀM MỚI
+        // 2. LÀM MỚI
         btnLamMoi.addActionListener(e -> {
             lamMoiForm();
             phieuPhatBUS.reloadFromDB();
             loadDataToTable();
         });
 
-        // 3. Nút LẬP PHIẾU PHẠT
+        // 3. LẬP PHIẾU PHẠT
         btnThem.addActionListener(e -> {
             if (txtMaPhieuMuon.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng nhập mã phiếu mượn!",
-                        "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập mã phiếu mượn!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            double soTien;
-            try {
-                soTien = Double.parseDouble(txtSoTien.getText().trim().replace(",", ""));
-                if (soTien <= 0) {
-                    JOptionPane.showMessageDialog(this, "Số tiền phải lớn hơn 0!",
-                            "Cảnh báo", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Số tiền không hợp lệ!",
-                        "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            double soTien = parseSoTien();
+            if (soTien <= 0) return;
+
+            String maNQL = SessionManager.getInstance().getMaNguoi();
+            if (maNQL == null || maNQL.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        "Không xác định được người đăng nhập!\nVui lòng đăng xuất và đăng nhập lại.",
+                        "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -231,17 +229,14 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
             PhieuPhatDTO pp = new PhieuPhatDTO();
             pp.setMaPP(maPP);
             pp.setMaPM(txtMaPhieuMuon.getText().trim());
-            pp.setMaNQL("ADMIN"); // Có thể truyền từ session đăng nhập
+            pp.setMaNQL(maNQL);
             pp.setNgayLap(java.time.LocalDate.now().toString());
             pp.setTongTien(String.valueOf(soTien));
-            pp.setTrangThai(0); // 0 = Chưa thanh toán
+            pp.setTrangThai(0);
 
-            // Tạo chi tiết phiếu phạt
             String lyDo = cbLyDo.getSelectedItem().toString();
-            String maCTPP = "CT" + maPP.substring(2);
-
             ChiTietPhieuPhatDTO ctpp = new ChiTietPhieuPhatDTO();
-            ctpp.setMaCTPP(maCTPP);
+            ctpp.setMaCTPP("CT" + maPP.substring(2));
             ctpp.setMaPP(maPP);
             ctpp.setMaCuonSach("");
             ctpp.setLyDo(lyDo);
@@ -260,92 +255,105 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
             }
         });
 
-        // 4. Nút XÁC NHẬN THU TIỀN (0 -> 1)
-        btnThuTien.addActionListener(e -> {
+        // 4. CẬP NHẬT (chỉ phiếu chưa TT)
+        btnCapNhat.addActionListener(e -> {
             if (table.getSelectedRow() < 0) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 phiếu phạt trong bảng!",
-                        "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 phiếu phạt trong bảng!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            String maPP = txtMaPhieuPhat.getText().trim();
-            String trangThaiHienTai = safeGet(table.getSelectedRow(), 5);
+            if (isDaTT()) {
+                JOptionPane.showMessageDialog(this, "Phiếu đã thanh toán, không thể sửa!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            double soTien = parseSoTien();
+            if (soTien <= 0) return;
 
-            if (trangThaiHienTai.equals("Đã thanh toán")) {
-                JOptionPane.showMessageDialog(this, "Phiếu phạt này đã được thanh toán rồi!",
-                        "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
+            String maPP = txtMaPhieuPhat.getText().trim();
+            String lyDo = cbLyDo.getSelectedItem().toString();
 
             int confirm = JOptionPane.showConfirmDialog(this,
-                    "Xác nhận thu tiền phiếu phạt " + maPP + "?\nSố tiền: " + safeGet(table.getSelectedRow(), 4) + " VNĐ",
+                    "Cập nhật phiếu " + maPP + "?\nLý do: " + lyDo + "\nSố tiền: " + String.format("%,.0f", soTien) + " VNĐ",
+                    "Xác nhận cập nhật", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                String result = phieuPhatBUS.capNhatPhieuPhat(maPP, lyDo, soTien);
+                JOptionPane.showMessageDialog(this, result);
+                if (result.contains("thành công")) {
+                    phieuPhatBUS.reloadFromDB();
+                    loadDataToTable();
+                    lamMoiForm();
+                }
+            }
+        });
+
+        // 5. XÁC NHẬN THU TIỀN (chỉ phiếu chưa TT)
+        btnThuTien.addActionListener(e -> {
+            if (table.getSelectedRow() < 0) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 phiếu phạt trong bảng!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            if (isDaTT()) {
+                JOptionPane.showMessageDialog(this, "Phiếu này đã thanh toán rồi!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            String maPP = txtMaPhieuPhat.getText().trim();
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Xác nhận thu tiền phiếu " + maPP + "?\nSố tiền: " + safeGet(table.getSelectedRow(), 4) + " VNĐ",
                     "Xác nhận thu tiền", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 String result = phieuPhatBUS.thanhToan(maPP);
-                if (result.equals("Xác nhận thanh toán thành công")) {
-                    JOptionPane.showMessageDialog(this, "Đã xác nhận thanh toán!");
+                JOptionPane.showMessageDialog(this, result);
+                if (result.contains("thành công")) {
                     loadDataToTable();
                     lamMoiForm();
-                } else {
-                    JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
-        // 5. Nút HỦY PHIẾU (0 -> 2, chỉ hủy được phiếu chưa thanh toán)
+        // 6. HỦY PHIẾU (chỉ phiếu chưa TT)
         btnHuy.addActionListener(e -> {
             if (table.getSelectedRow() < 0) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 phiếu phạt trong bảng!",
-                        "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 phiếu phạt trong bảng!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            if (isDaTT()) {
+                JOptionPane.showMessageDialog(this, "Phiếu đã thanh toán, không thể hủy!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             String maPP = txtMaPhieuPhat.getText().trim();
-            String trangThaiHienTai = safeGet(table.getSelectedRow(), 5);
-
-            if (trangThaiHienTai.equals("Đã thanh toán")) {
-                JOptionPane.showMessageDialog(this, "Không thể hủy phiếu đã thanh toán!",
-                        "Cảnh báo", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
             int confirm = JOptionPane.showConfirmDialog(this,
-                    "Bạn có chắc muốn hủy phiếu phạt " + maPP + "?\nPhiếu sẽ bị ẩn khỏi danh sách.",
+                    "Hủy phiếu phạt " + maPP + "?\nPhiếu sẽ bị ẩn khỏi danh sách.",
                     "Xác nhận hủy", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             if (confirm == JOptionPane.YES_OPTION) {
                 String result = phieuPhatBUS.deletePhieuPhat(maPP);
-                if (result.equals("Hủy phiếu phạt thành công")) {
-                    JOptionPane.showMessageDialog(this, "Đã hủy phiếu phạt!");
+                JOptionPane.showMessageDialog(this, result);
+                if (result.contains("thành công")) {
                     loadDataToTable();
                     lamMoiForm();
-                } else {
-                    JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
-        // 6. Đổi tiêu chí tìm kiếm -> chuyển TextField / ComboBox
+        // 7. Đổi tiêu chí tìm kiếm
         cbSearchCriteria.addActionListener(e -> {
-            String criteria = (String) cbSearchCriteria.getSelectedItem();
-            if ("Trạng Thái".equals(criteria)) {
+            if ("Trạng Thái".equals(cbSearchCriteria.getSelectedItem())) {
                 searchInputLayout.show(pnlSearchInput, "COMBO");
             } else {
                 searchInputLayout.show(pnlSearchInput, "TEXT");
             }
         });
 
-        // 7. Nút TÌM KIẾM
+        // 8. TÌM KIẾM
         btnSearch.addActionListener(e -> {
             String criteria = (String) cbSearchCriteria.getSelectedItem();
-            String keyword;
-            if ("Trạng Thái".equals(criteria)) {
-                keyword = (String) cbSearchTrangThai.getSelectedItem();
-            } else {
-                keyword = txtSearch.getText();
-            }
-            ArrayList<Object[]> ketQua = phieuPhatBUS.search(keyword, criteria);
-            hienThiKetQua(ketQua);
+            String keyword = "Trạng Thái".equals(criteria)
+                    ? (String) cbSearchTrangThai.getSelectedItem()
+                    : txtSearch.getText();
+            hienThiKetQua(phieuPhatBUS.search(keyword, criteria));
         });
 
-        // 8. Nút HỦY LỌC
+        // 9. HỦY LỌC
         btnResetSearch.addActionListener(e -> {
             txtSearch.setText("");
             cbSearchCriteria.setSelectedIndex(0);
@@ -356,43 +364,54 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
     }
 
     // ==========================================================
-    // CÁC HÀM HỖ TRỢ
+    // HÀM HỖ TRỢ
     // ==========================================================
 
+    // Kiểm tra dòng đang chọn đã thanh toán chưa
+    private boolean isDaTT() {
+        return safeGet(table.getSelectedRow(), 5).equals("Đã thanh toán");
+    }
+
     private void loadDataToTable() {
-        ArrayList<Object[]> data = phieuPhatBUS.getDanhSachHienThiGUI();
-        hienThiKetQua(data);
+        hienThiKetQua(phieuPhatBUS.getDanhSachHienThiGUI());
     }
 
     private void hienThiKetQua(ArrayList<Object[]> danhSach) {
         model.setRowCount(0);
-        for (Object[] row : danhSach) {
-            model.addRow(row);
-        }
+        for (Object[] row : danhSach) model.addRow(row);
     }
 
     private void lamMoiForm() {
         txtMaPhieuPhat.setText(phieuPhatBUS.generateMaPP());
-        txtMaPhieuMuon.setText("");
-        txtMaPhieuMuon.setEditable(true);
+        txtMaPhieuMuon.setText(""); txtMaPhieuMuon.setEditable(true);
         cbLyDo.setSelectedIndex(0);
         txtSoTien.setText("0");
-        txtSearch.setText("");
-        cbSearchTrangThai.setSelectedIndex(0);
+        txtSearch.setText(""); cbSearchTrangThai.setSelectedIndex(0);
         table.clearSelection();
     }
 
-    // Lấy giá trị an toàn từ bảng, tránh NullPointerException
+    private double parseSoTien() {
+        try {
+            double soTien = Double.parseDouble(txtSoTien.getText().trim().replace(",", ""));
+            if (soTien <= 0) {
+                JOptionPane.showMessageDialog(this, "Số tiền phải lớn hơn 0!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return -1;
+            }
+            return soTien;
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Số tiền không hợp lệ!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            return -1;
+        }
+    }
+
     private String safeGet(int row, int col) {
         Object val = model.getValueAt(row, col);
         return val != null ? val.toString() : "";
     }
 
-    // ===== GETTER =====
     public JTable getTable() { return table; }
     public DefaultTableModel getModel() { return model; }
 
-    // ===== TIỆN ÍCH UI =====
     private JLabel createLabel(String text, Font font) {
         JLabel lbl = new JLabel(text); lbl.setFont(font);
         lbl.setForeground(new Color(73, 80, 87)); return lbl;
@@ -409,7 +428,7 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         JButton btn = new JButton(text); btn.setFont(new Font(tenFont, Font.BOLD, 14));
         btn.setForeground(Color.WHITE); btn.setBackground(bgColor);
         btn.setBorderPainted(false); btn.setFocusPainted(false);
-        btn.setPreferredSize(new Dimension(150, 40));
+        btn.setPreferredSize(new Dimension(140, 40));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setOpaque(true);
         return btn;
