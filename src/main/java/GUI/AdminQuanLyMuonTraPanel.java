@@ -8,7 +8,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import BUS.*;
+import DAO.*;
 import DTO.*;
 
 public class AdminQuanLyMuonTraPanel extends JPanel {
@@ -16,19 +18,24 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
     private String tenFont = "Segoe UI";
     private Color colorBackground = new Color(248, 249, 250);
 
-    private JTextField txtMaPhieu, txtMaDG, txtMaThe, txtMaSach, txtNgayMuon, txtHanTra, txtNgayTra, txtTrangThai;
-    private JComboBox<String> cbSearchCriteria;
-    private JComboBox<String> cbSearchTrangThai;
-    private JTextField txtSearch;
-    private JPanel pnlSearchInput;
-    private CardLayout searchInputLayout;
-    private JTable table;
+    private JTextField    txtMaPhieu, txtMaDG, txtMaThe, txtNgayMuon, txtHanTra, txtNgayTra, txtTrangThai;
+    private JTextField    txtMaSachLookup;
+    private JComboBox<String> cbBanSao;
+    private JComboBox<String> cbSearchCriteria, cbSearchTrangThai;
+    private JTextField    txtSearch;
+    private JPanel        pnlSearchInput;
+    private CardLayout    searchInputLayout;
+    private JTable        table;
     private DefaultTableModel model;
-    private JButton btnThem, btnTra, btnXoa, btnLamMoi, btnSearch, btnResetSearch;
+    private JButton       btnThem, btnTra, btnXoa, btnLamMoi, btnSearch, btnResetSearch;
+    private JButton       btnLookupSach;
 
-    private PhieuMuonBUS phieuMuonBUS       = new PhieuMuonBUS();
-    private TheThuVienBUS theThuVienBUS     = new TheThuVienBUS();
-    private DocGiaBUS docGiaBUS             = new DocGiaBUS();
+    private PhieuMuonBUS   phieuMuonBUS  = new PhieuMuonBUS();
+    private TheThuVienBUS  theThuVienBUS = new TheThuVienBUS();
+    private DocGiaBUS      docGiaBUS     = new DocGiaBUS();
+    private SachCopyDAO    sachCopyDAO   = new SachCopyDAO();
+
+    private List<SachCopyDTO> dsBanSaoHienTai = new ArrayList<>();
 
     public AdminQuanLyMuonTraPanel() {
         initComponents();
@@ -50,52 +57,72 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         JPanel pnlCenter = new JPanel(new BorderLayout(0, 15));
         pnlCenter.setBackground(colorBackground);
 
-        // --- FORM NHẬP LIỆU (4x4 = 16 ô) ---
-        JPanel pnlInput = new JPanel(new GridLayout(4, 4, 15, 15));
+        Font fontLabel = new Font(tenFont, Font.BOLD, 14);
+        Font fontInput = new Font(tenFont, Font.PLAIN, 14);
+
+        // --- FORM (5 hàng x 4 cột) ---
+        JPanel pnlInput = new JPanel(new GridLayout(5, 4, 15, 12));
         pnlInput.setBackground(Color.WHITE);
         pnlInput.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(222, 226, 230), 1, true),
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)));
 
-        Font fontLabel = new Font(tenFont, Font.BOLD, 14);
-        Font fontInput = new Font(tenFont, Font.PLAIN, 14);
-
-        txtMaPhieu  = new JTextField(); txtMaPhieu.setFont(fontInput);  txtMaPhieu.setEditable(false);
-        txtMaDG     = new JTextField(); txtMaDG.setFont(fontInput);     // Admin nhập MaDocGia
-        txtMaThe    = new JTextField(); txtMaThe.setFont(fontInput);    txtMaThe.setEditable(false); // Tự tìm từ MaDG
-        txtMaThe.setBackground(new Color(233, 236, 239));
-        txtMaSach   = new JTextField(); txtMaSach.setFont(fontInput);
-        txtNgayMuon = new JTextField(); txtNgayMuon.setFont(fontInput); txtNgayMuon.setEditable(false);
-        txtHanTra   = new JTextField(); txtHanTra.setFont(fontInput);   txtHanTra.setEditable(false);
-        txtNgayTra  = new JTextField(); txtNgayTra.setFont(fontInput);  txtNgayTra.setEditable(false);
-
-        txtTrangThai = new JTextField("Đang mượn");
-        txtTrangThai.setFont(fontInput);
-        txtTrangThai.setEditable(false);
+        txtMaPhieu   = roField(fontInput);
+        txtMaDG      = new JTextField(); txtMaDG.setFont(fontInput);
+        txtMaThe     = roField(fontInput); txtMaThe.setBackground(new Color(233, 236, 239));
+        txtNgayMuon  = roField(fontInput);
+        txtHanTra    = roField(fontInput);
+        txtNgayTra   = roField(fontInput);
+        txtTrangThai = roField(fontInput);
         txtTrangThai.setBackground(new Color(227, 242, 253));
         txtTrangThai.setForeground(new Color(13, 71, 161));
 
-        pnlInput.add(createLabel("Mã phiếu mượn:", fontLabel));  pnlInput.add(txtMaPhieu);
-        pnlInput.add(createLabel("Mã độc giả:", fontLabel));     pnlInput.add(txtMaDG);
-        pnlInput.add(createLabel("Mã thẻ (tự tìm):", fontLabel));pnlInput.add(txtMaThe);
-        pnlInput.add(createLabel("Mã cuốn sách:", fontLabel));   pnlInput.add(txtMaSach);
-        pnlInput.add(createLabel("Ngày mượn:", fontLabel));      pnlInput.add(txtNgayMuon);
-        pnlInput.add(createLabel("Hạn trả:", fontLabel));        pnlInput.add(txtHanTra);
-        pnlInput.add(createLabel("Ngày trả thực:", fontLabel));  pnlInput.add(txtNgayTra);
-        pnlInput.add(createLabel("Trạng thái:", fontLabel));     pnlInput.add(txtTrangThai);
+        txtMaSachLookup = new JTextField(); txtMaSachLookup.setFont(fontInput);
+        txtMaSachLookup.setToolTipText("Nhập Mã Sách (VD: S000000001) rồi bấm Tìm");
+
+        btnLookupSach = new JButton("🔍 Tìm bản sao");
+        btnLookupSach.setFont(new Font(tenFont, Font.BOLD, 13));
+        btnLookupSach.setBackground(new Color(13, 110, 253));
+        btnLookupSach.setForeground(Color.WHITE);
+        btnLookupSach.setFocusPainted(false); btnLookupSach.setBorderPainted(false);
+        btnLookupSach.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        cbBanSao = new JComboBox<>();
+        cbBanSao.setFont(fontInput);
+
+        // Row 1
+        pnlInput.add(lbl("Mã phiếu mượn:", fontLabel)); pnlInput.add(txtMaPhieu);
+        pnlInput.add(lbl("Mã độc giả:", fontLabel));     pnlInput.add(txtMaDG);
+        // Row 2
+        pnlInput.add(lbl("Mã thẻ (tự tìm):", fontLabel)); pnlInput.add(txtMaThe);
+        pnlInput.add(lbl("Ngày mượn:", fontLabel));        pnlInput.add(txtNgayMuon);
+        // Row 3
+        pnlInput.add(lbl("Hạn trả:", fontLabel));       pnlInput.add(txtHanTra);
+        pnlInput.add(lbl("Ngày trả thực:", fontLabel)); pnlInput.add(txtNgayTra);
+        // Row 4
+        pnlInput.add(lbl("Trạng thái:", fontLabel)); pnlInput.add(txtTrangThai);
+        pnlInput.add(lbl("Mã sách:", fontLabel));
+
+        JPanel pnlLookup = new JPanel(new BorderLayout(5, 0));
+        pnlLookup.setBackground(Color.WHITE);
+        pnlLookup.add(txtMaSachLookup, BorderLayout.CENTER);
+        pnlLookup.add(btnLookupSach,   BorderLayout.EAST);
+        pnlInput.add(pnlLookup);
+
+        // Row 5: Chọn bản sao
+        pnlInput.add(lbl("Chọn bản sao:", fontLabel)); pnlInput.add(cbBanSao);
+        pnlInput.add(new JLabel()); pnlInput.add(new JLabel());
 
         // --- THANH TÌM KIẾM ---
         JPanel pnlSearch = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         pnlSearch.setBackground(colorBackground);
         pnlSearch.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        txtSearch = new JTextField(20);
-        txtSearch.setFont(fontInput);
+        txtSearch = new JTextField(20); txtSearch.setFont(fontInput);
         txtSearch.setPreferredSize(new Dimension(0, 35));
 
         cbSearchTrangThai = new JComboBox<>(new String[]{"Đang mượn", "Đã trả", "Trễ hạn", "Đã xóa"});
-        cbSearchTrangThai.setFont(fontInput);
-        cbSearchTrangThai.setPreferredSize(new Dimension(160, 35));
+        cbSearchTrangThai.setFont(fontInput); cbSearchTrangThai.setPreferredSize(new Dimension(160, 35));
 
         searchInputLayout = new CardLayout();
         pnlSearchInput = new JPanel(searchInputLayout);
@@ -105,51 +132,43 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         searchInputLayout.show(pnlSearchInput, "TEXT");
 
         cbSearchCriteria = new JComboBox<>(new String[]{"Tất cả", "Mã Phiếu", "Mã Độc Giả", "Trạng Thái"});
-        cbSearchCriteria.setFont(fontInput);
-        cbSearchCriteria.setPreferredSize(new Dimension(140, 35));
+        cbSearchCriteria.setFont(fontInput); cbSearchCriteria.setPreferredSize(new Dimension(140, 35));
 
-        btnSearch      = createActionButton("Lọc", new Color(13, 110, 253));
-        btnSearch.setPreferredSize(new Dimension(100, 35));
-        btnResetSearch = createActionButton("Hủy Lọc", new Color(108, 117, 125));
-        btnResetSearch.setPreferredSize(new Dimension(100, 35));
+        btnSearch      = actionBtn("Lọc",     new Color(13, 110, 253)); btnSearch.setPreferredSize(new Dimension(100, 35));
+        btnResetSearch = actionBtn("Hủy Lọc", new Color(108, 117, 125)); btnResetSearch.setPreferredSize(new Dimension(100, 35));
 
-        pnlSearch.add(createLabel("🔍 Tra cứu:", new Font(tenFont, Font.BOLD, 14)));
+        pnlSearch.add(lbl("🔍 Tra cứu:", new Font(tenFont, Font.BOLD, 14)));
         pnlSearch.add(pnlSearchInput);
-        pnlSearch.add(createLabel(" theo ", fontInput));
+        pnlSearch.add(lbl(" theo ", fontInput));
         pnlSearch.add(cbSearchCriteria);
         pnlSearch.add(btnSearch);
         pnlSearch.add(btnResetSearch);
 
         JPanel pnlTopCenter = new JPanel(new BorderLayout(0, 5));
         pnlTopCenter.setBackground(colorBackground);
-        pnlTopCenter.add(pnlInput, BorderLayout.NORTH);
+        pnlTopCenter.add(pnlInput,  BorderLayout.NORTH);
         pnlTopCenter.add(pnlSearch, BorderLayout.CENTER);
         pnlCenter.add(pnlTopCenter, BorderLayout.NORTH);
 
         // --- BẢNG ---
-        String[] columns = {"Mã Phiếu Mượn", "Mã Thẻ (ĐG)", "Ngày Mượn", "Hạn Trả", "Ngày Trả", "Trạng Thái"};
-        model = new DefaultTableModel(columns, 0) {
+        String[] cols = {"Mã Phiếu Mượn", "Mã Thẻ (ĐG)", "Ngày Mượn", "Hạn Trả", "Ngày Trả", "Trạng Thái"};
+        model = new DefaultTableModel(cols, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
         table = new JTable(model);
         setupTable(table);
-
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            public Component getTableCellRendererComponent(JTable t, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int col) {
+                Component c = super.getTableCellRendererComponent(t, value, isSelected, hasFocus, row, col);
                 if (!isSelected) {
                     String tt = model.getValueAt(row, 5) != null ? model.getValueAt(row, 5).toString() : "";
                     switch (tt) {
-                        case "Trễ hạn":
-                            c.setBackground(new Color(255, 235, 238)); c.setForeground(new Color(183, 28, 28)); break;
-                        case "Đã trả":
-                            c.setBackground(new Color(232, 245, 233)); c.setForeground(new Color(27, 94, 32)); break;
-                        case "Đã xóa":
-                            c.setBackground(new Color(230, 230, 230)); c.setForeground(new Color(100, 100, 100)); break;
-                        default:
-                            c.setBackground(Color.WHITE); c.setForeground(Color.BLACK); break;
+                        case "Trễ hạn": c.setBackground(new Color(255,235,238)); c.setForeground(new Color(183,28,28)); break;
+                        case "Đã trả":  c.setBackground(new Color(232,245,233)); c.setForeground(new Color(27,94,32));  break;
+                        case "Đã xóa":  c.setBackground(new Color(230,230,230)); c.setForeground(new Color(100,100,100)); break;
+                        default:        c.setBackground(Color.WHITE); c.setForeground(Color.BLACK); break;
                     }
                 }
                 return c;
@@ -161,118 +180,127 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         pnlCenter.add(scrollPane, BorderLayout.CENTER);
         add(pnlCenter, BorderLayout.CENTER);
 
-        // --- NÚT CHỨC NĂNG ---
+        // --- NÚT ---
         JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         pnlButtons.setBackground(colorBackground);
-
-        btnThem   = createActionButton("Lập Phiếu", new Color(25, 135, 84));
-        btnTra    = createActionButton("Xác Nhận Trả", new Color(13, 110, 253));
-        btnXoa    = createActionButton("Xóa Phiếu", new Color(220, 53, 69));
-        btnLamMoi = createActionButton("Làm Mới", new Color(108, 117, 125));
-
+        btnThem   = actionBtn("Lập Phiếu",    new Color(25, 135, 84));
+        btnTra    = actionBtn("Xác Nhận Trả", new Color(13, 110, 253));
+        btnXoa    = actionBtn("Xóa Phiếu",    new Color(220, 53, 69));
+        btnLamMoi = actionBtn("Làm Mới",      new Color(108, 117, 125));
         pnlButtons.add(btnThem); pnlButtons.add(btnTra); pnlButtons.add(btnXoa); pnlButtons.add(btnLamMoi);
         add(pnlButtons, BorderLayout.SOUTH);
     }
 
-    // ==========================================================
-    // SỰ KIỆN
-    // ==========================================================
     private void initEvents() {
 
-        // 1. Click bảng -> đổ dữ liệu lên form
+        // 1. Click bảng
         table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
+            @Override public void mouseClicked(MouseEvent e) {
                 int row = table.getSelectedRow();
-                if (row >= 0) {
-                    String maPM     = val(row, 0);
-                    String maThe    = val(row, 1);
-                    String ngayMuon = val(row, 2);
-                    String hanTra   = val(row, 3);
-                    String ngayTra  = val(row, 4);
-                    String tt       = val(row, 5);
-
-                    txtMaPhieu.setText(maPM);
-                    txtMaThe.setText(maThe);
-                    txtNgayMuon.setText(ngayMuon);
-                    txtHanTra.setText(hanTra);
-                    txtNgayTra.setText(ngayTra.equals("Chưa trả") ? "" : ngayTra);
-                    txtMaSach.setText("");
-                    txtTrangThai.setText(tt);
-                    capNhatMauTrangThai(tt);
-
-                    // Tự tìm ngược MaDocGia từ MaThe để hiện lên ô MaDG
-                    TheThuVienDTO the = theThuVienBUS.getById(maThe);
-                    txtMaDG.setText(the != null ? the.getMaDocGia() : "");
-                }
+                if (row < 0) return;
+                String maThe = val(row, 1);
+                String tt    = val(row, 5);
+                txtMaPhieu.setText(val(row, 0));
+                txtMaThe.setText(maThe);
+                txtNgayMuon.setText(val(row, 2));
+                txtHanTra.setText(val(row, 3));
+                txtNgayTra.setText(val(row, 4).equals("Chưa trả") ? "" : val(row, 4));
+                txtTrangThai.setText(tt);
+                capNhatMauTrangThai(tt);
+                // ✅ Tự tìm MaDG từ MaThe — không popup cảnh báo ở đây
+                TheThuVienDTO the = theThuVienBUS.getById(maThe);
+                txtMaDG.setText(the != null ? the.getMaDocGia() : "");
+                txtMaSachLookup.setText("");
+                cbBanSao.removeAllItems();
+                dsBanSaoHienTai.clear();
             }
         });
 
-        // 2. Khi admin nhập xong MaDocGia -> tự động tìm MaThe
+        // 2. focusLost MaDG → tự fill MaThe, báo nhẹ nếu chưa có thẻ
         txtMaDG.addFocusListener(new java.awt.event.FocusAdapter() {
-            @Override
-            public void focusLost(java.awt.event.FocusEvent e) {
+            @Override public void focusLost(java.awt.event.FocusEvent e) {
                 String maDG = txtMaDG.getText().trim();
-                if (!maDG.isEmpty()) {
-                    TheThuVienDTO the = theThuVienBUS.getByMaDocGia(maDG);
-                    if (the != null) {
-                        txtMaThe.setText(the.getMaThe());
-                    } else {
-                        txtMaThe.setText("");
-                        JOptionPane.showMessageDialog(AdminQuanLyMuonTraPanel.this,
-                                "Không tìm thấy thẻ thư viện cho độc giả: " + maDG,
-                                "Cảnh báo", JOptionPane.WARNING_MESSAGE);
-                    }
+                if (maDG.isEmpty()) return;
+                TheThuVienDTO the = theThuVienBUS.getByMaDocGia(maDG);
+                if (the != null) {
+                    txtMaThe.setText(the.getMaThe());
+                    txtMaThe.setForeground(new Color(33, 37, 41));
+                } else {
+                    // Báo nhẹ ngay trong ô — không popup lỗi đỏ
+                    txtMaThe.setText("⚠ Chưa có thẻ");
+                    txtMaThe.setForeground(new Color(220, 53, 69));
                 }
             }
         });
 
-        // 3. Đổi tiêu chí tìm kiếm
-        cbSearchCriteria.addActionListener(e -> {
-            if ("Trạng Thái".equals(cbSearchCriteria.getSelectedItem())) {
-                searchInputLayout.show(pnlSearchInput, "COMBO");
-            } else {
-                searchInputLayout.show(pnlSearchInput, "TEXT");
+        // 3. Bấm 🔍 Tìm bản sao
+        btnLookupSach.addActionListener(e -> {
+            String maSach = txtMaSachLookup.getText().trim();
+            if (maSach.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập Mã Sách trước!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
             }
+            loadBanSao(maSach);
+        });
+        txtMaSachLookup.addActionListener(e -> btnLookupSach.doClick());
+
+        // 4. Đổi tiêu chí tìm kiếm
+        cbSearchCriteria.addActionListener(e -> {
+            if ("Trạng Thái".equals(cbSearchCriteria.getSelectedItem()))
+                searchInputLayout.show(pnlSearchInput, "COMBO");
+            else
+                searchInputLayout.show(pnlSearchInput, "TEXT");
         });
 
-        // 4. LÀM MỚI
+        // 5. LÀM MỚI
         btnLamMoi.addActionListener(e -> { lamMoiForm(); loadDataToTable(); });
 
-        // 5. LẬP PHIẾU MỚI
+        // 6. LẬP PHIẾU
         btnThem.addActionListener(e -> {
-            String maDG   = txtMaDG.getText().trim();
-            String maThe  = txtMaThe.getText().trim();
-            String maSach = txtMaSach.getText().trim();
+            String maDG  = txtMaDG.getText().trim();
+            String maThe = txtMaThe.getText().trim();
 
-            // Kiểm tra dữ liệu đầu vào
-            if (maDG.isEmpty() || maSach.isEmpty()) {
-                JOptionPane.showMessageDialog(this,
-                        "Vui lòng nhập Mã độc giả và Mã cuốn sách!",
-                        "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            if (maDG.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập Mã độc giả!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-            // Kiểm tra lại thẻ (phòng trường hợp chưa focus out)
-            if (maThe.isEmpty()) {
+            // Tìm thẻ nếu chưa có
+            if (maThe.isEmpty() || maThe.startsWith("⚠")) {
                 TheThuVienDTO the = theThuVienBUS.getByMaDocGia(maDG);
                 if (the == null) {
                     JOptionPane.showMessageDialog(this,
-                            "Không tìm thấy thẻ thư viện cho độc giả: " + maDG + "\nKhông thể lập phiếu mượn!",
-                            "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            "Độc giả " + maDG + " chưa có thẻ thư viện!\n"
+                            + "→ Vào Quản Lý Độc Giả để cấp thẻ trước.",
+                            "Chưa có thẻ", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
                 maThe = the.getMaThe();
                 txtMaThe.setText(maThe);
+                txtMaThe.setForeground(new Color(33, 37, 41));
             }
 
-            // ✅ Kiểm tra độc giả có bị khóa không
+            // Lấy MaVach
+            String maVach = getMaVachDaChon();
+            if (maVach == null) {
+                JOptionPane.showMessageDialog(this,
+                        "Vui lòng chọn bản sao sách!\n"
+                        + "→ Nhập Mã Sách → bấm 🔍 → chọn bản sao trong danh sách",
+                        "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             if (docGiaBUS.isDocGiaLocked(maDG)) {
                 JOptionPane.showMessageDialog(this,
-                        "Độc giả " + maDG + " đang bị khóa thẻ!\n"
-                        + "Không thể lập phiếu mượn.\n"
-                        + "Vui lòng mở khóa thẻ trước trong 'Quản Lý Độc Giả'.",
-                        "Từ chối lập phiếu", JOptionPane.WARNING_MESSAGE);
+                        "Độc giả " + maDG + " đang bị khóa thẻ!\nKhông thể lập phiếu mượn.",
+                        "Từ chối", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Kiểm tra bản sao không bị hỏng
+            SachCopyDTO sc = sachCopyDAO.findById(maVach);
+            if (sc != null && "Hỏng".equals(sc.getTinhTrang())) {
+                JOptionPane.showMessageDialog(this, "Bản sao này đang bị Hỏng, không thể cho mượn!", "Từ chối", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
@@ -293,102 +321,75 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
                 try {
                     ChiTietPhieuMuonDTO ctpm = new ChiTietPhieuMuonDTO();
                     ctpm.setMaPM(pm.getMaPM());
-                    ctpm.setMaCuonSach(maSach);
+                    ctpm.setMaCuonSach(maVach);
                     ctpm.setTinhTrangSach("Bình thường");
                     new ChiTietPhieuMuonBUS().add(ctpm);
                 } catch (Exception ex) { ex.printStackTrace(); }
 
+                String tenBanSao = dsBanSaoHienTai.get(cbBanSao.getSelectedIndex()).getTenSachBanSao();
                 JOptionPane.showMessageDialog(this,
                         "Lập phiếu mượn thành công!\n"
                         + "Mã phiếu: " + pm.getMaPM() + "\n"
-                        + "Mã thẻ: " + pm.getMaThe() + "\n"
-                        + "Hạn trả: " + pm.getHenTra());
-                lamMoiForm();
-                loadDataToTable();
+                        + "Bản sao:  " + tenBanSao + "\n"
+                        + "Hạn trả:  " + pm.getHenTra());
+                lamMoiForm(); loadDataToTable();
             } else {
                 JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        // 6. XÁC NHẬN TRẢ
+        // 7. XÁC NHẬN TRẢ
         btnTra.addActionListener(e -> {
             String maPM = txtMaPhieu.getText().trim();
             if (maPM.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 phiếu mượn trong bảng!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            String tt = txtTrangThai.getText();
-            if ("Đã trả".equals(tt)) {
-                JOptionPane.showMessageDialog(this, "Phiếu này đã được trả rồi!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-            if ("Đã xóa".equals(tt)) {
-                JOptionPane.showMessageDialog(this, "Phiếu này đã bị xóa, không thể cập nhật!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
+            String tt = txtTrangThai.getText().trim();
+            if ("Đã trả".equals(tt)) { JOptionPane.showMessageDialog(this, "Phiếu này đã được trả rồi!"); return; }
+            if ("Đã xóa".equals(tt)) { JOptionPane.showMessageDialog(this, "Phiếu đã bị xóa!"); return; }
 
-            int confirm = JOptionPane.showConfirmDialog(this,
-                    "Xác nhận độc giả đã trả sách cho phiếu " + maPM + "?",
-                    "Xác nhận trả sách", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                PhieuMuonDTO pm = phieuMuonBUS.getById(maPM);
-                if (pm == null) {
-                    JOptionPane.showMessageDialog(this, "Không tìm thấy phiếu mượn!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                pm.setNgayTra(LocalDate.now().toString());
-                pm.setTinhTrang("Đã trả");
-                String result = phieuMuonBUS.update(pm);
-                if (result.contains("thành công")) {
-                    JOptionPane.showMessageDialog(this, "Đã xác nhận trả sách thành công!");
-                    lamMoiForm(); loadDataToTable();
-                } else {
-                    JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
-                }
+            Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(this);
+            TraSachDialog dialog = new TraSachDialog(parentFrame, maPM);
+            dialog.setVisible(true);
+            if (!dialog.isConfirmed()) return;
+
+            PhieuMuonDTO pm = phieuMuonBUS.getById(maPM);
+            if (pm == null) { JOptionPane.showMessageDialog(this, "Không tìm thấy phiếu!", "Lỗi", JOptionPane.ERROR_MESSAGE); return; }
+            pm.setNgayTra(LocalDate.now().toString());
+            pm.setTinhTrang("Đã trả");
+            String result = phieuMuonBUS.update(pm);
+            if (result.contains("thành công")) {
+                String msg = "✔ Xác nhận trả thành công!";
+                if (dialog.hasHong()) msg += "\n⚠ Có sách hỏng — vào Quản Lý Phí Phạt để lập phiếu phạt.";
+                JOptionPane.showMessageDialog(this, msg, "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                lamMoiForm(); loadDataToTable();
+            } else {
+                JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        // 7. XÓA PHIẾU (soft delete)
+        // 8. XÓA PHIẾU
         btnXoa.addActionListener(e -> {
             String maPM = txtMaPhieu.getText().trim();
-            if (maPM.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 phiếu mượn trong bảng!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
+            if (maPM.isEmpty()) { JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 phiếu!"); return; }
             String tt = txtTrangThai.getText();
-            if ("Đã xóa".equals(tt)) {
-                JOptionPane.showMessageDialog(this, "Phiếu này đã bị xóa rồi!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
+            if ("Đã xóa".equals(tt)) { JOptionPane.showMessageDialog(this, "Phiếu đã bị xóa rồi!"); return; }
             if ("Đang mượn".equals(tt) || "Trễ hạn".equals(tt)) {
-                JOptionPane.showMessageDialog(this,
-                        "Không thể xóa phiếu đang mượn!\nVui lòng xác nhận trả sách trước.",
-                        "Từ chối xóa", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Không thể xóa phiếu đang mượn!\nXác nhận trả trước.", "Từ chối", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-
-            int confirm = JOptionPane.showConfirmDialog(this,
-                    "Xóa phiếu mượn " + maPM + "?\n"
-                    + "Phiếu sẽ bị ẩn, admin có thể xem lại bằng cách lọc 'Trạng Thái → Đã xóa'.",
-                    "Xác nhận xóa", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-            if (confirm == JOptionPane.YES_OPTION) {
-                PhieuMuonDTO pm = phieuMuonBUS.getById(maPM);
-                if (pm == null) {
-                    JOptionPane.showMessageDialog(this, "Không tìm thấy phiếu mượn!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                pm.setTinhTrang("Đã xóa");
-                String result = phieuMuonBUS.update(pm);
-                if (result.contains("thành công")) {
-                    JOptionPane.showMessageDialog(this, "Đã ẩn phiếu mượn " + maPM);
-                    lamMoiForm(); loadDataToTable();
-                } else {
-                    JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
-                }
-            }
+            int confirm = JOptionPane.showConfirmDialog(this, "Xóa phiếu " + maPM + "?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+            if (confirm != JOptionPane.YES_OPTION) return;
+            PhieuMuonDTO pm = phieuMuonBUS.getById(maPM);
+            if (pm == null) return;
+            pm.setTinhTrang("Đã xóa");
+            String result = phieuMuonBUS.update(pm);
+            if (result.contains("thành công")) { lamMoiForm(); loadDataToTable(); }
+            else JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
         });
 
-        // 8. LỌC
+        // 9. LỌC
         btnSearch.addActionListener(e -> {
             String criteria = (String) cbSearchCriteria.getSelectedItem();
             String keyword  = "Trạng Thái".equals(criteria)
@@ -397,11 +398,11 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
             boolean hienDaXoa = "Trạng Thái".equals(criteria) && "Đã xóa".equals(keyword);
             hienThiKetQua(phieuMuonBUS.search(keyword), criteria, keyword, hienDaXoa);
         });
+        txtSearch.addActionListener(e -> btnSearch.doClick());
 
-        // 9. HỦY LỌC
+        // 10. HỦY LỌC
         btnResetSearch.addActionListener(e -> {
-            txtSearch.setText("");
-            cbSearchCriteria.setSelectedIndex(0);
+            txtSearch.setText(""); cbSearchCriteria.setSelectedIndex(0);
             cbSearchTrangThai.setSelectedIndex(0);
             searchInputLayout.show(pnlSearchInput, "TEXT");
             loadDataToTable();
@@ -409,9 +410,40 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
     }
 
     // ==========================================================
+    // LOOKUP BẢN SAO
+    // ==========================================================
+    private void loadBanSao(String maSach) {
+        cbBanSao.removeAllItems();
+        dsBanSaoHienTai.clear();
+
+        List<SachCopyDTO> list = sachCopyDAO.getAll();
+        for (SachCopyDTO sc : list) {
+            if (maSach.equalsIgnoreCase(sc.getMaSach())
+                    && !Boolean.TRUE.equals(sc.getIsDeleted())
+                    && !"Hỏng".equals(sc.getTinhTrang())) {
+                dsBanSaoHienTai.add(sc);
+                // ✅ Chỉ hiện tên + tình trạng, không hiện MaVach dài
+                cbBanSao.addItem(sc.getTenSachBanSao() + "  [" + sc.getTinhTrang() + "]");
+            }
+        }
+
+        if (dsBanSaoHienTai.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "Không có bản sao nào còn dùng được cho sách: " + maSach
+                    + "\n(Kiểm tra lại Mã Sách hoặc tình trạng kho)",
+                    "Không có bản sao", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private String getMaVachDaChon() {
+        int idx = cbBanSao.getSelectedIndex();
+        if (idx < 0 || idx >= dsBanSaoHienTai.size()) return null;
+        return dsBanSaoHienTai.get(idx).getMaVach();
+    }
+
+    // ==========================================================
     // HÀM HỖ TRỢ
     // ==========================================================
-
     private void loadDataToTable() {
         model.setRowCount(0);
         LocalDate today = LocalDate.now();
@@ -424,21 +456,19 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         } catch (Exception ex) { ex.printStackTrace(); }
     }
 
-    private void hienThiKetQua(ArrayList<PhieuMuonDTO> danhSach, String criteria, String keyword, boolean hienDaXoa) {
+    private void hienThiKetQua(ArrayList<PhieuMuonDTO> ds, String criteria, String keyword, boolean hienDaXoa) {
         model.setRowCount(0);
         LocalDate today = LocalDate.now();
         String kw = keyword.toLowerCase().trim();
-
-        for (PhieuMuonDTO pm : danhSach) {
+        for (PhieuMuonDTO pm : ds) {
             String tt = tinhTrangHienThi(pm, today);
             if ("Đã xóa".equals(tt) && !hienDaXoa) continue;
-
             boolean match;
             switch (criteria) {
-                case "Mã Phiếu":   match = pm.getMaPM() != null && pm.getMaPM().toLowerCase().contains(kw); break;
+                case "Mã Phiếu":   match = pm.getMaPM()  != null && pm.getMaPM().toLowerCase().contains(kw);  break;
                 case "Mã Độc Giả": match = pm.getMaThe() != null && pm.getMaThe().toLowerCase().contains(kw); break;
                 case "Trạng Thái": match = tt.toLowerCase().contains(kw); break;
-                default:           match = true; break;
+                default:           match = true;
             }
             if (match) model.addRow(toRow(pm, tt));
         }
@@ -447,8 +477,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
     private Object[] toRow(PhieuMuonDTO pm, String tt) {
         return new Object[]{
             pm.getMaPM(), pm.getMaThe(), pm.getNgayMuon(), pm.getHenTra(),
-            (pm.getNgayTra() == null || pm.getNgayTra().isEmpty()) ? "Chưa trả" : pm.getNgayTra(),
-            tt
+            (pm.getNgayTra() == null || pm.getNgayTra().isEmpty()) ? "Chưa trả" : pm.getNgayTra(), tt
         };
     }
 
@@ -463,26 +492,18 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
 
     private void capNhatMauTrangThai(String tt) {
         switch (tt) {
-            case "Trễ hạn":
-                txtTrangThai.setBackground(new Color(255, 235, 238)); txtTrangThai.setForeground(new Color(183, 28, 28)); break;
-            case "Đã trả":
-                txtTrangThai.setBackground(new Color(232, 245, 233)); txtTrangThai.setForeground(new Color(27, 94, 32)); break;
-            case "Đã xóa":
-                txtTrangThai.setBackground(new Color(230, 230, 230)); txtTrangThai.setForeground(new Color(100, 100, 100)); break;
-            default:
-                txtTrangThai.setBackground(new Color(227, 242, 253)); txtTrangThai.setForeground(new Color(13, 71, 161)); break;
+            case "Trễ hạn": txtTrangThai.setBackground(new Color(255,235,238)); txtTrangThai.setForeground(new Color(183,28,28)); break;
+            case "Đã trả":  txtTrangThai.setBackground(new Color(232,245,233)); txtTrangThai.setForeground(new Color(27,94,32));  break;
+            case "Đã xóa":  txtTrangThai.setBackground(new Color(230,230,230)); txtTrangThai.setForeground(new Color(100,100,100)); break;
+            default:        txtTrangThai.setBackground(new Color(227,242,253)); txtTrangThai.setForeground(new Color(13,71,161));  break;
         }
-    }
-
-    private String val(int row, int col) {
-        return model.getValueAt(row, col) != null ? model.getValueAt(row, col).toString() : "";
     }
 
     public void lamMoiForm() {
         txtMaPhieu.setText(phieuMuonBUS.generateMaPM());
-        txtMaDG.setText("");
-        txtMaThe.setText("");
-        txtMaSach.setText("");
+        txtMaDG.setText(""); txtMaThe.setText("");
+        txtMaSachLookup.setText("");
+        cbBanSao.removeAllItems(); dsBanSaoHienTai.clear();
         LocalDate today = LocalDate.now();
         txtNgayMuon.setText(today.toString());
         txtHanTra.setText(today.plusDays(14).toString());
@@ -490,14 +511,18 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         txtTrangThai.setText("Đang mượn");
         capNhatMauTrangThai("Đang mượn");
         table.clearSelection();
-        theThuVienBUS.getAll(); // refresh cache thẻ
     }
 
-    // ===== TIỆN ÍCH UI =====
-    private JLabel createLabel(String text, Font font) {
-        JLabel lbl = new JLabel(text); lbl.setFont(font); lbl.setForeground(new Color(73, 80, 87)); return lbl;
+    private String val(int row, int col) {
+        return model.getValueAt(row, col) != null ? model.getValueAt(row, col).toString() : "";
     }
 
+    private JTextField roField(Font f) {
+        JTextField tf = new JTextField(); tf.setFont(f); tf.setEditable(false); return tf;
+    }
+    private JLabel lbl(String text, Font font) {
+        JLabel l = new JLabel(text); l.setFont(font); l.setForeground(new Color(73, 80, 87)); return l;
+    }
     private void setupTable(JTable t) {
         t.setRowHeight(32); t.setFont(new Font(tenFont, Font.PLAIN, 14));
         t.getTableHeader().setFont(new Font(tenFont, Font.BOLD, 14));
@@ -505,10 +530,9 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         t.setShowGrid(false); t.setIntercellSpacing(new Dimension(0, 0));
         t.setShowHorizontalLines(true); t.setGridColor(new Color(222, 226, 230));
     }
-
-    private JButton createActionButton(String text, Color bgColor) {
+    private JButton actionBtn(String text, Color bg) {
         JButton btn = new JButton(text); btn.setFont(new Font(tenFont, Font.BOLD, 14));
-        btn.setForeground(Color.WHITE); btn.setBackground(bgColor);
+        btn.setForeground(Color.WHITE); btn.setBackground(bg);
         btn.setBorderPainted(false); btn.setFocusPainted(false);
         btn.setPreferredSize(new Dimension(160, 40)); btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setOpaque(true); return btn;
