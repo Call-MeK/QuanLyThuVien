@@ -165,10 +165,23 @@ public class TimKiemSachPanel extends JPanel {
         bottomPanel.setBackground(Color.WHITE);
 
         btnXemChiTiet = new JButton("Xem Chi Tiết / Mượn");
-        btnXemChiTiet.setBackground(new Color(34, 197, 94));
-        btnXemChiTiet.setForeground(Color.WHITE);
         btnXemChiTiet.setFont(new Font(tenFont, Font.BOLD, 13));
+        btnXemChiTiet.setBackground(new Color(99, 102, 241)); // Màu Xanh Indigo chuẩn
+        btnXemChiTiet.setForeground(Color.WHITE);
         btnXemChiTiet.setFocusPainted(false);
+        btnXemChiTiet.setBorderPainted(false);
+        btnXemChiTiet.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Con trỏ bàn tay
+        
+        // Hiệu ứng Hover: Sáng lên khi di chuột vào
+        btnXemChiTiet.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnXemChiTiet.setBackground(new Color(79, 70, 229)); // Màu Indigo đậm
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnXemChiTiet.setBackground(new Color(99, 102, 241)); // Trả lại ban đầu
+            }
+        });
+
         bottomPanel.add(btnXemChiTiet);
 
         add(topPanel, BorderLayout.NORTH);
