@@ -317,10 +317,14 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
                 return;
             }
 
-            if (docGiaBUS.isDocGiaLocked(maDG)) {
-                JOptionPane.showMessageDialog(this,
-                        "Độc giả " + maDG + " đang bị khóa thẻ!\nKhông thể lập phiếu mượn.",
-                        "Từ chối", JOptionPane.WARNING_MESSAGE);
+            // Kiểm tra khóa thẻ + giới hạn số sách mượn
+            String kiemTra = docGiaBUS.kiemTraCoTheMuon(maDG);
+            if (kiemTra != null) {
+                // Hiển thị thêm thông tin số sách đang mượn / giới hạn
+                int dangMuon = docGiaBUS.getSachDangMuon(maDG);
+                int gioiHan  = docGiaBUS.getGioiHanMuon(maDG);
+                String thongTin = kiemTra + "\n\n📚 Đang mượn: " + dangMuon + "/" + gioiHan + " cuốn";
+                JOptionPane.showMessageDialog(this, thongTin, "Không thể mượn", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
