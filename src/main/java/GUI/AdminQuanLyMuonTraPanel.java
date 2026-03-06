@@ -105,7 +105,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         txtMaSachLookup = new JTextField(); txtMaSachLookup.setFont(fontInput);
         txtMaSachLookup.setToolTipText("Nhập Mã Sách (VD: S000000001) rồi bấm Tìm");
 
-        btnLookupSach = new JButton("🔍 Tìm bản sao");
+        btnLookupSach = new JButton("Tìm bản sao");
         btnLookupSach.setFont(new Font(tenFont, Font.BOLD, 13));
         btnLookupSach.setBackground(new Color(13, 110, 253));
         btnLookupSach.setForeground(Color.WHITE);
@@ -162,7 +162,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         btnSearch      = actionBtn("Lọc",     new Color(13, 110, 253)); btnSearch.setPreferredSize(new Dimension(100, 35));
         btnResetSearch = actionBtn("Hủy Lọc", new Color(108, 117, 125)); btnResetSearch.setPreferredSize(new Dimension(100, 35));
 
-        pnlSearch.add(lbl("🔍 Tra cứu:", new Font(tenFont, Font.BOLD, 14)));
+        pnlSearch.add(lbl("Tra cứu:", new Font(tenFont, Font.BOLD, 14)));
         pnlSearch.add(pnlSearchInput);
         pnlSearch.add(lbl(" theo ", fontInput));
         pnlSearch.add(cbSearchCriteria);
@@ -270,7 +270,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
                     txtMaThe.setText(the.getMaThe());
                     txtMaThe.setForeground(new Color(33, 37, 41));
                 } else {
-                    txtMaThe.setText("⚠ Chưa có thẻ");
+                    txtMaThe.setText("Chưa có thẻ");
                     txtMaThe.setForeground(new Color(220, 53, 69));
                 }
             }
@@ -313,7 +313,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
                 if (the == null) {
                     JOptionPane.showMessageDialog(this,
                             "Độc giả " + maDG + " chưa có thẻ thư viện!\n"
-                            + "→ Vào Quản Lý Độc Giả để cấp thẻ trước.",
+                            + "Vào Quản Lý Độc Giả để cấp thẻ trước.",
                             "Chưa có thẻ", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
@@ -400,8 +400,8 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
             pm.setTinhTrang("Đã trả");
             String result = phieuMuonBUS.update(pm);
             if (result.contains("thành công")) {
-                String msg = "✔ Xác nhận trả thành công!";
-                if (dialog.hasHong()) msg += "\n⚠ Có sách hỏng — vào Quản Lý Phí Phạt để lập phiếu phạt.";
+                String msg = "Xác nhận trả thành công!";
+                if (dialog.hasHong()) msg += "\nCó sách hỏng — vào Quản Lý Phí Phạt để lập phiếu phạt.";
                 JOptionPane.showMessageDialog(this, msg, "Thành công", JOptionPane.INFORMATION_MESSAGE);
                 lamMoiForm(); loadDataToTable();
             } else {
