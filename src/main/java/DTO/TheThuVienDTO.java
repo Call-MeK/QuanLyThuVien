@@ -13,13 +13,14 @@ public class TheThuVienDTO {
     private String TenThe;
     private String MaDocGia;
     private String NgayCap;
-
-    public TheThuVienDTO() {
-    }
     private String NgayHetHan;
     private String MaNQL;
 
-    public TheThuVienDTO(String MaThe, String TenThe, String MaDocGia, String NgayCap, String NgayHetHan, String MaNQL) {
+    public TheThuVienDTO() {
+    }
+
+    public TheThuVienDTO(String MaThe, String TenThe, String MaDocGia, String NgayCap, String NgayHetHan,
+            String MaNQL) {
         this.MaThe = MaThe;
         this.TenThe = TenThe;
         this.MaDocGia = MaDocGia;
@@ -75,5 +76,5 @@ public class TheThuVienDTO {
     public void setMaNQL(String MaNQL) {
         this.MaNQL = MaNQL;
     }
-    
+
 }
