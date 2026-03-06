@@ -105,7 +105,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         txtMaSachLookup = new JTextField(); txtMaSachLookup.setFont(fontInput);
         txtMaSachLookup.setToolTipText("Nhập Mã Sách (VD: S000000001) rồi bấm Tìm");
 
-        btnLookupSach = new JButton("🔍 Tìm bản sao");
+        btnLookupSach = new JButton("Tìm bản sao");
         btnLookupSach.setFont(new Font(tenFont, Font.BOLD, 13));
         btnLookupSach.setBackground(new Color(13, 110, 253));
         btnLookupSach.setForeground(Color.WHITE);
@@ -162,7 +162,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         btnSearch      = actionBtn("Lọc",     new Color(13, 110, 253)); btnSearch.setPreferredSize(new Dimension(100, 35));
         btnResetSearch = actionBtn("Hủy Lọc", new Color(108, 117, 125)); btnResetSearch.setPreferredSize(new Dimension(100, 35));
 
-        pnlSearch.add(lbl("🔍 Tra cứu:", new Font(tenFont, Font.BOLD, 14)));
+        pnlSearch.add(lbl("Tra cứu:", new Font(tenFont, Font.BOLD, 14)));
         pnlSearch.add(pnlSearchInput);
         pnlSearch.add(lbl(" theo ", fontInput));
         pnlSearch.add(cbSearchCriteria);
