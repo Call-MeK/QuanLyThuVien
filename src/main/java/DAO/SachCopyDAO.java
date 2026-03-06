@@ -7,21 +7,33 @@ import java.util.List;
 
 public class SachCopyDAO {
 
-    /** Sinh MaVach tiếp theo trong 1 connection (dùng cho transaction) */
-    public String generateMaVach(Connection con) throws Exception {
-        String sql = "SELECT MAX(RTRIM(MaVach)) FROM SACHCOPY";
+    /**
+     * Sinh MaVach tiếp theo trong 1 connection (dùng cho transaction)
+     * FIX: Nhận offset để tránh trùng MaVach khi gọi nhiều lần trong cùng 1 vòng lặp
+     */
+    public String generateMaVach(Connection con, int offset) throws Exception {
+        String sql = "SELECT COUNT(*) FROM SACHCOPY";
         try (Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
-            if (rs.next() && rs.getString(1) != null) {
-                long num = Long.parseLong(rs.getString(1).trim().substring(2)) + 1;
+            if (rs.next()) {
+                long num = rs.getLong(1) + 1 + offset;
                 return String.format("MV%018d", num);
             }
         }
-        return "MV000000000000000001";
+        return String.format("MV%018d", 1 + offset);
     }
 
-    /** Tạo N bản sao mới khi nhập kho — dùng trong transaction của AdminQuanLyNhapSachPanel */
+    /** Giữ lại overload cũ để không break code khác */
+    public String generateMaVach(Connection con) throws Exception {
+        return generateMaVach(con, 0);
+    }
+
+    /**
+     * Tạo N bản sao mới khi nhập kho — dùng trong transaction của AdminQuanLyNhapSachPanel
+     * FIX: Truyền offset vào generateMaVach để mỗi lần lặp ra MaVach khác nhau
+     */
     public int insertNewCopies(Connection con, String maSach, String tenSach, int soLuong) throws Exception {
+        // Lấy số bản sao hiện có để đánh số thứ tự đúng
         String sqlCount = "SELECT COUNT(*) FROM SACHCOPY WHERE RTRIM(MaSach) = ?";
         int currentCount = 0;
         try (PreparedStatement ps = con.prepareStatement(sqlCount)) {
@@ -30,14 +42,24 @@ public class SachCopyDAO {
                 if (rs.next()) currentCount = rs.getInt(1);
             }
         }
+
+        // Lấy tổng số bản sao toàn bảng để offset MaVach
+        String sqlTotal = "SELECT COUNT(*) FROM SACHCOPY";
+        int totalCount = 0;
+        try (Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sqlTotal)) {
+            if (rs.next()) totalCount = rs.getInt(1);
+        }
+
         String sql = "INSERT INTO SACHCOPY (MaVach, MaSach, TenSachBanSao, TinhTrang, IsDeleted) VALUES (?, ?, ?, N'Tốt', 0)";
         int success = 0;
-        for (int i = 1; i <= soLuong; i++) {
-            String maVach = generateMaVach(con);
+        for (int i = 0; i < soLuong; i++) {
+            // FIX: offset = i + success để mỗi vòng lặp ra MaVach tăng dần, không trùng
+            String maVach = String.format("MV%018d", totalCount + i + 1);
             try (PreparedStatement ps = con.prepareStatement(sql)) {
                 ps.setString(1, maVach);
-                ps.setString(2, maSach);
-                ps.setString(3, tenSach + " - Bản " + (currentCount + i));
+                ps.setString(2, maSach.trim());
+                ps.setString(3, tenSach + " - Bản " + (currentCount + i + 1));
                 if (ps.executeUpdate() > 0) success++;
             }
         }

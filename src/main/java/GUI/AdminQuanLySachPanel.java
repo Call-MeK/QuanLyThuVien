@@ -15,7 +15,6 @@ public class AdminQuanLySachPanel extends JPanel {
     private String tenFont = "Segoe UI";
     private Color colorBackground = new Color(248, 249, 250);
 
-    // Form fields
     private JTextField txtMaSach, txtTenSach, txtNamXB, txtNgonNgu, txtGiaBia, txtMaTacGia;
     private JComboBox<String> cbTheLoai, cbNXB;
     private JTextField txtSearch;
@@ -23,8 +22,7 @@ public class AdminQuanLySachPanel extends JPanel {
 
     private JTable table;
     private DefaultTableModel model;
-    
-    // Gộp chung tất cả các nút
+
     private JButton btnThem, btnSua, btnXoa, btnLamMoi, btnSearch, btnResetSearch;
     private JButton btnRefresh, btnImport, btnExport, btnSave;
 
@@ -41,6 +39,21 @@ public class AdminQuanLySachPanel extends JPanel {
         initEvents();
         lamMoiForm();
         loadDataToTable();
+
+        // Tự reload mỗi khi panel được hiển thị (switch tab)
+        this.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentShown(java.awt.event.ComponentEvent e) {
+                loadDataToTable();
+            }
+        });
+    }
+
+    // =====================================================
+    // PUBLIC METHOD để AdminFrame gọi refresh từ bên ngoài
+    // =====================================================
+    public void loadData() {
+        loadDataToTable();
     }
 
     // =====================================================
@@ -51,7 +64,6 @@ public class AdminQuanLySachPanel extends JPanel {
         setBackground(colorBackground);
         setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
 
-        // --- HEADER BÊN TRÊN (Chứa Tiêu đề + Nút Làm Mới Icon) ---
         JPanel pnlHeader = new JPanel(new BorderLayout());
         pnlHeader.setBackground(colorBackground);
 
@@ -60,13 +72,12 @@ public class AdminQuanLySachPanel extends JPanel {
         lblTitle.setForeground(new Color(33, 37, 41));
         pnlHeader.add(lblTitle, BorderLayout.WEST);
 
-        // Nút Làm Mới bằng Icon
         btnRefresh = new JButton();
         btnRefresh.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnRefresh.setContentAreaFilled(false); 
+        btnRefresh.setContentAreaFilled(false);
         btnRefresh.setBorderPainted(false);
         btnRefresh.setFocusPainted(false);
-        btnRefresh.setToolTipText("Làm mới dữ liệu (F5)"); 
+        btnRefresh.setToolTipText("Làm mới dữ liệu (F5)");
         btnRefresh.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
 
         try {
@@ -84,7 +95,6 @@ public class AdminQuanLySachPanel extends JPanel {
         JPanel pnlCenter = new JPanel(new BorderLayout(0, 15));
         pnlCenter.setBackground(colorBackground);
 
-        // ---- FORM NHẬP LIỆU ----
         JPanel pnlInput = new JPanel(new GridLayout(4, 4, 15, 12));
         pnlInput.setBackground(Color.WHITE);
         pnlInput.setBorder(BorderFactory.createCompoundBorder(
@@ -94,7 +104,6 @@ public class AdminQuanLySachPanel extends JPanel {
         Font fontLabel = new Font(tenFont, Font.BOLD, 14);
         Font fontInput = new Font(tenFont, Font.PLAIN, 14);
 
-        // Mã sách: readonly
         txtMaSach = new JTextField(); txtMaSach.setFont(fontInput);
         txtMaSach.setEditable(false);
         txtMaSach.setBackground(new Color(233, 236, 239));
@@ -109,20 +118,15 @@ public class AdminQuanLySachPanel extends JPanel {
         cbTheLoai = new JComboBox<>(); cbTheLoai.setFont(fontInput);
         cbNXB     = new JComboBox<>(); cbNXB.setFont(fontInput);
 
-        // Row 1
         pnlInput.add(lbl("Mã sách:", fontLabel));       pnlInput.add(txtMaSach);
         pnlInput.add(lbl("Tên sách:", fontLabel));       pnlInput.add(txtTenSach);
-        // Row 2
         pnlInput.add(lbl("Thể loại:", fontLabel));       pnlInput.add(cbTheLoai);
         pnlInput.add(lbl("Nhà xuất bản:", fontLabel));   pnlInput.add(cbNXB);
-        // Row 3
         pnlInput.add(lbl("Năm xuất bản:", fontLabel));   pnlInput.add(txtNamXB);
         pnlInput.add(lbl("Ngôn ngữ:", fontLabel));       pnlInput.add(txtNgonNgu);
-        // Row 4
         pnlInput.add(lbl("Giá bìa (VNĐ):", fontLabel)); pnlInput.add(txtGiaBia);
         pnlInput.add(lbl("Mã tác giả:", fontLabel));     pnlInput.add(txtMaTacGia);
 
-        // ---- THANH TÌM KIẾM ----
         JPanel pnlSearch = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         pnlSearch.setBackground(colorBackground);
         pnlSearch.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
@@ -152,7 +156,6 @@ public class AdminQuanLySachPanel extends JPanel {
         pnlTopCenter.add(pnlSearch, BorderLayout.CENTER);
         pnlCenter.add(pnlTopCenter, BorderLayout.NORTH);
 
-        // ---- BẢNG ----
         String[] cols = {"Mã Sách", "Tên Sách", "Thể Loại", "Nhà Xuất Bản",
                          "Năm XB", "Ngôn Ngữ", "Giá Bìa", "Tác Giả", "Số Cuốn"};
         model = new DefaultTableModel(cols, 0) {
@@ -160,31 +163,29 @@ public class AdminQuanLySachPanel extends JPanel {
         };
         table = new JTable(model);
         setupTable(table);
-        
+
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230), 1));
         pnlCenter.add(scrollPane, BorderLayout.CENTER);
         add(pnlCenter, BorderLayout.CENTER);
 
-        // ---- NÚT CHỨC NĂNG ----
         JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         pnlButtons.setBackground(colorBackground);
 
         btnThem   = actionBtn("Thêm Mới", new Color(25, 135, 84));
         btnSua    = actionBtn("Cập Nhật", new Color(255, 193, 7)); btnSua.setForeground(Color.BLACK);
         btnXoa    = actionBtn("Xóa Sách", new Color(220, 53, 69));
-        
-        btnImport = actionBtn("Import", new Color(33, 115, 70)); 
-        btnSave = actionBtn("Save", new Color(111, 66, 193));
-        btnExport = actionBtn("Export", new Color(33, 115, 70));
+        btnImport = actionBtn("Import",   new Color(33, 115, 70));
+        btnSave   = actionBtn("Save",     new Color(111, 66, 193));
+        btnExport = actionBtn("Export",   new Color(33, 115, 70));
 
-        pnlButtons.add(btnImport); 
+        pnlButtons.add(btnImport);
         pnlButtons.add(btnSave);
         pnlButtons.add(btnExport);
-        pnlButtons.add(btnThem); 
-        pnlButtons.add(btnSua); 
-        pnlButtons.add(btnXoa); 
-        
+        pnlButtons.add(btnThem);
+        pnlButtons.add(btnSua);
+        pnlButtons.add(btnXoa);
+
         add(pnlButtons, BorderLayout.SOUTH);
     }
 
@@ -206,37 +207,30 @@ public class AdminQuanLySachPanel extends JPanel {
     // =====================================================
     private void initEvents() {
 
-        // 1. Click bảng -> đổ lên form
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int row = table.getSelectedRow();
                 if (row < 0) return;
-
                 txtMaSach.setText(val(row, 0));
                 txtTenSach.setText(val(row, 1));
                 txtNamXB.setText(val(row, 4));
                 txtNgonNgu.setText(val(row, 5));
-                // Giá bìa: bỏ định dạng "xxx.xxx đ" về số thuần
                 txtGiaBia.setText(val(row, 6).replace(".", "").replace(",", "").replace(" đ", "").replace("đ", "").trim());
-                txtMaTacGia.setText(""); // Mã tác giả để trống, user tự điền nếu muốn sửa
-
+                txtMaTacGia.setText("");
                 chonComboTheoTen(cbTheLoai, val(row, 2));
                 chonComboTheoTen(cbNXB,     val(row, 3));
             }
         });
 
-        // 2. THÊM MỚI
         btnThem.addActionListener(e -> {
             SachDTO sach = layDuLieuForm();
             if (sach == null) return;
-
             String result = sachBUS.insert(sach);
             if (result.contains("thành công")) {
                 String maTG = txtMaTacGia.getText().trim();
-                if (!maTG.isEmpty()) {
+                if (!maTG.isEmpty())
                     for (String mg : maTG.split(",")) sachBUS.insertSachTacGia(sach.getMaSach(), mg.trim());
-                }
                 JOptionPane.showMessageDialog(this, result);
                 lamMoiForm(); loadDataToTable();
             } else {
@@ -244,7 +238,6 @@ public class AdminQuanLySachPanel extends JPanel {
             }
         });
 
-        // 3. CẬP NHẬT
         btnSua.addActionListener(e -> {
             String maSach = txtMaSach.getText().trim();
             if (maSach.isEmpty()) {
@@ -253,11 +246,9 @@ public class AdminQuanLySachPanel extends JPanel {
             }
             SachDTO sach = layDuLieuForm();
             if (sach == null) return;
-
             int confirm = JOptionPane.showConfirmDialog(this,
                     "Cập nhật thông tin sách " + maSach + "?", "Xác nhận", JOptionPane.YES_NO_OPTION);
             if (confirm != JOptionPane.YES_OPTION) return;
-
             String result = sachBUS.update(sach);
             if (result.contains("thành công")) {
                 String maTG = txtMaTacGia.getText().trim();
@@ -272,7 +263,6 @@ public class AdminQuanLySachPanel extends JPanel {
             }
         });
 
-        // 4. XÓA (Soft Delete + kiểm tra đang mượn)
         btnXoa.addActionListener(e -> {
             String maSach  = txtMaSach.getText().trim();
             String tenSach = txtTenSach.getText().trim();
@@ -280,13 +270,10 @@ public class AdminQuanLySachPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 sách trong bảng trước!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-
             int confirm = JOptionPane.showConfirmDialog(this,
-                    "Xóa sách: " + tenSach + " (" + maSach + ")?\n"
-                    + "Sách sẽ bị ẩn khỏi hệ thống.",
+                    "Xóa sách: " + tenSach + " (" + maSach + ")?\nSách sẽ bị ẩn khỏi hệ thống.",
                     "Xác nhận xóa", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             if (confirm != JOptionPane.YES_OPTION) return;
-
             String result = sachBUS.delete(maSach);
             if (result.contains("thành công")) {
                 JOptionPane.showMessageDialog(this, result);
@@ -296,29 +283,22 @@ public class AdminQuanLySachPanel extends JPanel {
             }
         });
 
-        // 5. TÌM KIẾM
         btnSearch.addActionListener(e -> timKiem());
         txtSearch.addActionListener(e -> timKiem());
 
-        // 6. HỦY LỌC
         btnResetSearch.addActionListener(e -> {
             txtSearch.setText("");
             cbSearchCriteria.setSelectedIndex(0);
             loadDataToTable();
         });
 
-        // 7. Nút LÀM MỚI (Icon góc trên)
-        btnRefresh.addActionListener(e -> { 
+        btnRefresh.addActionListener(e -> {
             lamMoiForm();
             loadDataToTable();
         });
 
-        // 8. Nút IMPORT EXCEL
-        btnImport.addActionListener(e -> {
-            Utils.ExcelImporter.importExcelToTable(table, model);
-        });
+        btnImport.addActionListener(e -> Utils.ExcelImporter.importExcelToTable(table, model));
 
-        // 9. Nút EXPORT EXCEL
         btnExport.addActionListener(e -> {
             if (model.getRowCount() == 0) {
                 JOptionPane.showMessageDialog(this, "Không có dữ liệu để xuất!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
@@ -326,59 +306,37 @@ public class AdminQuanLySachPanel extends JPanel {
             }
             Utils.ExcelExporter.exportTableToExcel(table, "DanhSach_Sach");
         });
-        
-        // 10. Nút SAVE (Dành cho Import Excel)
+
         btnSave.addActionListener(e -> {
             int rowCount = table.getRowCount();
             if (rowCount == 0) {
                 JOptionPane.showMessageDialog(this, "Bảng đang trống, không có dữ liệu để lưu!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-
-            int confirm = JOptionPane.showConfirmDialog(this, 
-                    "Lưu toàn bộ " + rowCount + " dòng trên bảng vào Database?", 
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Lưu toàn bộ " + rowCount + " dòng trên bảng vào Database?",
                     "Xác nhận", JOptionPane.YES_NO_OPTION);
-            
             if (confirm == JOptionPane.YES_OPTION) {
-                int successCount = 0;
-                int failCount = 0;
-                
+                int successCount = 0, failCount = 0;
                 for (int i = 0; i < rowCount; i++) {
                     try {
                         SachDTO sach = new SachDTO();
-                        // Cột: 0:Mã Sách | 1:Tên Sách | 2:Thể Loại | 3:Nhà Xuất Bản | 4:Năm XB | 5:Ngôn Ngữ | 6:Giá Bìa | 7:Tác Giả | 8:Số Cuốn
                         sach.setMaSach(model.getValueAt(i, 0).toString().trim());
                         sach.setTenSach(model.getValueAt(i, 1).toString().trim());
-                        
                         sach.setTheLoai(getMaTheLoai(model.getValueAt(i, 2).toString().trim()));
                         sach.setMaNXB(getMaNXB(model.getValueAt(i, 3).toString().trim()));
-                        
                         String namXBStr = model.getValueAt(i, 4).toString().trim();
                         sach.setNamXB(Integer.parseInt(namXBStr.isEmpty() ? "0" : namXBStr));
-                        
                         sach.setNgonNgu(model.getValueAt(i, 5).toString().trim());
-
-                        // Các trường mặc định để chạy đúng DTO
                         sach.setGiaBia(Float.valueOf(0f));
                         sach.setIsDeleted(Boolean.FALSE);
-
-                        // Lưu vào DB
                         String result = sachBUS.insert(sach);
-                        if (result.equals("Thêm sách thành công!")) {
-                            successCount++;
-                        } else {
-                            failCount++; 
-                        }
-                    } catch (Exception ex) {
-                        failCount++;
-                    }
+                        if (result.equals("Thêm sách thành công!")) successCount++; else failCount++;
+                    } catch (Exception ex) { failCount++; }
                 }
-
-                JOptionPane.showMessageDialog(this, 
-                        "Lưu hoàn tất!\n- Thành công: " + successCount + " cuốn\n- Bỏ qua (Trùng mã/Lỗi): " + failCount + " cuốn", 
+                JOptionPane.showMessageDialog(this,
+                        "Lưu hoàn tất!\n- Thành công: " + successCount + " cuốn\n- Bỏ qua (Trùng mã/Lỗi): " + failCount + " cuốn",
                         "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-                
-                // Tải lại bảng sau khi Save
                 loadDataToTable();
             }
         });
@@ -432,7 +390,6 @@ public class AdminQuanLySachPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Giá bìa phải là số!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return null;
         }
-
         SachDTO sach = new SachDTO();
         sach.setMaSach(txtMaSach.getText().trim());
         sach.setTenSach(tenSach);
@@ -446,11 +403,8 @@ public class AdminQuanLySachPanel extends JPanel {
 
     public void lamMoiForm() {
         txtMaSach.setText(sachBUS.generateMaSach());
-        txtTenSach.setText("");
-        txtNamXB.setText("");
-        txtNgonNgu.setText("");
-        txtGiaBia.setText("0");
-        txtMaTacGia.setText("");
+        txtTenSach.setText(""); txtNamXB.setText("");
+        txtNgonNgu.setText(""); txtGiaBia.setText("0"); txtMaTacGia.setText("");
         if (cbTheLoai.getItemCount() > 0) cbTheLoai.setSelectedIndex(0);
         if (cbNXB.getItemCount() > 0) cbNXB.setSelectedIndex(0);
         table.clearSelection();
@@ -474,7 +428,6 @@ public class AdminQuanLySachPanel extends JPanel {
         Object v = model.getValueAt(row, col); return v != null ? v.toString() : "";
     }
 
-    // ===== TIỆN ÍCH UI =====
     private JLabel lbl(String text, Font font) {
         JLabel l = new JLabel(text); l.setFont(font); l.setForeground(new Color(73, 80, 87)); return l;
     }
@@ -489,12 +442,9 @@ public class AdminQuanLySachPanel extends JPanel {
         t.setIntercellSpacing(new Dimension(0, 0));
         t.setShowHorizontalLines(true);
         t.setGridColor(new Color(222, 226, 230));
-
-        // ✅ Màu highlight rõ ràng: nền xanh đậm, chữ trắng
         t.setSelectionBackground(new Color(37, 99, 235));
         t.setSelectionForeground(Color.WHITE);
 
-        // Renderer để tô màu cột "Số Cuốn" (col 8): đỏ nếu = 0
         t.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -503,7 +453,6 @@ public class AdminQuanLySachPanel extends JPanel {
                 if (!isSelected) {
                     c.setBackground(Color.WHITE);
                     c.setForeground(new Color(33, 37, 41));
-                    // Cột Số Cuốn (col 8): đỏ nếu = 0, xanh nếu > 0
                     if (col == 8 && value != null) {
                         try {
                             int soLuong = Integer.parseInt(value.toString());
@@ -517,18 +466,15 @@ public class AdminQuanLySachPanel extends JPanel {
                         } catch (Exception ignored) {}
                     }
                 }
-                // Căn giữa cột số
                 if (col == 4 || col == 8) ((JLabel) c).setHorizontalAlignment(SwingConstants.CENTER);
                 if (col == 6) ((JLabel) c).setHorizontalAlignment(SwingConstants.RIGHT);
                 return c;
             }
         });
 
-        // Độ rộng cột
         int[] widths = {95, 210, 130, 130, 65, 80, 100, 150, 75};
-        for (int i = 0; i < widths.length; i++) {
+        for (int i = 0; i < widths.length; i++)
             t.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
-        }
     }
 
     private JButton actionBtn(String text, Color bg) {
@@ -542,10 +488,9 @@ public class AdminQuanLySachPanel extends JPanel {
         return btn;
     }
 
-    // ===== GETTER =====
-    public JTable getTable()           { return table; }
-    public DefaultTableModel getModel(){ return model; }
-    public JButton getBtnThem()        { return btnThem; }
-    public JButton getBtnSua()         { return btnSua; }
-    public JButton getBtnXoa()         { return btnXoa; }
+    public JTable getTable()            { return table; }
+    public DefaultTableModel getModel() { return model; }
+    public JButton getBtnThem()         { return btnThem; }
+    public JButton getBtnSua()          { return btnSua; }
+    public JButton getBtnXoa()          { return btnXoa; }
 }
