@@ -11,13 +11,12 @@ package DTO;
 public class NhaXuatBanDTO {
     private String MaNXB;
     private String TenNXB;
-
-    public NhaXuatBanDTO() {
-    }
     private String DiaChi;
     private String Email;
     private String SoDienThoai;
-
+    
+    public NhaXuatBanDTO() {
+    }
     public NhaXuatBanDTO(String MaNXB, String TenNXB, String DiaChi, String Email, String SoDienThoai) {
         this.MaNXB = MaNXB;
         this.TenNXB = TenNXB;
