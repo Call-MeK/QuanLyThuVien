@@ -15,7 +15,7 @@ import DTO.*;
 /**
  * Quản Lý Nhập Sách
  * Luồng: Điền thông tin phiếu → Thêm từng sách vào chi tiết
- *        → Bấm "Lưu Phiếu" → Tự động tạo SACHCOPY
+ * → Bấm "Lưu Phiếu" → Tự động tạo SACHCOPY
  */
 public class AdminQuanLyNhapSachPanel extends JPanel {
 
@@ -25,12 +25,13 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
     private final Color  clrBorder      = new Color(222, 226, 230);
 
     // === PHẦN TRÊN: Form đầu phiếu ===
-    private JTextField txtMaPN, txtNgayNhap, txtMaNXB;
+    private JTextField txtMaPN, txtNgayNhap;
+    private JComboBox<String> cbNXB; // Thay bằng ComboBox
     private JLabel     lblTongTien;
 
     // === PHẦN GIỮA: Bảng chi tiết đang soạn ===
     private JTextField           txtMaSachNhap, txtTenSach, txtSoLuong, txtDonGia;
-    private JButton              btnThemDong, btnXoaDong;
+    private JButton              btnThemDong, btnCapNhatDong, btnXoaDong; // Thêm nút cập nhật
     private JTable               tblChiTiet;
     private DefaultTableModel    modelChiTiet;
 
@@ -44,6 +45,8 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
     private final PhieuNhapBUS        pnBUS   = new PhieuNhapBUS();
     private final ChiTietPhieuNhapBUS ctBUS   = new ChiTietPhieuNhapBUS();
     private final SachDAO             sachDAO = new SachDAO();
+    private final NhaXuatBanBUS       nxbBUS  = new NhaXuatBanBUS(); // Thêm BUS lấy danh sách NXB
+    private List<NhaXuatBanDTO>       listNXB;
 
     public AdminQuanLyNhapSachPanel() {
         buildUI();
@@ -99,14 +102,17 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
 
         txtMaPN     = roField(fi);
         txtNgayNhap = new JTextField(fi.getSize()); txtNgayNhap.setFont(fi);
-        txtMaNXB    = new JTextField(); txtMaNXB.setFont(fi);
+        
+        cbNXB = new JComboBox<>(); cbNXB.setFont(fi);
+        loadComboBoxNXB(); // Load dữ liệu lên CbNXB
+
         lblTongTien = new JLabel("0 đ");
         lblTongTien.setFont(new Font(tenFont, Font.BOLD, 15));
         lblTongTien.setForeground(new Color(25, 135, 84));
 
         pnlHeader.add(lbl("Mã phiếu nhập:", fl));  pnlHeader.add(txtMaPN);
         pnlHeader.add(lbl("Ngày nhập:", fl));        pnlHeader.add(txtNgayNhap);
-        pnlHeader.add(lbl("Nhà cung cấp (MaNXB):", fl)); pnlHeader.add(txtMaNXB);
+        pnlHeader.add(lbl("Nhà cung cấp:", fl));     pnlHeader.add(cbNXB);
         pnlHeader.add(lbl("Tổng tiền:", fl));        pnlHeader.add(lblTongTien);
         pnlHeader.add(new JLabel()); pnlHeader.add(new JLabel());
         pnlHeader.add(new JLabel()); pnlHeader.add(new JLabel());
@@ -120,14 +126,19 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         txtSoLuong    = tf(fi, 6);  txtSoLuong.setText("1");
         txtDonGia     = tf(fi, 10); txtDonGia.setText("0");
 
-        btnThemDong = smallBtn("➕ Thêm dòng", new Color(13, 110, 253));
-        btnXoaDong  = smallBtn("🗑 Xóa dòng",  new Color(220, 53, 69));
+        btnThemDong    = smallBtn("➕ Thêm", new Color(13, 110, 253));
+        btnCapNhatDong = smallBtn("✏ Cập nhật", new Color(255, 193, 7)); 
+        btnCapNhatDong.setForeground(Color.BLACK);
+        btnXoaDong     = smallBtn("🗑 Xóa",  new Color(220, 53, 69));
 
         pnlAddRow.add(lbl("Mã sách:", fl)); pnlAddRow.add(txtMaSachNhap);
         pnlAddRow.add(lbl("Tên sách:", fl)); pnlAddRow.add(txtTenSach);
         pnlAddRow.add(lbl("Số lượng:", fl)); pnlAddRow.add(txtSoLuong);
-        pnlAddRow.add(lbl("Đơn giá:", fl));  pnlAddRow.add(txtDonGia);
-        pnlAddRow.add(btnThemDong); pnlAddRow.add(btnXoaDong);
+        pnlAddRow.add(lbl("Đơn giá 1 cuốn:", fl));  pnlAddRow.add(txtDonGia);
+        
+        pnlAddRow.add(btnThemDong); 
+        pnlAddRow.add(btnCapNhatDong);
+        pnlAddRow.add(btnXoaDong);
 
         // --- Bảng chi tiết đang soạn ---
         String[] cols = {"Mã Sách", "Tên Sách", "Số Lượng", "Đơn Giá (đ)", "Thành Tiền (đ)"};
@@ -206,12 +217,30 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         // Thêm dòng vào chi tiết
         btnThemDong.addActionListener(e -> themDong());
 
+        // Cập nhật dòng đang chọn
+        btnCapNhatDong.addActionListener(e -> capNhatDong());
+
         // Xóa dòng đang chọn
         btnXoaDong.addActionListener(e -> {
             int row = tblChiTiet.getSelectedRow();
             if (row < 0) { JOptionPane.showMessageDialog(this, "Chọn dòng cần xóa!"); return; }
             modelChiTiet.removeRow(row);
             capNhatTongTien();
+        });
+
+        // Đổ dữ liệu lên form khi click vào bảng chi tiết
+        tblChiTiet.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = tblChiTiet.getSelectedRow();
+                if (row >= 0) {
+                    txtMaSachNhap.setText(modelChiTiet.getValueAt(row, 0).toString());
+                    txtTenSach.setText(modelChiTiet.getValueAt(row, 1).toString());
+                    txtSoLuong.setText(modelChiTiet.getValueAt(row, 2).toString());
+                    String dgRaw = modelChiTiet.getValueAt(row, 3).toString().replaceAll("[,\\.]", "");
+                    txtDonGia.setText(dgRaw);
+                }
+            }
         });
 
         // Lưu phiếu
@@ -274,10 +303,10 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         float donGia;
         try {
             soLuong = Integer.parseInt(slStr);
-            donGia  = Float.parseFloat(dgStr.replace(",", ""));
-            if (soLuong <= 0) throw new NumberFormatException();
+            donGia  = Float.parseFloat(dgStr.replaceAll("[,\\.]", ""));
+            if (soLuong <= 0 || donGia < 0) throw new NumberFormatException();
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Số lượng phải là số nguyên > 0, Đơn giá phải là số!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Số lượng phải là số nguyên > 0, Đơn giá phải là số hợp lệ!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -295,11 +324,57 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         txtMaSachNhap.requestFocus();
     }
 
+    private void capNhatDong() {
+        int row = tblChiTiet.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 dòng trong bảng chi tiết để cập nhật!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String maSach  = txtMaSachNhap.getText().trim();
+        String tenSach = txtTenSach.getText().trim();
+        String slStr   = txtSoLuong.getText().trim();
+        String dgStr   = txtDonGia.getText().trim();
+
+        if (maSach.isEmpty() || tenSach.isEmpty() || tenSach.startsWith("⚠")) {
+            JOptionPane.showMessageDialog(this, "Nhập Mã Sách hợp lệ trước!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int soLuong;
+        float donGia;
+        try {
+            soLuong = Integer.parseInt(slStr);
+            donGia  = Float.parseFloat(dgStr.replaceAll("[,\\.]", "")); 
+            if (soLuong <= 0 || donGia < 0) throw new NumberFormatException();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Số lượng phải là số nguyên > 0, Đơn giá phải là số hợp lệ!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        float thanhTien = soLuong * donGia;
+
+        modelChiTiet.setValueAt(maSach, row, 0);
+        modelChiTiet.setValueAt(tenSach, row, 1);
+        modelChiTiet.setValueAt(soLuong, row, 2);
+        modelChiTiet.setValueAt(String.format("%,.0f", donGia), row, 3);
+        modelChiTiet.setValueAt(String.format("%,.0f", thanhTien), row, 4);
+
+        capNhatTongTien();
+
+        txtMaSachNhap.setText(""); txtTenSach.setText("");
+        txtSoLuong.setText("1"); txtDonGia.setText("0");
+        tblChiTiet.clearSelection();
+        txtMaSachNhap.requestFocus();
+    }
+
     private void capNhatTongTien() {
         double tong = 0;
         for (int i = 0; i < modelChiTiet.getRowCount(); i++) {
-            String tt = modelChiTiet.getValueAt(i, 4).toString().replace(",", "");
-            try { tong += Double.parseDouble(tt); } catch (Exception ignored) {}
+            String ttStr = modelChiTiet.getValueAt(i, 4).toString().replaceAll("[,\\.]", "");
+            try { 
+                tong += Double.parseDouble(ttStr); 
+            } catch (Exception ignored) {}
         }
         lblTongTien.setText(String.format("%,.0f đ", tong));
     }
@@ -307,10 +382,11 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
     private void luuPhieu() {
         String maPN    = txtMaPN.getText().trim();
         String ngay    = txtNgayNhap.getText().trim();
-        String maNXB   = txtMaNXB.getText().trim();
+        String tenNXB  = (String) cbNXB.getSelectedItem();
+        String maNXB   = getMaNXBByTen(tenNXB);
 
         if (ngay.isEmpty()) { JOptionPane.showMessageDialog(this, "Vui lòng nhập Ngày nhập!"); return; }
-        if (maNXB.isEmpty()) { JOptionPane.showMessageDialog(this, "Vui lòng nhập Nhà cung cấp (MaNXB)!"); return; }
+        if (maNXB == null || maNXB.isEmpty()) { JOptionPane.showMessageDialog(this, "Vui lòng chọn Nhà cung cấp!"); return; }
         if (modelChiTiet.getRowCount() == 0) {
             JOptionPane.showMessageDialog(this, "Chưa có sách nào trong phiếu!\nThêm ít nhất 1 dòng chi tiết.", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return;
@@ -325,14 +401,12 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         String maNQL = SessionManager.getInstance().getMaNguoi();
         if (maNQL == null || maNQL.isEmpty()) maNQL = "NV00000001";
 
-        // Tính tổng tiền
         double tong = 0;
         for (int i = 0; i < modelChiTiet.getRowCount(); i++) {
-            String tt = modelChiTiet.getValueAt(i, 4).toString().replace(",", "");
+            String tt = modelChiTiet.getValueAt(i, 4).toString().replaceAll("[,\\.]", "");
             try { tong += Double.parseDouble(tt); } catch (Exception ignored) {}
         }
 
-        // Insert PHIEUNHAP
         PhieuNhapDTO pn = new PhieuNhapDTO(maPN, ngay, (float) tong, maNXB, maNQL);
         String r = pnBUS.addPhieuNhap(pn);
         if (!r.equals("Thêm thành công")) {
@@ -340,7 +414,6 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
             return;
         }
 
-        // Insert CHITIETPHIEUNHAP + tạo SACHCOPY trong 1 transaction
         int tongBanSao = 0;
         try (java.sql.Connection con = DAO.DatabaseConnection.getConnection()) {
             con.setAutoCommit(false);
@@ -350,9 +423,8 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
                     String maSach  = modelChiTiet.getValueAt(i, 0).toString().trim();
                     String tenSach = modelChiTiet.getValueAt(i, 1).toString().trim();
                     int    sl      = Integer.parseInt(modelChiTiet.getValueAt(i, 2).toString());
-                    float  dg      = Float.parseFloat(modelChiTiet.getValueAt(i, 3).toString().replace(",", ""));
+                    float  dg      = Float.parseFloat(modelChiTiet.getValueAt(i, 3).toString().replaceAll("[,\\.]", ""));
 
-                    // Insert chi tiết
                     ChiTietPhieuNhapDTO ct = new ChiTietPhieuNhapDTO(maPN, maSach, sl, dg);
                     String sqlCT = "INSERT INTO CHITIETPHIEUNHAP (MaPN, MaSach, SoLuongNhap, DonGia) VALUES (?, ?, ?, ?)";
                     try (java.sql.PreparedStatement ps = con.prepareStatement(sqlCT)) {
@@ -361,13 +433,11 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
                         ps.executeUpdate();
                     }
 
-                    // Tạo SACHCOPY
                     tongBanSao += copyDAO.insertNewCopies(con, maSach, tenSach, sl);
                 }
                 con.commit();
             } catch (Exception ex) {
                 con.rollback();
-                // Rollback cả PHIEUNHAP
                 pnBUS.deletePhieuNhap(maPN);
                 JOptionPane.showMessageDialog(this, "Lỗi khi lưu chi tiết: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
@@ -450,12 +520,33 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
     public void lamMoiPhieu() {
         txtMaPN.setText(new PhieuNhapDAO().generateMaPN());
         txtNgayNhap.setText(LocalDate.now().toString());
-        txtMaNXB.setText("");
+        if (cbNXB != null && cbNXB.getItemCount() > 0) cbNXB.setSelectedIndex(0);
         modelChiTiet.setRowCount(0);
         lblTongTien.setText("0 đ");
         txtMaSachNhap.setText(""); txtTenSach.setText("");
         txtSoLuong.setText("1"); txtDonGia.setText("0");
         tblLichSu.clearSelection();
+    }
+
+    private void loadComboBoxNXB() {
+        cbNXB.removeAllItems();
+        listNXB = nxbBUS.getAll();
+        if (listNXB != null) {
+            for (NhaXuatBanDTO nxb : listNXB) {
+                cbNXB.addItem(nxb.getTenNXB()); 
+            }
+        }
+    }
+
+    private String getMaNXBByTen(String tenNXB) {
+        if (listNXB != null) {
+            for (NhaXuatBanDTO nxb : listNXB) {
+                if (nxb.getTenNXB().equals(tenNXB)) {
+                    return nxb.getMaNXB(); 
+                }
+            }
+        }
+        return "";
     }
 
     // ==========================================================

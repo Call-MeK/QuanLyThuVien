@@ -13,16 +13,16 @@ public class SachDAO {
 
    public List<SachDTO> getAll() {
         List<SachDTO> list = new ArrayList<>();
-        // Lấy tất cả các cột, bao gồm cả cột SoLuong chúng ta mới thêm
-        String sql = "SELECT * FROM SACH WHERE isdeleted = 0";
+        // SỬA LỖI: Đếm SoLuong từ bảng SACHCOPY thay vì lấy trực tiếp từ bảng SACH
+        String sql = "SELECT s.*, " +
+                     "(SELECT COUNT(*) FROM SACHCOPY sc WHERE sc.MaSach = s.MaSach AND sc.IsDeleted = 0) AS SoLuong " +
+                     "FROM SACH s WHERE s.isdeleted = 0";
         
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             
-            // THIẾU VÒNG LẶP NÀY:
             while (rs.next()) {
-                // Khởi tạo đối tượng SachDTO từ dữ liệu dòng hiện tại
                 SachDTO sach = new SachDTO(
                         rs.getString("MaSach"),
                         rs.getString("tenSach"),
@@ -32,13 +32,10 @@ public class SachDAO {
                         rs.getString("NgonNgu"),
                         rs.getFloat("GiaBia"),
                         rs.getBoolean("isdeleted"),
-                        new ArrayList<>() // Danh sách tác giả tạm thời để trống
+                        new ArrayList<>() 
                 );
                 
-                // Lấy giá trị SoLuong từ database và gán vào DTO
                 sach.setSoLuong(rs.getInt("SoLuong"));
-                
-                // Thêm vào danh sách trả về
                 list.add(sach);
             }
         } catch (Exception e) { 
@@ -46,6 +43,7 @@ public class SachDAO {
         }
         return list;
     }
+
     public SachDTO getById(String maSach) {
         String sql = "SELECT * FROM SACH WHERE MaSach = ? AND isdeleted = 0";
         try (Connection con = DatabaseConnection.getConnection();
@@ -69,12 +67,9 @@ public class SachDAO {
         return null;
     }
 
-    /**
-     * Lấy danh sách đầy đủ để hiển thị bảng admin.
-     * Dùng STUFF/FOR XML PATH thay STRING_AGG — tương thích SQL Server 2012+
-     */
     public List<Object[]> getDanhSachDayDu() {
         List<Object[]> list = new ArrayList<>();
+        // SỬA LỖI: Đếm số lượng từ SACHCOPY (những cuốn chưa bị xóa)
         String sql = 
             "SELECT s.MaSach, s.tenSach, " +
             "       ISNULL(tl.TenTheLoai, s.TheLoai)  AS TenTheLoai, " +
@@ -87,17 +82,13 @@ public class SachDAO {
             "           WHERE st.MaSach = s.MaSach " +
             "           FOR XML PATH(''), TYPE).value('.','NVARCHAR(MAX)'), 1, 2, ''), " +
             "       N'Chưa cập nhật') AS TenTacGia, " +
-            
-            // CHỈ CẦN SỬA ĐÚNG DÒNG NÀY: Lấy thẳng cột SoLuong từ bảng SACH (kí danh là s)
-            "       s.SoLuong " + 
-            
+            "       (SELECT COUNT(*) FROM SACHCOPY sc WHERE sc.MaSach = s.MaSach AND sc.IsDeleted = 0) AS SoLuong " + 
             "FROM SACH s " +
             "LEFT JOIN THELOAI      tl ON s.TheLoai = tl.MaTheLoai " +
             "LEFT JOIN NHAXUATBAN   n  ON s.MaNXB   = n.MaNXB " +
             "WHERE s.isdeleted = 0 " +
             "ORDER BY s.MaSach";
             
-        // ... (phần try-catch giữ nguyên) ...
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {

@@ -102,4 +102,35 @@ public class PhieuNhapDAO {
         }
         return list;
     }
+
+    public String generateMaPN() {
+        String newMaPN = "PN001";
+        String sql = "SELECT MaPN FROM PHIEUNHAP";
+        
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            int maxId = 0;
+            while (rs.next()) {
+                String maPN = rs.getString("MaPN");
+                if (maPN != null && maPN.startsWith("PN")) {
+                    try {
+                        int id = Integer.parseInt(maPN.substring(2));
+                        if (id > maxId) {
+                            maxId = id;
+                        }
+                    } catch (NumberFormatException e) {
+                        // Ignore
+                    }
+                }
+            }
+            if (maxId > 0) {
+                newMaPN = String.format("PN%03d", maxId + 1); // Đổi "%03d" thành "%04d" nếu form mã của bạn là PN0001
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return newMaPN;
+    }
 }
