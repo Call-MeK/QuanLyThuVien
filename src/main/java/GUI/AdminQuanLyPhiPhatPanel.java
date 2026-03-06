@@ -143,7 +143,7 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         btnResetSearch = createActionButton("Hủy Lọc", new Color(108, 117, 125));
         btnResetSearch.setPreferredSize(new Dimension(100, 35));
 
-        pnlSearch.add(createLabel("🔍 Tra cứu:", new Font(tenFont, Font.BOLD, 14)));
+        pnlSearch.add(createLabel("Tra cứu:", new Font(tenFont, Font.BOLD, 14)));
         pnlSearch.add(pnlSearchInput);
         pnlSearch.add(createLabel(" theo ", fontInput));
         pnlSearch.add(cbSearchCriteria);
