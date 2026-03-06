@@ -23,7 +23,11 @@ public class SachCopyDAO {
         return generateMaVach(con, 0);
     }
 
+    /**
+     * FIX: Thêm NgayNhap = GETDATE() để tránh lỗi NOT NULL trên cột NgayNhap
+     */
     public int insertNewCopies(Connection con, String maSach, String tenSach, int soLuong) throws Exception {
+        // Đếm bản sao hiện có của sách này
         int currentCount = 0;
         try (PreparedStatement ps = con.prepareStatement(
                 "SELECT COUNT(*) FROM SACHCOPY WHERE RTRIM(MaSach) = ?")) {
@@ -33,12 +37,14 @@ public class SachCopyDAO {
             }
         }
 
+        // Đếm tổng bản sao toàn bảng để tạo MaVach không trùng
         int totalCount = 0;
         try (Statement st = con.createStatement();
              ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM SACHCOPY")) {
             if (rs.next()) totalCount = rs.getInt(1);
         }
 
+        // FIX: Thêm NgayNhap = GETDATE() vào câu INSERT
         String sql = "INSERT INTO SACHCOPY (MaVach, MaSach, TenSachBanSao, TinhTrang, IsDeleted, NgayNhap) " +
                      "VALUES (?, ?, ?, N'Tốt', 0, GETDATE())";
         int success = 0;
@@ -105,7 +111,6 @@ public class SachCopyDAO {
         return null;
     }
 
-    /** Lấy tất cả bản sao chưa xóa (dùng cho các màn hình khác) */
     public List<SachCopyDTO> getAll() {
         List<SachCopyDTO> list = new ArrayList<>();
         String sql = "SELECT * FROM SACHCOPY WHERE IsDeleted=0";
@@ -117,40 +122,6 @@ public class SachCopyDAO {
         return list;
     }
 
-    /**
-     * Lấy bản sao KHẢ DỤNG để cho mượn:
-     * - Đúng mã sách
-     * - TinhTrang = 'Tốt'
-     * - Chưa bị xóa
-     * - Không đang được mượn (không có trong CHITIETPHIEUMUON của phiếu đang mượn)
-     */
-    public List<SachCopyDTO> getAvailable(String maSach) {
-        List<SachCopyDTO> list = new ArrayList<>();
-        String sql = "SELECT * FROM SACHCOPY " +
-                     "WHERE RTRIM(MaSach) = ? " +
-                     "AND TinhTrang = N'Tốt' " +
-                     "AND IsDeleted = 0 " +
-                     "AND RTRIM(MaVach) NOT IN (" +
-                     "  SELECT RTRIM(ct.MaCuonSach) " +
-                     "  FROM CHITIETPHIEUMUON ct " +
-                     "  JOIN PHIEUMUON pm ON ct.MaPM = pm.MaPM " +
-                     "  WHERE pm.TinhTrang = N'Đang mượn'" +
-                     ")";
-        try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setString(1, maSach.trim());
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) list.add(mapRow(rs));
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-        return list;
-    }
-
-    /**
-     * Cập nhật tình trạng bản sao.
-     * - Khi trả: tinhTrang = "Tốt" (hoặc trạng thái thực tế từ TraSachDialog)
-     * - Khi phát hiện hỏng: tinhTrang = "Hỏng"
-     */
     public boolean updateTinhTrang(String maVach, String tinhTrang, String ghiChu) {
         String sql = "UPDATE SACHCOPY SET TinhTrang=? WHERE RTRIM(MaVach)=?";
         try (Connection con = DatabaseConnection.getConnection();

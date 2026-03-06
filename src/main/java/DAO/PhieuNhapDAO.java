@@ -79,20 +79,21 @@ public class PhieuNhapDAO {
     }
 
     public String generateMaPN() {
-    String sql = "SELECT MAX(MaPN) FROM phieunhap WHERE MaPN LIKE 'PN%[0-9]'";
-    try (Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
-        if (rs.next() && rs.getString(1) != null) {
-            String maxMa = rs.getString(1);
-            // Lấy phần số ở cuối, bỏ qua mã format cũ như "PN003"
-            String soStr = maxMa.replaceAll("[^0-9]", "");
-            int soMoi = Integer.parseInt(soStr) + 1;
-            return String.format("PN%08d", soMoi);
-        }
-    } catch (Exception e) {
-        e.printStackTrace();
+        String sql = "SELECT MAX(MaPN) FROM PHIEUNHAP WHERE MaPN LIKE 'PN%'";
+        try (Connection con = DatabaseConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next() && rs.getString(1) != null) {
+                String lastMa = rs.getString(1).trim();
+                try {
+                    // Lấy phần số sau "PN", bất kể độ dài
+                    int lastNum = Integer.parseInt(lastMa.substring(2).trim());
+                    return String.format("PN%08d", lastNum + 1);
+                } catch (NumberFormatException e) {
+                    // ignore
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return "PN00000001";
     }
-    return "PN00000001";
-}
 }
