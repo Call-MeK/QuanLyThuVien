@@ -1,6 +1,7 @@
 package BUS;
 
 import DAO.DocGiaDAO;
+import DAO.PhieuMuonDAO;
 import DTO.DocGiaDTO;
 import java.util.ArrayList;
 
@@ -8,56 +9,105 @@ public class DocGiaBUS {
     private DocGiaDAO docGiaDAO;
     private ArrayList<DocGiaDTO> listdocGia;
 
+    // Giới hạn mượn theo loại độc giả
+    private static final int GIOI_HAN_GIANG_VIEN      = 7;
+    private static final int GIOI_HAN_NGHIEN_CUU_SINH = 7;
+    private static final int GIOI_HAN_SINH_VIEN        = 3;
+    private static final int GIOI_HAN_HOC_SINH         = 3;
+    private static final int GIOI_HAN_THUONG           = 2;
+
     public DocGiaBUS() {
         docGiaDAO = new DocGiaDAO();
         listdocGia = docGiaDAO.getAll();
-// BẢO HIỂM CHỐNG LỖI CRASH GIAO DIỆN
         if (listdocGia == null) {
-            listdocGia = new ArrayList<>(); 
+            listdocGia = new ArrayList<>();
             System.out.println("CẢNH BÁO: docGiaDAO.getAll() đang bị lỗi và trả về null!");
         }
     }
-    public String generateMaDocGia() {
-        return docGiaDAO.generateMaDocGia();
-    }
 
-    public ArrayList<DocGiaDTO> getAll() {
-        return docGiaDAO.getAll();
-    }
+    public String generateMaDocGia() { return docGiaDAO.generateMaDocGia(); }
+    public ArrayList<DocGiaDTO> getAll() { return docGiaDAO.getAll(); }
+    public ArrayList<DocGiaDTO> getListDocGia() { return listdocGia; }
 
-    public ArrayList<DocGiaDTO> getListDocGia() {
-        return listdocGia;
-    }
-
-   // Cập nhật luôn hàm reload
     public void reloadFromDB() {
         listdocGia = docGiaDAO.getAll();
-        if (listdocGia == null) {
-            listdocGia = new ArrayList<>();
-        }
+        if (listdocGia == null) listdocGia = new ArrayList<>();
     }
 
     public boolean hasMaDocGia(String maDocGia) {
-        for (DocGiaDTO dg : listdocGia) {
+        for (DocGiaDTO dg : listdocGia)
             if (dg.getMaDocGia().equals(maDocGia)) return true;
-        }
         return false;
     }
 
+    /** Kiểm tra độc giả có bị khóa thẻ không */
     public boolean isDocGiaLocked(String maDocGia) {
         for (DocGiaDTO dg : listdocGia) {
-            if (dg.getMaDocGia().equals(maDocGia)) {
+            if (dg.getMaDocGia().equals(maDocGia))
                 return dg.getIsDeleted() != null && dg.getIsDeleted();
-            }
         }
         return false;
     }
 
-    // ĐÃ SỬA: Thêm maNQL để cấp thẻ thư viện
-    public String addDocGia(DocGiaDTO dg, String maNQL) {
-        if (hasMaDocGia(dg.getMaDocGia())) {
-            return "Mã độc giả đã tồn tại";
+    /**
+     * Kiểm tra độc giả có được phép mượn thêm không.
+     * Trả về null nếu OK, trả về thông báo lỗi nếu không được mượn.
+     */
+    public String kiemTraCoTheMuon(String maDocGia) {
+        // 1. Kiểm tra khóa thẻ
+        if (isDocGiaLocked(maDocGia)) {
+            return "Độc giả " + maDocGia + " đang bị khóa thẻ!\nKhông thể lập phiếu mượn.";
         }
+
+        // 2. Lấy loại độc giả để biết giới hạn
+        String loaiDocGia = "Thường";
+        for (DocGiaDTO dg : listdocGia) {
+            if (dg.getMaDocGia().equals(maDocGia)) {
+                loaiDocGia = dg.getLoaiDocGia() != null ? dg.getLoaiDocGia() : "Thường";
+                break;
+            }
+        }
+        int gioiHan = getGioiHanTheoLoai(loaiDocGia);
+
+        // 3. Đếm số sách đang mượn (query DB để chính xác)
+        int dangMuon = docGiaDAO.demSachDangMuon(maDocGia);
+        if (dangMuon >= gioiHan) {
+            return "Độc giả " + maDocGia + " đang mượn " + dangMuon + "/" + gioiHan + " cuốn (giới hạn "
+                    + loaiDocGia + ").\nVui lòng trả bớt sách trước khi mượn thêm!";
+        }
+
+        return null; // OK, được phép mượn
+    }
+
+    /** Lấy số sách đang mượn hiện tại của độc giả */
+    public int getSachDangMuon(String maDocGia) {
+        return docGiaDAO.demSachDangMuon(maDocGia);
+    }
+
+    /** Lấy giới hạn mượn theo loại độc giả */
+    public int getGioiHanMuon(String maDocGia) {
+        for (DocGiaDTO dg : listdocGia) {
+            if (dg.getMaDocGia().equals(maDocGia)) {
+                String loai = dg.getLoaiDocGia() != null ? dg.getLoaiDocGia() : "Thường";
+                return getGioiHanTheoLoai(loai);
+            }
+        }
+        return GIOI_HAN_THUONG;
+    }
+
+    private int getGioiHanTheoLoai(String loai) {
+        if (loai == null) return GIOI_HAN_THUONG;
+        switch (loai.trim()) {
+            case "Giảng viên":      return GIOI_HAN_GIANG_VIEN;
+            case "Nghiên cứu sinh": return GIOI_HAN_NGHIEN_CUU_SINH;
+            case "Sinh viên":       return GIOI_HAN_SINH_VIEN;
+            case "Học sinh":        return GIOI_HAN_HOC_SINH;
+            default:                return GIOI_HAN_THUONG;
+        }
+    }
+
+    public String addDocGia(DocGiaDTO dg, String maNQL) {
+        if (hasMaDocGia(dg.getMaDocGia())) return "Mã độc giả đã tồn tại";
         if (docGiaDAO.add(dg, maNQL)) {
             listdocGia.add(dg);
             return "Thêm thành công";
@@ -68,12 +118,10 @@ public class DocGiaBUS {
     public String updateDocGia(DocGiaDTO dg) {
         if (!hasMaDocGia(dg.getMaDocGia())) return "Mã độc giả không tồn tại";
         if (isDocGiaLocked(dg.getMaDocGia())) return "Không thể sửa độc giả đang bị khóa";
-        
         if (docGiaDAO.update(dg)) {
             for (int i = 0; i < listdocGia.size(); i++) {
                 if (listdocGia.get(i).getMaDocGia().equals(dg.getMaDocGia())) {
-                    listdocGia.set(i, dg);
-                    break;
+                    listdocGia.set(i, dg); break;
                 }
             }
             return "Cập nhật thành công";
@@ -94,7 +142,6 @@ public class DocGiaBUS {
     public String softDeleteDocGia(String maDocGia) {
         if (!hasMaDocGia(maDocGia)) return "Mã độc giả không tồn tại";
         if (isDocGiaLocked(maDocGia)) return "Độc giả đã bị khóa rồi";
-        
         if (docGiaDAO.softdelete(maDocGia)) {
             for (DocGiaDTO dg : listdocGia) {
                 if (dg.getMaDocGia().equals(maDocGia)) {
@@ -112,11 +159,9 @@ public class DocGiaBUS {
     public String restoreDocGia(String maDocGia) {
         if (!hasMaDocGia(maDocGia)) return "Mã độc giả không tồn tại";
         if (!isDocGiaLocked(maDocGia)) return "Độc giả này chưa bị khóa";
-        
         DocGiaDTO target = null;
-        for (DocGiaDTO dg : listdocGia) {
+        for (DocGiaDTO dg : listdocGia)
             if (dg.getMaDocGia().equals(maDocGia)) { target = dg; break; }
-        }
         if (target == null) return "Không tìm thấy độc giả";
 
         String oldTrangThai = target.getTrangThai();
@@ -127,122 +172,72 @@ public class DocGiaBUS {
         target.setNgayXoa("");
         target.setTrangThai("Đang hoạt động");
 
-        if (docGiaDAO.update(target)) { return "Mở khóa thành công"; }
-        
+        if (docGiaDAO.update(target)) return "Mở khóa thành công";
+
         target.setIsDeleted(oldIsDeleted);
         target.setTrangThai(oldTrangThai);
         target.setNgayXoa(oldNgayXoa);
         return "Mở khóa thất bại";
     }
 
-    public Object[] getThongTinCaNhan(String maDocGia) {
-        return docGiaDAO.getThongTinCaNhan(maDocGia);
-    }
+    public Object[] getThongTinCaNhan(String maDocGia) { return docGiaDAO.getThongTinCaNhan(maDocGia); }
 
     public ArrayList<DocGiaDTO> search(String keyword, String criteria) {
         ArrayList<DocGiaDTO> result = new ArrayList<>();
-        if (listdocGia == null || listdocGia.isEmpty()) {
-            listdocGia = docGiaDAO.getAll();
-        }
-        
+        if (listdocGia == null || listdocGia.isEmpty()) listdocGia = docGiaDAO.getAll();
         String lowerKeyword = keyword.toLowerCase().trim();
-
         for (DocGiaDTO dg : listdocGia) {
             boolean match = false;
-            String ma = dg.getMaDocGia() != null ? dg.getMaDocGia().toLowerCase() : "";
-            String ten = dg.getHoTen() != null ? dg.getHoTen().toLowerCase() : "";
-            String sdt = dg.getSoDienThoai() != null ? dg.getSoDienThoai().toLowerCase() : "";
-            String email = dg.getEmail() != null ? dg.getEmail().toLowerCase() : "";
-            // Lấy chính xác trạng thái từ CSDL (Đang hoạt động, Đã khóa, Đã xóa, Hết hạn...)
-            String trangThai = dg.getTrangThai() != null ? dg.getTrangThai().toLowerCase() : "";
-
+            String ma       = dg.getMaDocGia()      != null ? dg.getMaDocGia().toLowerCase()      : "";
+            String ten      = dg.getHoTen()          != null ? dg.getHoTen().toLowerCase()          : "";
+            String sdt      = dg.getSoDienThoai()    != null ? dg.getSoDienThoai().toLowerCase()    : "";
+            String email    = dg.getEmail()          != null ? dg.getEmail().toLowerCase()          : "";
+            String trangThai= dg.getTrangThai()      != null ? dg.getTrangThai().toLowerCase()      : "";
             switch (criteria) {
-                case "Tất cả":
-                    // Khi chọn "Tất cả", ta tìm kiếm trên mọi cột
-                    if (ma.contains(lowerKeyword) || ten.contains(lowerKeyword) || 
-                        sdt.contains(lowerKeyword) || trangThai.contains(lowerKeyword)) {
-                        match = true;
-                    }
-                    break;
-                case "Mã ĐG": 
-                    match = ma.contains(lowerKeyword); 
-                    break;
-                case "Họ Tên": 
-                    match = ten.contains(lowerKeyword); 
-                    break;
-                case "Số Điện Thoại": 
-                    match = sdt.contains(lowerKeyword); 
-                    break;
-                case "Email":  // <--- THÊM CASE NÀY VÀO 
-                    match = email.contains(lowerKeyword); 
-                    break;
-                case "Trạng Thái": 
-                    // Khi lọc trạng thái, so sánh BẰNG để chính xác (ví dụ "Đã khóa" không được nhầm với "Đã xóa")
-                    match = trangThai.equals(lowerKeyword); 
-                    break;
+                case "Tất cả":       match = ma.contains(lowerKeyword) || ten.contains(lowerKeyword) || sdt.contains(lowerKeyword) || trangThai.contains(lowerKeyword); break;
+                case "Mã ĐG":        match = ma.contains(lowerKeyword);        break;
+                case "Họ Tên":       match = ten.contains(lowerKeyword);       break;
+                case "Số Điện Thoại":match = sdt.contains(lowerKeyword);       break;
+                case "Email":        match = email.contains(lowerKeyword);     break;
+                case "Trạng Thái":   match = trangThai.equals(lowerKeyword);   break;
             }
-
-            // Nếu khớp điều kiện lọc -> Thêm vào danh sách kết quả
-            if (match) {
-                result.add(dg);
-            }
+            if (match) result.add(dg);
         }
-        
         return result;
     }
-    // Cập nhật thông tin liên hệ (SĐT, Email) cho Độc giả
+
     public String updateThongTinLienHe(String maDocGia, String sdt, String email) {
-        if (sdt.trim().isEmpty() || email.trim().isEmpty()) {
-            return "Số điện thoại và Email không được để trống!";
-        }
+        if (sdt.trim().isEmpty() || email.trim().isEmpty()) return "Số điện thoại và Email không được để trống!";
         if (docGiaDAO.updateThongTinLienHe(maDocGia, sdt, email)) {
             for (DocGiaDTO dg : listdocGia) {
-                if (dg.getMaDocGia().equals(maDocGia)) {
-                    dg.setSoDienThoai(sdt);
-                    dg.setEmail(email);
-                    break;
-                }
+                if (dg.getMaDocGia().equals(maDocGia)) { dg.setSoDienThoai(sdt); dg.setEmail(email); break; }
             }
             return "Cập nhật thông tin thành công!";
         }
         return "Cập nhật thất bại. Vui lòng thử lại!";
     }
-   // Kiểm tra xem SĐT đã tồn tại chưa (Loại trừ chính mã độc giả đang cập nhật)
+
     public boolean checkDuplicatePhone(String phone, String maDG) {
-        for (DocGiaDTO dg : listdocGia) {
-            if (dg.getSoDienThoai() != null && dg.getSoDienThoai().equals(phone) && !dg.getMaDocGia().equals(maDG)) {
-                return true; // Bị trùng
-            }
-        }
+        for (DocGiaDTO dg : listdocGia)
+            if (dg.getSoDienThoai() != null && dg.getSoDienThoai().equals(phone) && !dg.getMaDocGia().equals(maDG)) return true;
         return false;
     }
 
-    // Kiểm tra xem Email đã tồn tại chưa
     public boolean checkDuplicateEmail(String email, String maDG) {
-        for (DocGiaDTO dg : listdocGia) {
-            if (dg.getEmail() != null && dg.getEmail().equals(email) && !dg.getMaDocGia().equals(maDG)) {
-                return true; // Bị trùng
-            }
-        }
+        for (DocGiaDTO dg : listdocGia)
+            if (dg.getEmail() != null && dg.getEmail().equals(email) && !dg.getMaDocGia().equals(maDG)) return true;
         return false;
     }
+
     public String xoaMemDocGia(String maDocGia) {
         if (!hasMaDocGia(maDocGia)) return "Mã độc giả không tồn tại";
-        
-        // 1. Kiểm tra nghiệp vụ
         String dieuKien = docGiaDAO.kiemTraDieuKienXoa(maDocGia);
-        if (!dieuKien.equals("OK")) {
-            return dieuKien; // Bị vướng quy định (trả sách / nộp phạt) thì báo lỗi ngay
-        }
-
-        // 2. Chấp nhận cho xóa (ẩn)
+        if (!dieuKien.equals("OK")) return dieuKien;
         if (docGiaDAO.xoaMemThanhDaXoa(maDocGia)) {
             for (DocGiaDTO dg : listdocGia) {
                 if (dg.getMaDocGia().equals(maDocGia)) {
-                    dg.setIsDeleted(true);
-                    dg.setTrangThai("Đã xóa");
-                    dg.setNgayXoa(java.time.LocalDate.now().toString());
-                    break;
+                    dg.setIsDeleted(true); dg.setTrangThai("Đã xóa");
+                    dg.setNgayXoa(java.time.LocalDate.now().toString()); break;
                 }
             }
             return "Xóa thành công";
