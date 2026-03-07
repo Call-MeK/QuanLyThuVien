@@ -15,9 +15,9 @@ public class SachDAO {
         List<SachDTO> list = new ArrayList<>();
         // SỬA LỖI: Đếm SoLuong từ bảng SACHCOPY thay vì lấy trực tiếp từ bảng SACH
         String sql = "SELECT s.*, " +
-                     "(SELECT COUNT(*) FROM SACHCOPY sc WHERE sc.MaSach = s.MaSach AND sc.IsDeleted = 0) AS SoLuong " +
-                     "FROM SACH s WHERE s.isdeleted = 0";
-        
+                 "(SELECT COUNT(*) FROM SACHCOPY sc WHERE RTRIM(sc.MaSach) = RTRIM(s.MaSach) AND sc.IsDeleted = 0) AS SoLuong " +
+                 "FROM SACH s WHERE s.isdeleted = 0";
+    
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -68,55 +68,56 @@ public class SachDAO {
     }
 
     public List<Object[]> getDanhSachDayDu() {
-        List<Object[]> list = new ArrayList<>();
-        // SỬA LỖI: Đếm số lượng từ SACHCOPY (những cuốn chưa bị xóa)
-        String sql = 
-    "SELECT s.MaSach, s.tenSach, " +
-    "       ISNULL(tl.TenTheLoai, s.TheLoai) AS TenTheLoai, " +
-    "       ISNULL(n.TenNXB, s.MaNXB) AS TenNXB, " +
-    "       s.NamXB, s.NgonNgu, s.GiaBia, " +
-    "       ISNULL(STUFF((" +
-    "           SELECT ', ' + tg.TenTacGia " +
-    "           FROM TACGIA tg " +
-    "           JOIN SACH_TACGIA st ON tg.MaTacGia = st.MaTacGia " +
-    "           WHERE st.MaSach = s.MaSach " +
-    "           FOR XML PATH(''), TYPE).value('.','NVARCHAR(MAX)'), 1, 2, ''), " +
-    "       N'Chưa cập nhật') AS TenTacGia, " +
-    "       (SELECT COUNT(*) FROM SACHCOPY sc " +
-    "        WHERE sc.MaSach = s.MaSach " +
-    "        AND sc.IsDeleted = 0 " +
-    "        AND sc.TinhTrang = N'Tốt' " +
-    "        AND RTRIM(sc.MaVach) NOT IN (" +
-    "            SELECT RTRIM(ct.MaCuonSach) " +
-    "            FROM CHITIETPHIEUMUON ct " +
-    "            JOIN PHIEUMUON pm ON ct.MaPM = pm.MaPM " +
-    "            WHERE pm.TinhTrang = N'Đang mượn'" +
-    "        )) AS SoLuong " +
-    "FROM SACH s " +
-    "LEFT JOIN THELOAI tl ON s.TheLoai = tl.MaTheLoai " +
-    "LEFT JOIN NHAXUATBAN n ON s.MaNXB = n.MaNXB " +
-    "WHERE s.isdeleted = 0 " +
-    "ORDER BY s.MaSach";
-            
-        try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(new Object[]{
-                    rs.getString("MaSach"),
-                    rs.getString("tenSach"),
-                    rs.getString("TenTheLoai"),
-                    rs.getString("TenNXB"),
-                    rs.getInt("NamXB"),
-                    rs.getString("NgonNgu"),
-                    String.format("%,.0f đ", rs.getFloat("GiaBia")),
-                    rs.getString("TenTacGia"),
-                    rs.getInt("SoLuong")
-                });
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-        return list;
-    }
+    List<Object[]> list = new ArrayList<>();
+    // SỬA LỖI 0: Dùng NOT EXISTS thay cho NOT IN và thêm RTRIM(sc.MaSach) = RTRIM(s.MaSach)
+    String sql = 
+"SELECT s.MaSach, s.tenSach, " +
+"       ISNULL(tl.TenTheLoai, s.TheLoai) AS TenTheLoai, " +
+"       ISNULL(n.TenNXB, s.MaNXB) AS TenNXB, " +
+"       s.NamXB, s.NgonNgu, s.GiaBia, " +
+"       ISNULL(STUFF((" +
+"           SELECT ', ' + tg.TenTacGia " +
+"           FROM TACGIA tg " +
+"           JOIN SACH_TACGIA st ON tg.MaTacGia = st.MaTacGia " +
+"           WHERE RTRIM(st.MaSach) = RTRIM(s.MaSach) " +
+"           FOR XML PATH(''), TYPE).value('.','NVARCHAR(MAX)'), 1, 2, ''), " +
+"       N'Chưa cập nhật') AS TenTacGia, " +
+"       (SELECT COUNT(*) FROM SACHCOPY sc " +
+"        WHERE RTRIM(sc.MaSach) = RTRIM(s.MaSach) " +
+"        AND sc.IsDeleted = 0 " +
+"        AND sc.TinhTrang = N'Tốt' " +
+"        AND NOT EXISTS (" +
+"            SELECT 1 " +
+"            FROM CHITIETPHIEUMUON ct " +
+"            JOIN PHIEUMUON pm ON ct.MaPM = pm.MaPM " +
+"            WHERE pm.TinhTrang = N'Đang mượn' " +
+"            AND RTRIM(ct.MaCuonSach) = RTRIM(sc.MaVach)" +
+"        )) AS SoLuong " +
+"FROM SACH s " +
+"LEFT JOIN THELOAI tl ON s.TheLoai = tl.MaTheLoai " +
+"LEFT JOIN NHAXUATBAN n ON s.MaNXB = n.MaNXB " +
+"WHERE s.isdeleted = 0 " +
+"ORDER BY s.MaSach";
+        
+    try (Connection con = DatabaseConnection.getConnection();
+         PreparedStatement ps = con.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+            list.add(new Object[]{
+                rs.getString("MaSach"),
+                rs.getString("tenSach"),
+                rs.getString("TenTheLoai"),
+                rs.getString("TenNXB"),
+                rs.getInt("NamXB"),
+                rs.getString("NgonNgu"),
+                String.format("%,.0f đ", rs.getFloat("GiaBia")),
+                rs.getString("TenTacGia"),
+                rs.getInt("SoLuong")
+            });
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+    return list;
+}
 
     public boolean isDangMuon(String maSach) {
         String sql =
