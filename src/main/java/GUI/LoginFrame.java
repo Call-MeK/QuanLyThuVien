@@ -31,9 +31,7 @@ public class LoginFrame extends JFrame {
         JPanel mainPanel = new JPanel(new GridLayout(1, 2));
         mainPanel.setBackground(Color.WHITE);
 
-        // ==========================================
-        // 1. LEFT PANEL (Branding)
-        // ==========================================
+        // LEFT PANEL
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.setBackground(colorPrimary);
 
@@ -66,9 +64,7 @@ public class LoginFrame extends JFrame {
         leftPanel.add(brandingPanel, BorderLayout.NORTH);
         leftPanel.add(lblImage, BorderLayout.CENTER);
 
-        // ==========================================
-        // 2. RIGHT PANEL (Form Đăng Nhập)
-        // ==========================================
+        // RIGHT PANEL
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
         rightPanel.setBackground(Color.WHITE);
@@ -114,50 +110,20 @@ public class LoginFrame extends JFrame {
                 BorderFactory.createLineBorder(new Color(206, 212, 218), 1, true),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 
-        final JToggleButton btnTogglePass = new JToggleButton();
+        final JToggleButton btnTogglePass = new JToggleButton("Hiện");
         btnTogglePass.setBackground(Color.WHITE);
         btnTogglePass.setFocusPainted(false);
         btnTogglePass.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
         btnTogglePass.setPreferredSize(new Dimension(60, 40));
         btnTogglePass.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        ImageIcon iconS = null;
-        ImageIcon iconH = null;
-        try {
-            ImageIcon sIcon = new ImageIcon(getClass().getResource("/Images/showpassword.jpg"));
-            iconS = new ImageIcon(sIcon.getImage().getScaledInstance(30, 20, Image.SCALE_SMOOTH));
-
-            ImageIcon hIcon = new ImageIcon(getClass().getResource("/Images/hidepassword.jpg"));
-            iconH = new ImageIcon(hIcon.getImage().getScaledInstance(30, 20, Image.SCALE_SMOOTH));
-
-            btnTogglePass.setIcon(iconS);
-        } catch (Exception e) {
-            btnTogglePass.setText("Hiện");
-        }
-
-        final ImageIcon iconShow = iconS;
-        final ImageIcon iconHide = iconH;
-
-        btnTogglePass.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                if (btnTogglePass.isSelected()) {
-                    txtPassword.setEchoChar((char) 0); // Hiển thị mật khẩu
-                    if (iconHide != null) {
-                        btnTogglePass.setIcon(iconHide);
-                        btnTogglePass.setText("");
-                    } else {
-                        btnTogglePass.setText("Ẩn");
-                    }
-                } else {
-                    txtPassword.setEchoChar('•'); // Ẩn mật khẩu (ký tự mặc định)
-                    if (iconShow != null) {
-                        btnTogglePass.setIcon(iconShow);
-                        btnTogglePass.setText("");
-                    } else {
-                        btnTogglePass.setText("Hiện");
-                    }
-                }
+        btnTogglePass.addActionListener(ev -> {
+            if (btnTogglePass.isSelected()) {
+                txtPassword.setEchoChar((char) 0);
+                btnTogglePass.setText("Ẩn");
+            } else {
+                txtPassword.setEchoChar('•');
+                btnTogglePass.setText("Hiện");
             }
         });
 
@@ -166,10 +132,9 @@ public class LoginFrame extends JFrame {
 
         JLabel lblRole = new JLabel("Vai trò:");
         lblRole.setFont(labelFont);
-        JComboBox<String> cbRole = new JComboBox<String>(new String[] { "Độc giả (User)", "Quản trị viên (Admin)" });
+        JComboBox<String> cbRole = new JComboBox<>(new String[]{"Độc giả (User)", "Quản trị viên (Admin)"});
         cbRole.setFont(inputFont);
         cbRole.setBackground(Color.WHITE);
-        cbRole.setPreferredSize(new Dimension(300, 40));
 
         formPanel.add(lblUsername);
         formPanel.add(txtUsername);
@@ -187,24 +152,15 @@ public class LoginFrame extends JFrame {
         btnLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLogin.setMaximumSize(new Dimension(350, 45));
-        
         this.getRootPane().setDefaultButton(btnLogin);
 
         btnLogin.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent evt) {
-                btnLogin.setBackground(new Color(11, 94, 215));
-            }
-
-            public void mouseExited(MouseEvent evt) {
-                btnLogin.setBackground(colorPrimary);
-            }
+            public void mouseEntered(MouseEvent evt) { btnLogin.setBackground(new Color(11, 94, 215)); }
+            public void mouseExited(MouseEvent evt)  { btnLogin.setBackground(colorPrimary); }
         });
 
-        // ==========================================
-        // SỰ KIỆN ĐĂNG NHẬP - ĐÃ SỬA: LƯU SESSION + TRUYỀN MÃ
-        // ==========================================
         btnLogin.addActionListener(e -> {
-            String username = txtUsername.getText();
+            String username = txtUsername.getText().trim();
             String password = new String(txtPassword.getPassword());
             String role = (String) cbRole.getSelectedItem();
 
@@ -221,35 +177,62 @@ public class LoginFrame extends JFrame {
             String loggedInUserName = "";
             String userRolePrefix = role.equals("Quản trị viên (Admin)") ? "NV" : "DG";
 
-            for (ConNguoiDTO cn : cnBus.getListConNguoi()) {
-                if (cn.getTenDangNhap().equals(username) && cn.getMatKhau().equals(password)) {
-                    if (cn.getMaNguoi().startsWith(userRolePrefix)) {
-                        loginSuccess = true;
-                        loggedInUserId = cn.getMaNguoi();
-                        loggedInUserName = cn.getHoTen();
-                        break;
+            try {
+                for (ConNguoiDTO cn : cnBus.getListConNguoi()) {
+                    if (cn.getTenDangNhap().equals(username) && cn.getMatKhau().equals(password)) {
+                        if (cn.getMaNguoi().startsWith(userRolePrefix)) {
+                            loginSuccess = true;
+                            loggedInUserId = cn.getMaNguoi();
+                            loggedInUserName = cn.getHoTen();
+                            break;
+                        }
                     }
                 }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this,
+                        "Lỗi kết nối cơ sở dữ liệu:\n" + ex.getMessage(),
+                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
             }
 
             if (loginSuccess) {
-    if (role.equals("Quản trị viên (Admin)")) {
-        SessionManager.getInstance().login(loggedInUserId, loggedInUserName, "Admin");
-        JOptionPane.showMessageDialog(this, "Đăng nhập Admin thành công!\nXin chào " + loggedInUserName,
-                "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-        new AdminFrame(loggedInUserId).setVisible(true);
-    } else {
-        SessionManager.getInstance().login(loggedInUserId, loggedInUserName, "DocGia");
-        JOptionPane.showMessageDialog(this, "Đăng nhập thành công!\nXin chào " + loggedInUserName,
-                "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-        new UserHomeFrame(loggedInUserId).setVisible(true);
-    }
-    this.dispose();
-} else {
-    JOptionPane.showMessageDialog(this,
-            "Sai tên đăng nhập, mật khẩu hoặc sai vai trò!",
-            "Lỗi", JOptionPane.ERROR_MESSAGE);
-}
+                if (role.equals("Quản trị viên (Admin)")) {
+                    SessionManager.getInstance().login(loggedInUserId, loggedInUserName, "Admin");
+                    JOptionPane.showMessageDialog(this,
+                            "Đăng nhập Admin thành công!\nXin chào " + loggedInUserName,
+                            "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                    try {
+                        AdminFrame adminFrame = new AdminFrame(loggedInUserId);
+                        adminFrame.setVisible(true);
+                        this.dispose();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(this,
+                                "Lỗi mở giao diện Admin:\n" + ex.getMessage(),
+                                "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    SessionManager.getInstance().login(loggedInUserId, loggedInUserName, "DocGia");
+                    JOptionPane.showMessageDialog(this,
+                            "Đăng nhập thành công!\nXin chào " + loggedInUserName,
+                            "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                    try {
+                        UserHomeFrame userFrame = new UserHomeFrame(loggedInUserId);
+                        userFrame.setVisible(true);
+                        this.dispose();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(this,
+                                "Lỗi mở giao diện Độc Giả:\n" + ex.getMessage(),
+                                "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "Sai tên đăng nhập, mật khẩu hoặc sai vai trò!",
+                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         rightPanel.add(Box.createVerticalStrut(20));
@@ -271,9 +254,7 @@ public class LoginFrame extends JFrame {
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        } catch (Exception ex) { ex.printStackTrace(); }
         SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
     }
 }

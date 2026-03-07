@@ -45,13 +45,16 @@ public class DocGiaBUS {
     }
 
     public boolean isDocGiaLocked(String maDocGia) {
-        for (DocGiaDTO dg : listdocGia) {
-            if (dg.getMaDocGia().equals(maDocGia)) {
-                return dg.getIsDeleted() != null && dg.getIsDeleted();
-            }
+    for (DocGiaDTO dg : listdocGia) {
+        if (dg.getMaDocGia().trim().equals(maDocGia.trim())) {
+            boolean isDeletedFlag = dg.getIsDeleted() != null && dg.getIsDeleted();
+            boolean trangThaiKhoa = "Bị khóa".equalsIgnoreCase(dg.getTrangThai())
+                    || "Đã khóa".equalsIgnoreCase(dg.getTrangThai());
+            return isDeletedFlag || trangThaiKhoa;
         }
-        return false;
     }
+    return false;
+}
 
     // ĐÃ SỬA: Thêm maNQL để cấp thẻ thư viện
     public String addDocGia(DocGiaDTO dg, String maNQL) {

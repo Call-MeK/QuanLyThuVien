@@ -71,23 +71,32 @@ public class SachDAO {
         List<Object[]> list = new ArrayList<>();
         // SỬA LỖI: Đếm số lượng từ SACHCOPY (những cuốn chưa bị xóa)
         String sql = 
-            "SELECT s.MaSach, s.tenSach, " +
-            "       ISNULL(tl.TenTheLoai, s.TheLoai)  AS TenTheLoai, " +
-            "       ISNULL(n.TenNXB,      s.MaNXB)    AS TenNXB, " +
-            "       s.NamXB, s.NgonNgu, s.GiaBia, " +
-            "       ISNULL(STUFF((" +
-            "           SELECT ', ' + tg.TenTacGia " +
-            "           FROM TACGIA tg " +
-            "           JOIN SACH_TACGIA st ON tg.MaTacGia = st.MaTacGia " +
-            "           WHERE st.MaSach = s.MaSach " +
-            "           FOR XML PATH(''), TYPE).value('.','NVARCHAR(MAX)'), 1, 2, ''), " +
-            "       N'Chưa cập nhật') AS TenTacGia, " +
-            "       (SELECT COUNT(*) FROM SACHCOPY sc WHERE sc.MaSach = s.MaSach AND sc.IsDeleted = 0) AS SoLuong " + 
-            "FROM SACH s " +
-            "LEFT JOIN THELOAI      tl ON s.TheLoai = tl.MaTheLoai " +
-            "LEFT JOIN NHAXUATBAN   n  ON s.MaNXB   = n.MaNXB " +
-            "WHERE s.isdeleted = 0 " +
-            "ORDER BY s.MaSach";
+    "SELECT s.MaSach, s.tenSach, " +
+    "       ISNULL(tl.TenTheLoai, s.TheLoai) AS TenTheLoai, " +
+    "       ISNULL(n.TenNXB, s.MaNXB) AS TenNXB, " +
+    "       s.NamXB, s.NgonNgu, s.GiaBia, " +
+    "       ISNULL(STUFF((" +
+    "           SELECT ', ' + tg.TenTacGia " +
+    "           FROM TACGIA tg " +
+    "           JOIN SACH_TACGIA st ON tg.MaTacGia = st.MaTacGia " +
+    "           WHERE st.MaSach = s.MaSach " +
+    "           FOR XML PATH(''), TYPE).value('.','NVARCHAR(MAX)'), 1, 2, ''), " +
+    "       N'Chưa cập nhật') AS TenTacGia, " +
+    "       (SELECT COUNT(*) FROM SACHCOPY sc " +
+    "        WHERE sc.MaSach = s.MaSach " +
+    "        AND sc.IsDeleted = 0 " +
+    "        AND sc.TinhTrang = N'Tốt' " +
+    "        AND RTRIM(sc.MaVach) NOT IN (" +
+    "            SELECT RTRIM(ct.MaCuonSach) " +
+    "            FROM CHITIETPHIEUMUON ct " +
+    "            JOIN PHIEUMUON pm ON ct.MaPM = pm.MaPM " +
+    "            WHERE pm.TinhTrang = N'Đang mượn'" +
+    "        )) AS SoLuong " +
+    "FROM SACH s " +
+    "LEFT JOIN THELOAI tl ON s.TheLoai = tl.MaTheLoai " +
+    "LEFT JOIN NHAXUATBAN n ON s.MaNXB = n.MaNXB " +
+    "WHERE s.isdeleted = 0 " +
+    "ORDER BY s.MaSach";
             
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
