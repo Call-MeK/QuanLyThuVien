@@ -18,7 +18,7 @@ public class DatabaseConnection {
             // Cấu hình URL kết nối
             String URL = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyThuVien;trustServerCertificate=true";
             String UserName = "sa";
-            String Password = "sa"; // Đã cập nhật mật khẩu của bạn
+            String Password = "nhiheo"; // Đã cập nhật mật khẩu của bạn
 
             // Kiểm tra nếu kết nối chưa tồn tại hoặc đã bị đóng thì tạo mới
             if (connection == null || connection.isClosed()) {
