@@ -24,12 +24,11 @@ public class UserHomeFrame extends JFrame {
 
     private String previousCard = "TrangChu";
     private String maDocGiaDangNhap = "";
-    private boolean isBiKhoa = false; // Trạng thái khóa thẻ
+    private boolean isBiKhoa = false;
 
     public UserHomeFrame(String maDocGia) {
         this.maDocGiaDangNhap = maDocGia;
 
-        // Kiểm tra trạng thái khóa ngay khi mở app
         DocGiaBUS docGiaBUS = new DocGiaBUS();
         this.isBiKhoa = docGiaBUS.isDocGiaLocked(maDocGia);
 
@@ -45,13 +44,11 @@ public class UserHomeFrame extends JFrame {
             panelThongTin.loadData(this.maDocGiaDangNhap);
         }
 
-        // Hiện banner cảnh báo nếu bị khóa
         if (isBiKhoa) {
             showLockBanner();
         }
     }
 
-    // Hiện banner đỏ cảnh báo tài khoản bị khóa ở đầu cửa sổ
     private void showLockBanner() {
         JPanel banner = new JPanel(new BorderLayout());
         banner.setBackground(new Color(220, 53, 69));
@@ -70,7 +67,6 @@ public class UserHomeFrame extends JFrame {
         banner.add(lblIcon, BorderLayout.WEST);
         banner.add(lblMsg, BorderLayout.CENTER);
 
-        // Thêm banner vào đầu cửa sổ
         add(banner, BorderLayout.NORTH);
         revalidate();
     }
@@ -93,12 +89,12 @@ public class UserHomeFrame extends JFrame {
         logoLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         menuPanel.add(logoLabel);
 
-        JButton btnTrangChu    = createMenuButton("Trang Chủ");
-        JButton btnTimSach     = createMenuButton("Tìm Sách");
-        JButton btnSachDangMuon= createMenuButton("Sách Đang Mượn");
-        JButton btnPhieuPhat   = createMenuButton("Phiếu Phạt & Thanh Toán");
-        JButton btnThongTin    = createMenuButton("Thông Tin Cá Nhân");
-        JButton btnDangXuat    = createMenuButton("Đăng Xuất");
+        JButton btnTrangChu     = createMenuButton("Trang Chủ");
+        JButton btnTimSach      = createMenuButton("Tìm Sách");
+        JButton btnSachDangMuon = createMenuButton("Sách Đang Mượn");
+        JButton btnPhieuPhat    = createMenuButton("Phiếu Phạt & Thanh Toán");
+        JButton btnThongTin     = createMenuButton("Thông Tin Cá Nhân");
+        JButton btnDangXuat     = createMenuButton("Đăng Xuất");
         btnDangXuat.setForeground(new Color(248, 113, 113));
 
         menuPanel.add(btnTrangChu);
@@ -123,18 +119,16 @@ public class UserHomeFrame extends JFrame {
         panelThongTin        = new ThongTinCaNhanPanel();
         panelChiTietSach     = new ChiTietSachPanel();
 
-        mainContentPanel.add(panelTrangChu,    "TrangChu");
-        mainContentPanel.add(panelTimSach,     "TimSach");
-        mainContentPanel.add(panelSachDangMuon,"SachDangMuon");
-        mainContentPanel.add(panelPhieuPhat,   "PhieuPhat");
-        mainContentPanel.add(panelThongTin,    "ThongTin");
-        mainContentPanel.add(panelChiTietSach, "ChiTietSach");
+        mainContentPanel.add(panelTrangChu,     "TrangChu");
+        mainContentPanel.add(panelTimSach,      "TimSach");
+        mainContentPanel.add(panelSachDangMuon, "SachDangMuon");
+        mainContentPanel.add(panelPhieuPhat,    "PhieuPhat");
+        mainContentPanel.add(panelThongTin,     "ThongTin");
+        mainContentPanel.add(panelChiTietSach,  "ChiTietSach");
 
-        // Quay lại từ Chi Tiết Sách
         panelChiTietSach.getBtnQuayLai().addActionListener(e ->
                 cardLayout.show(mainContentPanel, previousCard));
 
-        // Nút Mượn Sách trong Chi Tiết
         panelChiTietSach.getBtnMuonSach().addActionListener(e -> {
             if (isBiKhoa) {
                 JOptionPane.showMessageDialog(UserHomeFrame.this,
@@ -149,26 +143,11 @@ public class UserHomeFrame extends JFrame {
         });
 
         // 3. SỰ KIỆN CHUYỂN TRANG
-        btnTrangChu.addActionListener(e -> {
-            cardLayout.show(mainContentPanel, "TrangChu");
-            previousCard = "TrangChu";
-        });
-        btnTimSach.addActionListener(e -> {
-            cardLayout.show(mainContentPanel, "TimSach");
-            previousCard = "TimSach";
-        });
-        btnSachDangMuon.addActionListener(e -> {
-            cardLayout.show(mainContentPanel, "SachDangMuon");
-            previousCard = "SachDangMuon";
-        });
-        btnPhieuPhat.addActionListener(e -> {
-            cardLayout.show(mainContentPanel, "PhieuPhat");
-            previousCard = "PhieuPhat";
-        });
-        btnThongTin.addActionListener(e -> {
-            cardLayout.show(mainContentPanel, "ThongTin");
-            previousCard = "ThongTin";
-        });
+        btnTrangChu.addActionListener(e -> { cardLayout.show(mainContentPanel, "TrangChu");    previousCard = "TrangChu"; });
+        btnTimSach.addActionListener(e ->  { cardLayout.show(mainContentPanel, "TimSach");     previousCard = "TimSach"; });
+        btnSachDangMuon.addActionListener(e -> { cardLayout.show(mainContentPanel, "SachDangMuon"); previousCard = "SachDangMuon"; });
+        btnPhieuPhat.addActionListener(e -> { cardLayout.show(mainContentPanel, "PhieuPhat");  previousCard = "PhieuPhat"; });
+        btnThongTin.addActionListener(e ->  { cardLayout.show(mainContentPanel, "ThongTin");   previousCard = "ThongTin"; });
         btnDangXuat.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(UserHomeFrame.this,
                     "Bạn có muốn đăng xuất không?", "Xác nhận", JOptionPane.YES_NO_OPTION);
@@ -183,6 +162,7 @@ public class UserHomeFrame extends JFrame {
         add(mainContentPanel, BorderLayout.CENTER);
 
         // Xem chi tiết từ Tìm Sách
+        // Cột bảng: 0=MaSach, 1=TenSach, 2=TacGia, 3=TheLoai, 4=NXB, 5=ConSan
         panelTimSach.getBtnXemChiTiet().addActionListener(e -> {
             JTable t = panelTimSach.getTable();
             int row = t.getSelectedRow();
@@ -190,11 +170,12 @@ public class UserHomeFrame extends JFrame {
                 JOptionPane.showMessageDialog(UserHomeFrame.this, "Vui lòng chọn 1 sách trong bảng!");
             } else {
                 panelChiTietSach.setThongTinSach(
-                        t.getValueAt(row, 1).toString(),
-                        t.getValueAt(row, 2).toString(),
-                        t.getValueAt(row, 3).toString(),
-                        "NXB Mặc Định", "2023",
-                        t.getValueAt(row, 4).toString(),
+                        t.getValueAt(row, 1).toString(),  // Tên sách
+                        t.getValueAt(row, 2).toString(),  // Tác giả
+                        t.getValueAt(row, 3).toString(),  // Thể loại
+                        t.getValueAt(row, 4).toString(),  // NXB ✅
+                        "—",                              // Năm XB (bảng không có)
+                        t.getValueAt(row, 5).toString(),  // Còn X cuốn ✅ FIX
                         "Mô tả chi tiết cho sách: " + t.getValueAt(row, 1));
                 previousCard = "TimSach";
                 cardLayout.show(mainContentPanel, "ChiTietSach");
@@ -215,7 +196,6 @@ public class UserHomeFrame extends JFrame {
         JPanel centerPanel = new JPanel(new BorderLayout(0, 20));
         centerPanel.setBackground(new Color(248, 250, 252));
 
-        // Banner ảnh welcome
         JLabel banner = new JLabel("", SwingConstants.CENTER);
         banner.setOpaque(true);
         banner.setBackground(new Color(226, 232, 240));
@@ -227,9 +207,7 @@ public class UserHomeFrame extends JFrame {
                 Image img = originalIcon.getImage().getScaledInstance(900, 150, Image.SCALE_SMOOTH);
                 banner.setIcon(new ImageIcon(img));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) { e.printStackTrace(); }
         centerPanel.add(banner, BorderLayout.NORTH);
 
         JPanel booksArea = new JPanel(new BorderLayout(0, 15));
@@ -274,6 +252,11 @@ public class UserHomeFrame extends JFrame {
         String category = sach.getTheLoai() != null ? sach.getTheLoai() : "Khác";
         String namXB    = String.valueOf(sach.getNamXB());
 
+        // Đếm số bản sao còn sẵn cho card trang chủ
+        DAO.SachCopyDAO sachCopyDAO = new DAO.SachCopyDAO();
+        java.util.List<DTO.SachCopyDTO> dsBanSao = sachCopyDAO.getAvailable(sach.getMaSach());
+        String tinhTrang = dsBanSao.isEmpty() ? "Hết sách" : "Còn " + dsBanSao.size() + " cuốn";
+
         JPanel card = new JPanel(new BorderLayout(0, 5));
         card.setBackground(Color.WHITE);
         card.setPreferredSize(new Dimension(180, 250));
@@ -313,16 +296,20 @@ public class UserHomeFrame extends JFrame {
         btn.setFocusPainted(false);
         btn.setBorderPainted(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
         btn.addMouseListener(new MouseAdapter() {
             @Override public void mouseEntered(MouseEvent e) { btn.setBackground(new Color(79, 70, 229)); }
             @Override public void mouseExited(MouseEvent e)  { btn.setBackground(new Color(99, 102, 241)); }
         });
 
+        String finalTinhTrang = tinhTrang;
         btn.addActionListener(e -> {
             panelChiTietSach.setThongTinSach(
-                    title, "Nhiều tác giả", category,
-                    sach.getMaNXB(), namXB, "Sẵn sàng",
+                    title,
+                    "Nhiều tác giả",
+                    category,
+                    sach.getMaNXB(),
+                    namXB,
+                    finalTinhTrang,   // ✅ Dùng số bản sao thực tế
                     "Mã sách: " + sach.getMaSach()
                     + "\nGiá bìa: " + sach.getGiaBia() + " VNĐ"
                     + "\nNgôn ngữ: " + sach.getNgonNgu());
