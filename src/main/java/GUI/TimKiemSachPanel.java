@@ -3,14 +3,12 @@ package GUI;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.util.List;
 import BUS.SachBUS;
 import BUS.TheLoaiBUS;
 import BUS.NhaXuatBanBUS;
+import DAO.SachCopyDAO;
 import DTO.SachDTO;
 import DTO.TheLoaiDTO;
 import DTO.NhaXuatBanDTO;
@@ -31,9 +29,7 @@ public class TimKiemSachPanel extends JPanel {
         setBackground(Color.WHITE);
         setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30));
 
-        // ==========================================
-        // PHẦN TRÊN: TIÊU ĐỀ & THANH TÌM KIẾM
-        // ==========================================
+        // PHẦN TRÊN
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.setBackground(Color.WHITE);
@@ -61,15 +57,12 @@ public class TimKiemSachPanel extends JPanel {
         txtSearch.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent evt) {
                 if (txtSearch.getText().equals(placeholderText)) {
-                    txtSearch.setText("");
-                    txtSearch.setForeground(Color.BLACK);
+                    txtSearch.setText(""); txtSearch.setForeground(Color.BLACK);
                 }
             }
-
             public void focusLost(FocusEvent evt) {
                 if (txtSearch.getText().isEmpty()) {
-                    txtSearch.setForeground(Color.GRAY);
-                    txtSearch.setText(placeholderText);
+                    txtSearch.setForeground(Color.GRAY); txtSearch.setText(placeholderText);
                 }
             }
         });
@@ -79,8 +72,7 @@ public class TimKiemSachPanel extends JPanel {
         btnSearch.setFont(new Font(tenFont, Font.BOLD, 13));
         btnSearch.setBackground(new Color(13, 110, 253));
         btnSearch.setForeground(Color.WHITE);
-        btnSearch.setFocusPainted(false);
-        btnSearch.setBorderPainted(false);
+        btnSearch.setFocusPainted(false); btnSearch.setBorderPainted(false);
         btnSearch.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         searchBoxPanel.add(txtSearch);
@@ -94,15 +86,14 @@ public class TimKiemSachPanel extends JPanel {
         JLabel lblFilter = new JLabel("Lọc theo:");
         lblFilter.setFont(new Font(tenFont, Font.PLAIN, 14));
 
-        final JComboBox<String> cbType = new JComboBox<>(new String[] {
-                "Tất cả", "Văn học - Tiểu thuyết", "Khoa học - Công nghệ", "Lịch sử - Địa lý"
+        final JComboBox<String> cbType = new JComboBox<>(new String[]{
+            "Tất cả", "Văn học", "Khoa học", "Kỹ năng sống", "Lịch sử"
         });
         cbType.setPreferredSize(new Dimension(200, 30));
         cbType.setFont(new Font(tenFont, Font.PLAIN, 13));
         cbType.setBackground(Color.WHITE);
 
-        filterPanel.add(lblFilter);
-        filterPanel.add(cbType);
+        filterPanel.add(lblFilter); filterPanel.add(cbType);
 
         topPanel.add(lblTitle);
         topPanel.add(Box.createVerticalStrut(5));
@@ -112,50 +103,49 @@ public class TimKiemSachPanel extends JPanel {
         topPanel.add(Box.createVerticalStrut(15));
         topPanel.add(filterPanel);
 
-        // ==========================================
-        // PHẦN DƯỚI: KẾT QUẢ TÌM KIẾM
-        // ==========================================
-        String[] cols = { "Mã Sách", "Tên Sách", "Tác Giả", "Thể Loại", "NXB", "Tình Trạng" };
-        model = new DefaultTableModel(cols, 0);
+        // BẢNG KẾT QUẢ - FIX: isCellEditable = false
+        String[] cols = {"Mã Sách", "Tên Sách", "Tác Giả", "Thể Loại", "NXB", "Còn Sẵn"};
+        model = new DefaultTableModel(cols, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
 
         loadData("", "Tất cả");
 
-        // Gắn sự kiện tìm kiếm
-        btnSearch.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String kw = txtSearch.getText();
-                if (kw.equals(placeholderText)) {
-                    kw = "";
-                }
-                loadData(kw, cbType.getSelectedItem().toString());
-            }
+        btnSearch.addActionListener(e -> {
+            String kw = txtSearch.getText().equals(placeholderText) ? "" : txtSearch.getText();
+            loadData(kw, cbType.getSelectedItem().toString());
         });
-
-        cbType.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String kw = txtSearch.getText();
-                if (kw.equals(placeholderText)) {
-                    kw = "";
-                }
-                loadData(kw, cbType.getSelectedItem().toString());
-            }
+        cbType.addActionListener(e -> {
+            String kw = txtSearch.getText().equals(placeholderText) ? "" : txtSearch.getText();
+            loadData(kw, cbType.getSelectedItem().toString());
         });
-
-        // Bắt sự kiện nhấn enter ở trường nhập text
-        txtSearch.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                btnSearch.doClick();
-            }
-        });
+        txtSearch.addActionListener(e -> btnSearch.doClick());
 
         table = new JTable(model);
         table.setRowHeight(30);
         table.getTableHeader().setFont(new Font(tenFont, Font.BOLD, 14));
         table.getTableHeader().setBackground(new Color(241, 245, 249));
         table.setFont(new Font(tenFont, Font.PLAIN, 14));
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        // Tô màu cột "Còn Sẵn"
+        table.getColumnModel().getColumn(5).setCellRenderer(new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable t, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int col) {
+                Component c = super.getTableCellRendererComponent(t, value, isSelected, hasFocus, row, col);
+                if (!isSelected) {
+                    String v = value != null ? value.toString() : "";
+                    if (v.startsWith("0") || v.equals("Hết sách")) {
+                        c.setForeground(new Color(220, 53, 69));
+                    } else {
+                        c.setForeground(new Color(25, 135, 84));
+                    }
+                }
+                return c;
+            }
+        });
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.getViewport().setBackground(Color.WHITE);
@@ -166,20 +156,13 @@ public class TimKiemSachPanel extends JPanel {
 
         btnXemChiTiet = new JButton("Xem Chi Tiết / Mượn");
         btnXemChiTiet.setFont(new Font(tenFont, Font.BOLD, 13));
-        btnXemChiTiet.setBackground(new Color(99, 102, 241)); // Màu Xanh Indigo chuẩn
+        btnXemChiTiet.setBackground(new Color(99, 102, 241));
         btnXemChiTiet.setForeground(Color.WHITE);
-        btnXemChiTiet.setFocusPainted(false);
-        btnXemChiTiet.setBorderPainted(false);
-        btnXemChiTiet.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Con trỏ bàn tay
-        
-        // Hiệu ứng Hover: Sáng lên khi di chuột vào
-        btnXemChiTiet.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btnXemChiTiet.setBackground(new Color(79, 70, 229)); // Màu Indigo đậm
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnXemChiTiet.setBackground(new Color(99, 102, 241)); // Trả lại ban đầu
-            }
+        btnXemChiTiet.setFocusPainted(false); btnXemChiTiet.setBorderPainted(false);
+        btnXemChiTiet.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnXemChiTiet.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent evt) { btnXemChiTiet.setBackground(new Color(79, 70, 229)); }
+            public void mouseExited(MouseEvent evt)  { btnXemChiTiet.setBackground(new Color(99, 102, 241)); }
         });
 
         bottomPanel.add(btnXemChiTiet);
@@ -190,71 +173,69 @@ public class TimKiemSachPanel extends JPanel {
     }
 
     private void loadData(String keyword, String theLoaiFilter) {
-        model.setRowCount(0); // clear data
+        model.setRowCount(0);
         try {
-            List<SachDTO> listSach;
-            if (keyword == null || keyword.trim().isEmpty()) {
-                listSach = new SachBUS().getAll();
-            } else {
-                listSach = new SachBUS().search(keyword);
-            }
+            List<SachDTO> listSach = (keyword == null || keyword.trim().isEmpty())
+                    ? new SachBUS().getAll()
+                    : new SachBUS().search(keyword);
 
-            TheLoaiBUS theLoaiBUS = new TheLoaiBUS();
-            NhaXuatBanBUS nxbBUS = new NhaXuatBanBUS();
+            TheLoaiBUS theLoaiBUS   = new TheLoaiBUS();
+            NhaXuatBanBUS nxbBUS    = new NhaXuatBanBUS();
+            SachCopyDAO sachCopyDAO = new SachCopyDAO();
 
             for (SachDTO s : listSach) {
-                // Lấy tên thể loại
-                String tenTheLoai = s.getTheLoai(); // mặc định dùng mã
+                // Tên thể loại
+                String tenTheLoai = s.getTheLoai();
                 if (tenTheLoai != null) {
-                    TheLoaiDTO tl = theLoaiBUS.getById(tenTheLoai);
-                    if (tl != null && tl.getTenTheLoai() != null) {
-                        tenTheLoai = tl.getTenTheLoai();
-                    }
+                    TheLoaiDTO tl = theLoaiBUS.getById(tenTheLoai.trim());
+                    if (tl != null && tl.getTenTheLoai() != null) tenTheLoai = tl.getTenTheLoai();
                 }
 
-                // Lọc theo combobox thể loại
+                // Lọc combobox
                 if (!theLoaiFilter.equals("Tất cả")) {
-                    if (tenTheLoai == null || !tenTheLoai.equals(theLoaiFilter)) {
-                        continue;
-                    }
+                    if (tenTheLoai == null || !tenTheLoai.equals(theLoaiFilter)) continue;
                 }
 
-                // Lấy chuỗi tên tác giả
+                // Tên tác giả
                 String tenTacGia = "Không rõ";
                 if (s.getDanhSachTacGia() != null && !s.getDanhSachTacGia().isEmpty()) {
                     StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < s.getDanhSachTacGia().size(); i++) {
                         sb.append(s.getDanhSachTacGia().get(i).getTenTacGia());
-                        if (i < s.getDanhSachTacGia().size() - 1) {
-                            sb.append(", ");
-                        }
+                        if (i < s.getDanhSachTacGia().size() - 1) sb.append(", ");
                     }
                     tenTacGia = sb.toString();
                 }
 
-                // Lấy tên nhà xuất bản
-                String tenNxb = s.getMaNXB(); // mặc định dùng mã
+                // Tên NXB
+                String tenNxb = s.getMaNXB();
                 if (tenNxb != null) {
-                    NhaXuatBanDTO nxb = nxbBUS.getById(tenNxb);
-                    if (nxb != null && nxb.getTenNXB() != null) {
-                        tenNxb = nxb.getTenNXB();
-                    }
+                    NhaXuatBanDTO nxb = nxbBUS.getById(tenNxb.trim());
+                    if (nxb != null && nxb.getTenNXB() != null) tenNxb = nxb.getTenNXB();
                 }
 
-                model.addRow(new Object[] { s.getMaSach(), s.getTenSach(), tenTacGia, tenTheLoai, tenNxb,
-                        "Sẵn sàng" });
+                // FIX: đếm số bản sao còn sẵn sàng
+                int soCuonConSan = 0;
+                try {
+                    var dsBanSao = sachCopyDAO.getAll();
+                    for (var sc : dsBanSao) {
+                        if (s.getMaSach().trim().equalsIgnoreCase(sc.getMaSach().trim())
+                                && !Boolean.TRUE.equals(sc.getIsDeleted())
+                                && !"Hỏng".equals(sc.getTinhTrang())) {
+                            soCuonConSan++;
+                        }
+                    }
+                } catch (Exception ex) { /* bỏ qua */ }
+
+                String conSan = soCuonConSan > 0 ? "Còn " + soCuonConSan + " cuốn" : "Hết sách";
+
+                model.addRow(new Object[]{
+                    s.getMaSach(), s.getTenSach(), tenTacGia, tenTheLoai, tenNxb, conSan
+                });
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        } catch (Exception ex) { ex.printStackTrace(); }
     }
 
-    // GETTER ĐỂ BẮT SỰ KIỆN TỪ USER HOME FRAME
-    public JButton getBtnXemChiTiet() {
-        return btnXemChiTiet;
-    }
-
-    public JTable getTable() {
-        return table;
-    }
+    public JButton getBtnXemChiTiet() { return btnXemChiTiet; }
+    public JTable getTable() { return table; }
 }
