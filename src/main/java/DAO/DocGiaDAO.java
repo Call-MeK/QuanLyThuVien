@@ -34,7 +34,7 @@ public class DocGiaDAO {
         } catch (Exception e) { 
             e.printStackTrace(); 
         }
-        return "DG00000001";
+        return "DG011";
     }
 
     private String generateMaThe(Connection conn) {
@@ -53,7 +53,7 @@ public class DocGiaDAO {
         } catch (Exception e) { 
             e.printStackTrace(); 
         }
-        return "TTV0000001";
+        return "T11";
     }
     // ===============================================
     // CÁC HÀM CRUD
