@@ -121,7 +121,27 @@ public class SachCopyDAO {
         } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
-
+     public List<SachCopyDTO> getAvailable(String maSach) {
+    List<SachCopyDTO> list = new ArrayList<>();
+    String sql = "SELECT * FROM SACHCOPY " +
+                 "WHERE RTRIM(MaSach) = ? " +
+                 "AND TinhTrang = N'Tốt' " +
+                 "AND IsDeleted = 0 " +
+                 "AND RTRIM(MaVach) NOT IN (" +
+                 "  SELECT RTRIM(ct.MaCuonSach) " +
+                 "  FROM CHITIETPHIEUMUON ct " +
+                 "  JOIN PHIEUMUON pm ON ct.MaPM = pm.MaPM " +
+                 "  WHERE pm.TinhTrang = N'Đang mượn'" +
+                 ")";
+    try (Connection con = DatabaseConnection.getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        ps.setString(1, maSach.trim());
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) list.add(mapRow(rs));
+        }
+    } catch (Exception e) { e.printStackTrace(); }
+    return list;
+}
     public boolean updateTinhTrang(String maVach, String tinhTrang, String ghiChu) {
         String sql = "UPDATE SACHCOPY SET TinhTrang=? WHERE RTRIM(MaVach)=?";
         try (Connection con = DatabaseConnection.getConnection();
