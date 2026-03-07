@@ -145,7 +145,7 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         JPanel pnlNV = card();
         pnlNV.setLayout(new BorderLayout(0, 8));
 
-        JLabel lblTitleNV = new JLabel("👤  Thông Tin Nhân Viên Nhập");
+        JLabel lblTitleNV = new JLabel("Thông Tin Nhân Viên Nhập");
         lblTitleNV.setFont(new Font(tenFont, Font.BOLD, 14));
         lblTitleNV.setForeground(new Color(13, 110, 253));
         lblTitleNV.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
@@ -331,7 +331,7 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         if (s != null) {
             txtTenSach.setText(s.getTenSach());
         } else {
-            txtTenSach.setText("⚠ Không tìm thấy");
+            txtTenSach.setText("Không tìm thấy");
             JOptionPane.showMessageDialog(this,
                     "Không tìm thấy sách: " + maSach,
                     "Cảnh báo", JOptionPane.WARNING_MESSAGE);
