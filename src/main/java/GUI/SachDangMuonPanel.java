@@ -219,7 +219,7 @@ public class SachDangMuonPanel extends JPanel {
         model.setRowCount(0);
 
         if (maTheCurrent == null || maTheCurrent.isEmpty()) {
-            model.addRow(new Object[]{"", "Không tìm thấy thẻ thư viện của bạn. Vui lòng liên hệ thủ thư.", "", "", "", ""});
+            model.addRow(new Object[]{"", "Không có sách đang mượn", "", "", "", ""});
             return;
         }
 

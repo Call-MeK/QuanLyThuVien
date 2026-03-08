@@ -29,7 +29,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
     private DefaultTableModel model;
 
     private JButton btnThem, btnTra, btnLamMoi, btnSearch, btnResetSearch, btnLookupSach;
-    private JButton btnImport, btnExport, btnSave;
+    private JButton  btnExport, btnSave;
 
     private PhieuMuonBUS phieuMuonBUS = new PhieuMuonBUS();
     private TheThuVienBUS theThuVienBUS = new TheThuVienBUS();
@@ -241,12 +241,10 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
 
         JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         pnlButtons.setBackground(colorBackground);
-        btnImport = actionBtn("Import", new Color(33, 115, 70));
         btnSave = actionBtn("Save", new Color(111, 66, 193));
         btnExport = actionBtn("Export", new Color(33, 115, 70));
         btnThem = actionBtn("Lập Phiếu", new Color(25, 135, 84));
         btnTra = actionBtn("Xác Nhận Trả", new Color(13, 110, 253));
-        pnlButtons.add(btnImport);
         pnlButtons.add(btnSave);
         pnlButtons.add(btnExport);
         pnlButtons.add(btnThem);
@@ -449,7 +447,6 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
             loadDataToTable();
         });
 
-        btnImport.addActionListener(e -> Utils.ExcelImporter.importExcelToTable(table, model));
         btnExport.addActionListener(e -> {
             if (model.getRowCount() == 0) {
                 JOptionPane.showMessageDialog(this, "Không có dữ liệu!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);

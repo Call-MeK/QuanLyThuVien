@@ -1,11 +1,13 @@
 package GUI;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.List;
 import BUS.*;
 import DTO.*;
@@ -19,6 +21,10 @@ public class AdminQuanLySachPanel extends JPanel {
     private JComboBox<String> cbTheLoai, cbNXB;
     private JTextField txtSearch;
     private JComboBox<String> cbSearchCriteria;
+
+    private JLabel lblImagePreview;
+    private JButton btnChonAnh;
+    private String selectedImagePath = "";
 
     private JTable table;
     private DefaultTableModel model;
@@ -88,11 +94,14 @@ public class AdminQuanLySachPanel extends JPanel {
         JPanel pnlCenter = new JPanel(new BorderLayout(0, 15));
         pnlCenter.setBackground(colorBackground);
 
-        JPanel pnlInput = new JPanel(new GridLayout(4, 4, 15, 12));
-        pnlInput.setBackground(Color.WHITE);
-        pnlInput.setBorder(BorderFactory.createCompoundBorder(
+        JPanel pnlInputWrapper = new JPanel(new BorderLayout(15, 0));
+        pnlInputWrapper.setBackground(Color.WHITE);
+        pnlInputWrapper.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(222, 226, 230), 1, true),
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)));
+
+        JPanel pnlInput = new JPanel(new GridLayout(4, 4, 15, 12));
+        pnlInput.setBackground(Color.WHITE);
 
         Font fontLabel = new Font(tenFont, Font.BOLD, 14);
         Font fontInput = new Font(tenFont, Font.PLAIN, 14);
@@ -136,6 +145,48 @@ public class AdminQuanLySachPanel extends JPanel {
         pnlInput.add(lbl("Mã tác giả:", fontLabel));
         pnlInput.add(txtMaTacGia);
 
+        JPanel pnlImage = new JPanel(new BorderLayout(0, 8));
+        pnlImage.setBackground(Color.WHITE);
+        pnlImage.setPreferredSize(new Dimension(180, 200));
+
+        lblImagePreview = new JLabel("Chưa có ảnh", SwingConstants.CENTER);
+        lblImagePreview.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(200, 200, 200), 1, true),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        lblImagePreview.setFont(new Font(tenFont, Font.ITALIC, 12));
+        lblImagePreview.setForeground(new Color(150, 150, 150));
+        lblImagePreview.setHorizontalAlignment(SwingConstants.CENTER);
+        lblImagePreview.setVerticalAlignment(SwingConstants.CENTER);
+
+        btnChonAnh = new JButton("Chọn Ảnh");
+        btnChonAnh.setFont(new Font(tenFont, Font.BOLD, 13));
+        btnChonAnh.setBackground(new Color(13, 110, 253));
+        btnChonAnh.setForeground(Color.WHITE);
+        btnChonAnh.setFocusPainted(false);
+        btnChonAnh.setBorderPainted(false);
+        btnChonAnh.setOpaque(true);
+        btnChonAnh.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnChonAnh.setPreferredSize(new Dimension(160, 35));
+
+        btnChonAnh.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Chọn hình ảnh bìa sách");
+            fileChooser.setFileFilter(new FileNameExtensionFilter(
+                    "Hình ảnh (*.jpg, *.png, *.gif, *.bmp)", "jpg", "jpeg", "png", "gif", "bmp"));
+            int result = fileChooser.showOpenDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                selectedImagePath = selectedFile.getAbsolutePath();
+                loadImagePreview(selectedImagePath);
+            }
+        });
+
+        pnlImage.add(lblImagePreview, BorderLayout.CENTER);
+        pnlImage.add(btnChonAnh, BorderLayout.SOUTH);
+
+        pnlInputWrapper.add(pnlInput, BorderLayout.CENTER);
+        pnlInputWrapper.add(pnlImage, BorderLayout.EAST);
+
         JPanel pnlSearch = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         pnlSearch.setBackground(colorBackground);
         pnlSearch.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
@@ -163,7 +214,7 @@ public class AdminQuanLySachPanel extends JPanel {
 
         JPanel pnlTopCenter = new JPanel(new BorderLayout(0, 5));
         pnlTopCenter.setBackground(colorBackground);
-        pnlTopCenter.add(pnlInput, BorderLayout.NORTH);
+        pnlTopCenter.add(pnlInputWrapper, BorderLayout.NORTH);
         pnlTopCenter.add(pnlSearch, BorderLayout.CENTER);
         pnlCenter.add(pnlTopCenter, BorderLayout.NORTH);
 
@@ -180,6 +231,7 @@ public class AdminQuanLySachPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230), 1));
+        scrollPane.setPreferredSize(new Dimension(0, 250));
         pnlCenter.add(scrollPane, BorderLayout.CENTER);
         add(pnlCenter, BorderLayout.CENTER);
 
@@ -235,6 +287,16 @@ public class AdminQuanLySachPanel extends JPanel {
                 txtMaTacGia.setText("");
                 chonComboTheoTen(cbTheLoai, val(row, 2));
                 chonComboTheoTen(cbNXB, val(row, 3));
+
+                String hinhAnh = val(row, 9);
+                if (!hinhAnh.isEmpty()) {
+                    selectedImagePath = hinhAnh;
+                    loadImagePreview(hinhAnh);
+                } else {
+                    selectedImagePath = "";
+                    lblImagePreview.setIcon(null);
+                    lblImagePreview.setText("Chưa có ảnh");
+                }
             }
         });
 
@@ -458,6 +520,7 @@ public class AdminQuanLySachPanel extends JPanel {
         sach.setNamXB(namXB);
         sach.setNgonNgu(ngonNgu);
         sach.setGiaBia(giaBia);
+        sach.setHinhAnh(selectedImagePath);
         return sach;
     }
 
@@ -468,11 +531,32 @@ public class AdminQuanLySachPanel extends JPanel {
         txtNgonNgu.setText("");
         txtGiaBia.setText("0");
         txtMaTacGia.setText("");
+        selectedImagePath = "";
+        lblImagePreview.setIcon(null);
+        lblImagePreview.setText("Chưa có ảnh");
         if (cbTheLoai.getItemCount() > 0)
             cbTheLoai.setSelectedIndex(0);
         if (cbNXB.getItemCount() > 0)
             cbNXB.setSelectedIndex(0);
         table.clearSelection();
+    }
+
+    private void loadImagePreview(String path) {
+        try {
+            File imgFile = new File(path);
+            if (imgFile.exists()) {
+                ImageIcon icon = new ImageIcon(path);
+                Image img = icon.getImage().getScaledInstance(140, 120, Image.SCALE_SMOOTH);
+                lblImagePreview.setIcon(new ImageIcon(img));
+                lblImagePreview.setText("");
+            } else {
+                lblImagePreview.setIcon(null);
+                lblImagePreview.setText("Không tìm thấy ảnh");
+            }
+        } catch (Exception e) {
+            lblImagePreview.setIcon(null);
+            lblImagePreview.setText("Lỗi tải ảnh");
+        }
     }
 
     private String getMaTheLoai(String tenTheLoai) {

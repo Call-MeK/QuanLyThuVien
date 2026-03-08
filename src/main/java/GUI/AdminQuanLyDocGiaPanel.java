@@ -25,7 +25,7 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
     private JTable table;
     private DefaultTableModel model;
     private JButton btnThem, btnSua, btnKhoa, btnMoKhoa, btnLamMoi, btnSearch, btnResetSearch;
-    private JButton btnImport, btnExport, btnSave;
+    private JButton  btnExport, btnSave;
     private DocGiaBUS docGiaBUS = new DocGiaBUS();
 
     public AdminQuanLyDocGiaPanel() {
@@ -185,7 +185,6 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         pnlButtons.setBackground(colorBackground);
 
-        btnImport = createActionButton("Import",    new Color(33, 115, 70));
         btnSave   = createActionButton("Save",      new Color(111, 66, 193));
         btnExport = createActionButton("Export",    new Color(33, 115, 70));
         btnThem   = createActionButton("Thêm",      new Color(25, 135, 84));
@@ -194,7 +193,6 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         
         btnMoKhoa = createActionButton("Mở Thẻ",  new Color(13, 110, 253));
 
-        pnlButtons.add(btnImport);
         pnlButtons.add(btnSave);
         pnlButtons.add(btnExport);
         pnlButtons.add(btnThem);
@@ -338,8 +336,6 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
             loadDataToTable();
         });
 
-        btnImport.addActionListener(e -> Utils.ExcelImporter.importExcelToTable(table, model));
-
         btnExport.addActionListener(e -> {
             if (model.getRowCount() == 0) { JOptionPane.showMessageDialog(this, "Không có dữ liệu!", "Cảnh báo", JOptionPane.WARNING_MESSAGE); return; }
             Utils.ExcelExporter.exportTableToExcel(table, "DanhSach_DocGia");
@@ -366,7 +362,7 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
                     dg.setMatKhau("12345");
                     dg.setTrangThai("Đang hoạt động");
                     dg.setIsDeleted(false);
-                    // Dữ liệu import hàng loạt sẽ có Loại mặc định là Sinh viên
+
                     dg.setLoaiDocGia("Sinh viên");
                     dg.setNgayDangKi(java.time.LocalDate.now().toString());
                     if (docGiaBUS.addDocGia(dg, maNQL).equals("Thêm thành công")) ok++; else fail++;

@@ -13,6 +13,10 @@ public class TheLoaiBUS {
         listTheLoai = new ArrayList<>();
     }
 
+    public ArrayList<String> getTenTheLoai() {
+        return theLoaiDAO.getTenTheLoai();
+    }
+
     public ArrayList<TheLoaiDTO> getAll() {
         listTheLoai = theLoaiDAO.getAll();
         return listTheLoai;

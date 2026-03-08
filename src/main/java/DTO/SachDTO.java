@@ -10,15 +10,37 @@ public class SachDTO {
     private int NamXB;
     private String NgonNgu;
     private int SoLuong;
-
     private Float GiaBia;
     private Boolean isDeleted;
+    private String HinhAnh;
 
     private ArrayList<TacGiaDTO> DanhSachTacGia;
 
     public SachDTO(String MaSach, String tenSach) {
         this.MaSach = MaSach;
         this.tenSach = tenSach;
+    }
+
+    public String getHinhAnh() {
+        return HinhAnh;
+    }
+
+    public void setHinhAnh(String HinhAnh) {
+        this.HinhAnh = HinhAnh;
+    }
+
+    public SachDTO(String MaSach, String tenSach, String TheLoai, String MaNXB, int NamXB, String NgonNgu, int SoLuong, Float GiaBia, Boolean isDeleted, String HinhAnh, ArrayList<TacGiaDTO> DanhSachTacGia) {
+        this.MaSach = MaSach;
+        this.tenSach = tenSach;
+        this.TheLoai = TheLoai;
+        this.MaNXB = MaNXB;
+        this.NamXB = NamXB;
+        this.NgonNgu = NgonNgu;
+        this.SoLuong = SoLuong;
+        this.GiaBia = GiaBia;
+        this.isDeleted = isDeleted;
+        this.HinhAnh = HinhAnh;
+        this.DanhSachTacGia = DanhSachTacGia;
     }
 
     public SachDTO() {

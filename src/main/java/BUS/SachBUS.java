@@ -34,6 +34,14 @@ public class SachBUS {
         return sachDAO.getDanhSachDayDu();
     }
 
+    public String getHinhAnh(String maSach) {
+        SachDTO sach = getById(maSach);
+        if (sach != null) {
+            return sach.getHinhAnh();
+        }
+        return null;
+    }
+
     public boolean isDangMuon(String maSach) {
         return sachDAO.isDangMuon(maSach);
     }

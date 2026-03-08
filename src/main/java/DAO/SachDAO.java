@@ -35,6 +35,10 @@ public class SachDAO {
                         new ArrayList<>());
 
                 sach.setSoLuong(rs.getInt("SoLuong"));
+                try {
+                    sach.setHinhAnh(rs.getString("HinhAnh"));
+                } catch (Exception ignored) {
+                }
                 list.add(sach);
             }
         } catch (Exception e) {
@@ -50,7 +54,7 @@ public class SachDAO {
             ps.setString(1, maSach);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return new SachDTO(
+                    SachDTO sach = new SachDTO(
                             rs.getString("MaSach"),
                             rs.getString("tenSach"),
                             rs.getString("TheLoai"),
@@ -60,6 +64,11 @@ public class SachDAO {
                             rs.getFloat("GiaBia"),
                             rs.getBoolean("isdeleted"),
                             new ArrayList<>());
+                    try {
+                        sach.setHinhAnh(rs.getString("HinhAnh"));
+                    } catch (Exception ignored) {
+                    }
+                    return sach;
                 }
             }
         } catch (Exception e) {
@@ -91,7 +100,8 @@ public class SachDAO {
                 "            JOIN PHIEUMUON pm ON ct.MaPM = pm.MaPM " +
                 "            WHERE pm.TinhTrang = N'Đang mượn' " +
                 "            AND RTRIM(ct.MaCuonSach) = RTRIM(sc.MaVach)" +
-                "        )) AS SoLuong " +
+                "        )) AS SoLuong, " +
+                "       s.HinhAnh " +
                 "FROM SACH s " +
                 "LEFT JOIN THELOAI tl ON s.TheLoai = tl.MaTheLoai " +
                 "LEFT JOIN NHAXUATBAN n ON s.MaNXB = n.MaNXB " +
@@ -111,7 +121,8 @@ public class SachDAO {
                         rs.getString("NgonNgu"),
                         String.format("%,.0f đ", rs.getFloat("GiaBia")),
                         rs.getString("TenTacGia"),
-                        rs.getInt("SoLuong")
+                        rs.getInt("SoLuong"),
+                        rs.getString("HinhAnh")
                 });
             }
         } catch (Exception e) {
@@ -159,7 +170,7 @@ public class SachDAO {
     }
 
     public boolean insert(SachDTO sach) {
-        String sql = "INSERT INTO SACH (MaSach, tenSach, TheLoai, MaNXB, NamXB, NgonNgu, GiaBia, isdeleted) VALUES (?, ?, ?, ?, ?, ?, ?, 0)";
+        String sql = "INSERT INTO SACH (MaSach, tenSach, TheLoai, MaNXB, NamXB, NgonNgu, GiaBia, isdeleted, HinhAnh) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)";
         try (Connection con = DatabaseConnection.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, sach.getMaSach());
@@ -169,6 +180,7 @@ public class SachDAO {
             ps.setInt(5, sach.getNamXB());
             ps.setString(6, sach.getNgonNgu());
             ps.setFloat(7, sach.getGiaBia());
+            ps.setString(8, sach.getHinhAnh());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -177,7 +189,7 @@ public class SachDAO {
     }
 
     public boolean update(SachDTO sach) {
-        String sql = "UPDATE SACH SET tenSach=?, TheLoai=?, MaNXB=?, NamXB=?, NgonNgu=?, GiaBia=? WHERE MaSach=? AND isdeleted=0";
+        String sql = "UPDATE SACH SET tenSach=?, TheLoai=?, MaNXB=?, NamXB=?, NgonNgu=?, GiaBia=?, HinhAnh=? WHERE MaSach=? AND isdeleted=0";
         try (Connection con = DatabaseConnection.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, sach.getTenSach());
@@ -186,7 +198,8 @@ public class SachDAO {
             ps.setInt(4, sach.getNamXB());
             ps.setString(5, sach.getNgonNgu());
             ps.setFloat(6, sach.getGiaBia());
-            ps.setString(7, sach.getMaSach());
+            ps.setString(7, sach.getHinhAnh());
+            ps.setString(8, sach.getMaSach());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();

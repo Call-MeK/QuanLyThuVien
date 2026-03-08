@@ -180,9 +180,9 @@ public class UserHomeFrame extends JFrame {
                         t.getValueAt(row, 1).toString(), // Tên sách
                         t.getValueAt(row, 2).toString(), // Tác giả
                         t.getValueAt(row, 3).toString(), // Thể loại
-                        t.getValueAt(row, 4).toString(), // NXB ✅
-                        "—", // Năm XB (bảng không có)
-                        t.getValueAt(row, 5).toString(), // Còn X cuốn ✅ FIX
+                        t.getValueAt(row, 4).toString(), // NXB
+                        "—",
+                        t.getValueAt(row, 5).toString(),
                         "Mô tả chi tiết cho sách: " + t.getValueAt(row, 1));
                 previousCard = "TimSach";
                 cardLayout.show(mainContentPanel, "ChiTietSach");
@@ -259,7 +259,16 @@ public class UserHomeFrame extends JFrame {
 
     private JPanel createBookCard(DTO.SachDTO sach) {
         String title = sach.getTenSach() != null ? sach.getTenSach() : "Chưa cập nhật tên";
-        String category = sach.getTheLoai() != null ? sach.getTheLoai() : "Khác";
+        String category = "Khác";
+        if (sach.getTheLoai() != null) {
+            BUS.TheLoaiBUS theLoaiBUS = new BUS.TheLoaiBUS();
+            DTO.TheLoaiDTO theLoaiDTO = theLoaiBUS.getById(sach.getTheLoai());
+            if (theLoaiDTO != null && theLoaiDTO.getTenTheLoai() != null) {
+                category = theLoaiDTO.getTenTheLoai();
+            } else {
+                category = sach.getTheLoai();
+            }
+        }
         String namXB = String.valueOf(sach.getNamXB());
 
         BUS.SachCopyBUS copyBUS = new BUS.SachCopyBUS();
@@ -278,6 +287,21 @@ public class UserHomeFrame extends JFrame {
         cover.setBackground(new Color(241, 245, 249));
         cover.setForeground(new Color(148, 163, 184));
         cover.setPreferredSize(new Dimension(100, 130));
+
+        String hinhAnh = sach.getHinhAnh();
+        if (hinhAnh != null && !hinhAnh.isEmpty()) {
+            try {
+                java.io.File imgFile = new java.io.File(hinhAnh);
+                if (imgFile.exists()) {
+                    ImageIcon icon = new ImageIcon(hinhAnh);
+                    Image img = icon.getImage().getScaledInstance(170, 130, Image.SCALE_SMOOTH);
+                    cover.setIcon(new ImageIcon(img));
+                    cover.setText("");
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
 
         JPanel info = new JPanel(new GridLayout(3, 1, 0, 2));
         info.setBackground(Color.WHITE);
@@ -318,11 +342,12 @@ public class UserHomeFrame extends JFrame {
         });
 
         String finalTinhTrang = tinhTrang;
+        String finalTheLoai = category;
         btn.addActionListener(e -> {
             panelChiTietSach.setThongTinSach(
                     title,
                     "Nhiều tác giả",
-                    category,
+                    finalTheLoai,
                     sach.getMaNXB(),
                     namXB,
                     finalTinhTrang,
@@ -362,6 +387,6 @@ public class UserHomeFrame extends JFrame {
     }
 
     public static void main(String[] args) {
-        java.awt.EventQueue.invokeLater(() -> new UserHomeFrame("DG00000002").setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new UserHomeFrame("DG02").setVisible(true));
     }
 }

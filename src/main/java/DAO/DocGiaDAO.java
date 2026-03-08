@@ -303,7 +303,8 @@ public class DocGiaDAO {
     }
 
     public Object[] getThongTinCaNhan(String maDocGia) {
-        String sql = "SELECT c.MaNguoi, c.HoTen, c.NgaySinh, c.SoDienThoai, c.Email, t.NgayCap, t.NgayHetHan " +
+        String sql = "SELECT c.MaNguoi, c.HoTen, c.NgaySinh, c.SoDienThoai, c.Email, t.NgayCap, t.NgayHetHan, c.TenDangNhap "
+                +
                 "FROM CONNGUOI c JOIN DOCGIA d ON c.MaNguoi = d.MaDocGia " +
                 "LEFT JOIN THETHUVIEN t ON d.MaDocGia = t.MaDocGia WHERE c.MaNguoi = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -316,7 +317,8 @@ public class DocGiaDAO {
                         rs.getDate("NgaySinh") != null ? rs.getDate("NgaySinh").toString() : "Chưa cập nhật",
                         rs.getString("SoDienThoai"), rs.getString("Email"),
                         rs.getDate("NgayCap") != null ? rs.getDate("NgayCap").toString() : "Chưa có thẻ",
-                        rs.getDate("NgayHetHan") != null ? rs.getDate("NgayHetHan").toString() : "Chưa có thẻ"
+                        rs.getDate("NgayHetHan") != null ? rs.getDate("NgayHetHan").toString() : "Chưa có thẻ",
+                        rs.getString("TenDangNhap")
                 };
             }
         } catch (Exception e) {

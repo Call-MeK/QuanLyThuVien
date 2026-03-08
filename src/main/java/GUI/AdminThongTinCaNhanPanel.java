@@ -53,9 +53,9 @@ public class AdminThongTinCaNhanPanel extends JPanel {
         gbc.insets = new Insets(10, 15, 10, 15);
 
         txtMaNV = createTextField("", false);
-        txtHoTen = createTextField("", false);
-        txtNgaySinh = createTextField("", false);
-        txtGioiTinh = createTextField("", false);
+        txtHoTen = createTextField("", true);
+        txtNgaySinh = createTextField("", true);
+        txtGioiTinh = createTextField("", true);
         txtSoDienThoai = createTextField("", true);  
         txtEmail = createTextField("", true);         
         txtDiaChi = createTextField("", true);        

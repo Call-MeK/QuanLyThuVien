@@ -116,4 +116,25 @@ public class TheLoaiDAO {
 
         return false;
     }
+
+    public ArrayList<String> getTenTheLoai() {
+        ArrayList<String> danhSach = new ArrayList<>();
+        Connection conn = DatabaseConnection.getConnection();
+        String sql = "SELECT TenTheLoai FROM THELOAI";
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                danhSach.add(rs.getString("TenTheLoai"));
+            }
+
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return danhSach;
+    }
 }

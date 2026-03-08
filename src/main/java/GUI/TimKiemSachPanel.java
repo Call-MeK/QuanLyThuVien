@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.List;
 import BUS.SachBUS;
 import BUS.TheLoaiBUS;
@@ -90,9 +91,10 @@ public class TimKiemSachPanel extends JPanel {
         JLabel lblFilter = new JLabel("Lọc theo:");
         lblFilter.setFont(new Font(tenFont, Font.PLAIN, 14));
 
-        final JComboBox<String> cbType = new JComboBox<>(new String[] {
-                "Tất cả", "Văn học", "Khoa học", "Kỹ năng sống", "Lịch sử"
-        });
+        TheLoaiBUS theLoaiBUS = new TheLoaiBUS();
+        ArrayList<String> listTheLoai = theLoaiBUS.getTenTheLoai();
+        listTheLoai.add(0, "Tất cả");
+        final JComboBox<String> cbType = new JComboBox<>(listTheLoai.toArray(new String[0]));
         cbType.setPreferredSize(new Dimension(200, 30));
         cbType.setFont(new Font(tenFont, Font.PLAIN, 13));
         cbType.setBackground(Color.WHITE);
@@ -208,11 +210,13 @@ public class TimKiemSachPanel extends JPanel {
                 }
 
                 String tenTacGia = "Không rõ";
-                if (s.getDanhSachTacGia() != null && !s.getDanhSachTacGia().isEmpty()) {
+                java.util.List<DTO.TacGiaDTO> dsTacGia = new DAO.SachDAO().getTacGiaCuaSach(s.getMaSach());
+
+                if (dsTacGia != null && !dsTacGia.isEmpty()) {
                     StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < s.getDanhSachTacGia().size(); i++) {
-                        sb.append(s.getDanhSachTacGia().get(i).getTenTacGia());
-                        if (i < s.getDanhSachTacGia().size() - 1)
+                    for (int i = 0; i < dsTacGia.size(); i++) {
+                        sb.append(dsTacGia.get(i).getTenTacGia());
+                        if (i < dsTacGia.size() - 1)
                             sb.append(", ");
                     }
                     tenTacGia = sb.toString();
