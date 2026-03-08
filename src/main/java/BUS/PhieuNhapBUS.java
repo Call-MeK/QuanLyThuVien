@@ -10,7 +10,6 @@ public class PhieuNhapBUS {
 
     public PhieuNhapBUS() {
         phieuNhapDAO = new PhieuNhapDAO();
-        // Lấy tất cả dữ liệu từ database khi khởi tạo
         listPhieuNhap = phieuNhapDAO.findAll();
     }
 

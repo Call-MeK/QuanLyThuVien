@@ -22,17 +22,15 @@ public class ChiTietSachPanel extends JPanel {
         setBackground(new Color(248, 250, 252));
         setBorder(new EmptyBorder(25, 30, 25, 30));
 
-        // Tiêu đề trang
+
         JLabel lblTitle = new JLabel("Chi Tiết Sách");
         lblTitle.setFont(new Font(tenFont, Font.BOLD, 28));
         lblTitle.setForeground(new Color(15, 23, 42));
         add(lblTitle, BorderLayout.NORTH);
 
-        // Nội dung chính
         JPanel mainContent = new JPanel(new BorderLayout(30, 0));
         mainContent.setBackground(new Color(248, 250, 252));
 
-        // --- BÊN TRÁI: Ảnh bìa ---
         JPanel panelImage = new JPanel(new BorderLayout());
         panelImage.setBackground(new Color(248, 250, 252));
         lblHinhAnh = new JLabel("BÌA SÁCH", SwingConstants.CENTER);
@@ -42,7 +40,6 @@ public class ChiTietSachPanel extends JPanel {
         panelImage.add(lblHinhAnh, BorderLayout.NORTH);
         mainContent.add(panelImage, BorderLayout.WEST);
 
-        // --- BÊN PHẢI: Thông tin chi tiết ---
         JPanel panelInfo = new JPanel();
         panelInfo.setLayout(new BoxLayout(panelInfo, BoxLayout.Y_AXIS));
         panelInfo.setBackground(new Color(248, 250, 252));
@@ -67,7 +64,6 @@ public class ChiTietSachPanel extends JPanel {
         panelInfo.add(lblTinhTrang);
         panelInfo.add(Box.createVerticalStrut(20));
 
-        // Mô tả sách
         JLabel lblMoTaTitle = createLabel("Mô tả nội dung:", 16, Font.BOLD, Color.BLACK);
         panelInfo.add(lblMoTaTitle);
         panelInfo.add(Box.createVerticalStrut(5));
@@ -88,12 +84,9 @@ public class ChiTietSachPanel extends JPanel {
         mainContent.add(panelInfo, BorderLayout.CENTER);
         add(mainContent, BorderLayout.CENTER);
 
-        // --- BÊN DƯỚI: Các nút chức năng ---
-       // --- BÊN DƯỚI: Các nút chức năng ---
         JPanel panelButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         panelButtons.setBackground(new Color(248, 250, 252));
 
-        // 1. Làm đẹp Nút Quay Lại (Màu Xám Slate)
         btnQuayLai = new JButton("Quay Lại");
         btnQuayLai.setFont(new Font(tenFont, Font.BOLD, 14));
         btnQuayLai.setBackground(new Color(100, 116, 139));
@@ -104,14 +97,12 @@ public class ChiTietSachPanel extends JPanel {
         
         btnQuayLai.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btnQuayLai.setBackground(new Color(71, 85, 105)); // Đậm hơn khi Hover
+                btnQuayLai.setBackground(new Color(71, 85, 105)); 
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnQuayLai.setBackground(new Color(100, 116, 139)); // Trả lại màu gốc
+                btnQuayLai.setBackground(new Color(100, 116, 139)); 
             }
         });
-
-        // 2. Làm đẹp Nút Đăng Ký Mượn Sách (Màu Xanh Indigo)
         btnMuonSach = new JButton("Đăng Ký Mượn Sách");
         btnMuonSach.setFont(new Font(tenFont, Font.BOLD, 14));
         btnMuonSach.setBackground(new Color(99, 102, 241));
@@ -122,10 +113,10 @@ public class ChiTietSachPanel extends JPanel {
         
         btnMuonSach.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btnMuonSach.setBackground(new Color(79, 70, 229)); // Đậm hơn khi Hover
+                btnMuonSach.setBackground(new Color(79, 70, 229)); 
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnMuonSach.setBackground(new Color(99, 102, 241)); // Trả lại màu gốc
+                btnMuonSach.setBackground(new Color(99, 102, 241)); 
             }
         });
 
@@ -133,16 +124,15 @@ public class ChiTietSachPanel extends JPanel {
         panelButtons.add(btnMuonSach);
         add(panelButtons, BorderLayout.SOUTH);
     }
-    // Hàm tạo Label tiện ích
+
     private JLabel createLabel(String text, int size, int style, Color color) {
         JLabel label = new JLabel(text);
         label.setFont(new Font(tenFont, style, size));
         label.setForeground(color);
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
         return label;
-    }
+    }   
 
-    // HÀM ĐỂ BÊN NGOÀI TRUYỀN DỮ LIỆU VÀO
     public void setThongTinSach(String tenSach, String tacGia, String theLoai, String nxb, String namXb, String tinhTrang, String moTa) {
         lblTenSach.setText(tenSach);
         lblTacGia.setText("Tác giả: " + tacGia);
@@ -161,7 +151,6 @@ public class ChiTietSachPanel extends JPanel {
         }
     }
 
-    // GETTER để UserHomeFrame bắt sự kiện
     public JButton getBtnQuayLai() { return btnQuayLai; }
     public JButton getBtnMuonSach() { return btnMuonSach; }
 }

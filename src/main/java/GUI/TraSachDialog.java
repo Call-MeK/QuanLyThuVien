@@ -11,27 +11,23 @@ import java.util.List;
 import BUS.*;
 import DAO.*;
 import DTO.*;
-import java.util.ArrayList;
 
 public class TraSachDialog extends JDialog {
 
-    // ===================== HẰNG SỐ PHÍ PHẠT =====================
-    private static final double PHI_TRE_HAN_MOI_NGAY = 5_000;   // 5,000đ/ngày trễ
-    // PHI_SACH_HONG = giá bìa của sách (lấy từ DB theo MaSach)
-
+    private static final double PHI_TRE_HAN_MOI_NGAY = 5_000; 
     private static final String[] TINH_TRANG = {"Tốt", "Bình thường", "Cũ", "Hỏng"};
     private static final String   tenFont    = "Segoe UI";
 
     private JTable            table;
     private DefaultTableModel model;
     private JLabel            lblEmptyHint;
-    private JLabel            lblTongPhat;   // Hiển thị tổng tiền phạt preview
+    private JLabel            lblTongPhat;   
     private JButton           btnXacNhan;
     private boolean           confirmed = false;
 
     private final List<String[]>      ketQua  = new ArrayList<>();
     private final String              maPM;
-    private final String              hanTra;  // Lấy từ PhieuMuon để tính trễ hạn
+    private final String              hanTra; 
     private final ChiTietPhieuMuonDAO ctpmDAO = new ChiTietPhieuMuonDAO();
     private final SachCopyDAO         copyDAO = new SachCopyDAO();
     private final SachHongDAO         hongDAO = new SachHongDAO();
@@ -41,7 +37,6 @@ public class TraSachDialog extends JDialog {
     public TraSachDialog(Frame parent, String maPM) {
         super(parent, "Xác Nhận Trả Sách — Phiếu: " + maPM, true);
         this.maPM    = maPM;
-        // Lấy hạn trả từ DB
         PhieuMuonBUS pmBUS = new PhieuMuonBUS();
         PhieuMuonDTO pm = pmBUS.getById(maPM);
         this.hanTra = (pm != null && pm.getHenTra() != null) ? pm.getHenTra() : "";
@@ -56,13 +51,11 @@ public class TraSachDialog extends JDialog {
         setLayout(new BorderLayout(10, 10));
         getRootPane().setBorder(BorderFactory.createEmptyBorder(15, 15, 10, 15));
 
-        // Header
         JPanel header = new JPanel(new GridLayout(2, 1, 0, 3));
         header.setOpaque(false);
         JLabel lblTitle = new JLabel("Chọn tình trạng thực tế cho từng cuốn sách");
         lblTitle.setFont(new Font(tenFont, Font.BOLD, 16));
 
-        // Hiển thị hạn trả và ngày hôm nay
         long soNgayTre = tinhSoNgayTre();
         String subText = "Hạn trả: " + (hanTra.isEmpty() ? "—" : hanTra);
         if (soNgayTre > 0) {
@@ -76,7 +69,6 @@ public class TraSachDialog extends JDialog {
         header.add(lblSub);
         add(header, BorderLayout.NORTH);
 
-        // Bảng
         model = new DefaultTableModel(
                 new String[]{"Tên Sách Bản Sao", "T.Trạng Lúc Mượn", "T.Trạng Trả Về", "Ghi Chú (nếu có)"}, 0) {
             @Override public boolean isCellEditable(int r, int c) { return c == 2 || c == 3; }
@@ -89,13 +81,12 @@ public class TraSachDialog extends JDialog {
         table.setSelectionBackground(new Color(37, 99, 235));
         table.setSelectionForeground(Color.WHITE);
 
-        // ComboBox tình trạng trả về
         JComboBox<String> cbTinhTrang = new JComboBox<>(TINH_TRANG);
         table.getColumnModel().getColumn(2).setCellEditor(new DefaultCellEditor(cbTinhTrang) {
             @Override
             public boolean stopCellEditing() {
                 boolean result = super.stopCellEditing();
-                capNhatTongPhat(); // Cập nhật tổng tiền phạt ngay khi đổi tình trạng
+                capNhatTongPhat(); 
                 return result;
             }
         });
@@ -120,12 +111,12 @@ public class TraSachDialog extends JDialog {
         pnlCenter.add(lblEmptyHint, BorderLayout.SOUTH);
         add(pnlCenter, BorderLayout.CENTER);
 
-        // Footer
+        
         JPanel south = new JPanel(new BorderLayout(10, 0));
         south.setOpaque(false);
         south.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0));
 
-        // Tổng tiền phạt preview
+        
         lblTongPhat = new JLabel("Tổng phí phạt dự kiến: 0 đ");
         lblTongPhat.setFont(new Font(tenFont, Font.BOLD, 14));
         lblTongPhat.setForeground(new Color(220, 53, 69));
@@ -167,7 +158,6 @@ public class TraSachDialog extends JDialog {
         capNhatTongPhat();
     }
 
-    // Tính tổng phí phạt dự kiến và hiển thị lên lblTongPhat
     private void capNhatTongPhat() {
         double tong = 0;
         long soNgayTre = tinhSoNgayTre();
@@ -198,7 +188,6 @@ public class TraSachDialog extends JDialog {
     private void xacNhan() {
         if (table.isEditing()) table.getCellEditor().stopCellEditing();
 
-        // Bước 1: Cập nhật tình trạng từng cuốn và ghi SACHHONG nếu hỏng
         boolean coHong = false;
         String ngayNay = LocalDate.now().toString();
         StringBuilder dsSachHong = new StringBuilder();
@@ -209,7 +198,7 @@ public class TraSachDialog extends JDialog {
             ketQua.get(i)[2] = ttTra;
             ketQua.get(i)[3] = ghiChu;
 
-            // Cập nhật TinhTrang bản sao trong SACHCOPY
+            
             copyDAO.updateTinhTrang(ketQua.get(i)[0], ttTra, ghiChu);
 
             if ("Hỏng".equals(ttTra)) {
@@ -228,21 +217,19 @@ public class TraSachDialog extends JDialog {
             }
         }
 
-        // Bước 2: Tự động tạo phiếu phạt nếu có phí
         long soNgayTre = tinhSoNgayTre();
         double tongPhi = 0;
         ArrayList<ChiTietPhieuPhatDTO> dsChiTiet = new ArrayList<>();
         String maNQL = BUS.SessionManager.getInstance().getMaNguoi();
-        if (maNQL == null || maNQL.isEmpty()) maNQL = "NV00000001";
+        if (maNQL == null || maNQL.isEmpty()) maNQL = "NV01";
 
-        // Chi tiết: trễ hạn
         if (soNgayTre > 0) {
             double phiTre = soNgayTre * PHI_TRE_HAN_MOI_NGAY;
             tongPhi += phiTre;
             ChiTietPhieuPhatDTO ct = new ChiTietPhieuPhatDTO();
             ct.setMaCTPP("CT" + System.currentTimeMillis() % 100000000);
             ct.setMaPP(""); // Sẽ set sau khi có maPP
-            ct.setMaCuonSach(ketQua.isEmpty() ? "MV000000000000000001" : ketQua.get(0)[0]);
+            ct.setMaCuonSach(ketQua.isEmpty() ? "MV001" : ketQua.get(0)[0]);
             ct.setLyDo("Trả sách trễ " + soNgayTre + " ngày (hạn: " + hanTra + ")");
             ct.setSoTien(String.valueOf(phiTre));
             dsChiTiet.add(ct);
@@ -270,7 +257,6 @@ public class TraSachDialog extends JDialog {
             }
         }
 
-        // Tạo phiếu phạt nếu có phí
         if (tongPhi > 0 && !dsChiTiet.isEmpty()) {
             String maPP = phatBUS.generateMaPP();
             PhieuPhatDTO pp = new PhieuPhatDTO();
@@ -281,12 +267,9 @@ public class TraSachDialog extends JDialog {
             pp.setTongTien(String.valueOf(tongPhi));
             pp.setTrangThai(0); // Chưa thanh toán
 
-            // Gán maPP cho từng chi tiết
             for (ChiTietPhieuPhatDTO ct : dsChiTiet) ct.setMaPP(maPP);
 
-            String resultPhat = phatBUS.taoPhieuPhat(pp, dsChiTiet);
-
-            // Thông báo kết quả
+        
             StringBuilder msg = new StringBuilder("✔ Xác nhận trả thành công!\n\n");
             if (soNgayTre > 0) {
                 msg.append("⏰ Trễ ").append(soNgayTre).append(" ngày — Phí: ")
@@ -308,18 +291,14 @@ public class TraSachDialog extends JDialog {
                     "Tạo Phiếu Phạt Thành Công", JOptionPane.WARNING_MESSAGE);
 
         } else if (coHong) {
-            // Hỏng nhưng không tính phí (trường hợp hiếm)
             JOptionPane.showMessageDialog(this,
                     "✔ Trả thành công!\n⚠ Sách hỏng đã ghi nhận:\n" + dsSachHong,
                     "Ghi Nhận Sách Hỏng", JOptionPane.WARNING_MESSAGE);
         }
-        // Nếu không có phí thì không hiện popup, trả lặng lẽ
-
         confirmed = true;
         dispose();
     }
 
-    // Tính số ngày trễ (0 nếu không trễ)
     private long tinhSoNgayTre() {
         if (hanTra == null || hanTra.isEmpty()) return 0;
         try {

@@ -7,8 +7,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +44,6 @@ public class ThongKePanel extends JPanel {
         setBackground(colorBackground);
         setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
 
-        // ============== TIÊU ĐỀ + NÚT ==============
         JPanel pnlHeader = new JPanel(new BorderLayout());
         pnlHeader.setBackground(colorBackground);
 
@@ -85,7 +82,6 @@ public class ThongKePanel extends JPanel {
         btnLoad.setPreferredSize(new Dimension(160, 40));
         btnLoad.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // --- SỰ KIỆN CHO CÁC NÚT ---
         btnLoad.addActionListener(e -> loadThongKe());
         
         btnXuatPDF.addActionListener(e -> exportToPDF());
@@ -100,7 +96,6 @@ public class ThongKePanel extends JPanel {
 
         add(pnlHeader, BorderLayout.NORTH);
 
-        // ============== NỘI DUNG CHÍNH: TABBED PANE ==============
         tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font(tenFont, Font.BOLD, 14));
         tabbedPane.setBackground(colorBackground);
@@ -142,15 +137,10 @@ public class ThongKePanel extends JPanel {
         }
     }
 
-    // =====================================================================
-    // TAB 1: SÁCH THEO THỂ LOẠI
-    // =====================================================================
     private JPanel createTabTheLoai() {
         JPanel panel = new JPanel(new GridLayout(1, 2, 15, 0));
         panel.setBackground(colorBackground);
         panel.setBorder(BorderFactory.createEmptyBorder(15, 10, 10, 10));
-
-        // Bảng bên trái
         modelTheLoai = new DefaultTableModel(new String[] { "Thể Loại", "Số Lượng" }, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -164,7 +154,6 @@ public class ThongKePanel extends JPanel {
         JPanel pnlTable = createSectionPanel("Bảng Dữ Liệu");
         pnlTable.add(scrollPane, BorderLayout.CENTER);
 
-        // Biểu đồ bên phải
         chartTheLoai = new BarChartPanel("Biểu Đồ Sách Theo Thể Loại",
                 new Color(54, 162, 235), new Color(30, 100, 180));
 
@@ -176,9 +165,6 @@ public class ThongKePanel extends JPanel {
         return panel;
     }
 
-    // =====================================================================
-    // TAB 2: TOP 5 ĐỘC GIẢ MƯỢN NHIỀU
-    // =====================================================================
     private JPanel createTabDocGia() {
         JPanel panel = new JPanel(new GridLayout(1, 2, 15, 0));
         panel.setBackground(colorBackground);
@@ -208,9 +194,6 @@ public class ThongKePanel extends JPanel {
         return panel;
     }
 
-    // =====================================================================
-    // TAB 3: TOP 10 SÁCH MƯỢN NHIỀU NHẤT
-    // =====================================================================
     private JPanel createTabSach() {
         JPanel panel = new JPanel(new GridLayout(1, 2, 15, 0));
         panel.setBackground(colorBackground);
@@ -240,12 +223,8 @@ public class ThongKePanel extends JPanel {
         return panel;
     }
 
-    // =====================================================================
-    // LOAD DỮ LIỆU TỪ BUS
-    // =====================================================================
     private void loadThongKe() {
         try {
-            // 1. Sách theo thể loại
             Map<String, Integer> dataTheLoai = thongKeBUS.thongKeSachTheoTheLoai();
             modelTheLoai.setRowCount(0);
             for (Map.Entry<String, Integer> entry : dataTheLoai.entrySet()) {
@@ -253,7 +232,6 @@ public class ThongKePanel extends JPanel {
             }
             chartTheLoai.setData(dataTheLoai);
 
-            // 2. Top 5 độc giả
             Map<String, Integer> dataDocGia = thongKeBUS.thongKeTop5DocGiaMuonNhieu();
             modelDocGia.setRowCount(0);
             for (Map.Entry<String, Integer> entry : dataDocGia.entrySet()) {
@@ -261,7 +239,6 @@ public class ThongKePanel extends JPanel {
             }
             chartDocGia.setData(dataDocGia);
 
-            // 3. Top 10 sách mượn nhiều
             Map<String, Integer> dataSach = thongKeBUS.thongKeSachMuonNhieuNhat();
             modelSach.setRowCount(0);
             for (Map.Entry<String, Integer> entry : dataSach.entrySet()) {
@@ -283,9 +260,6 @@ public class ThongKePanel extends JPanel {
         }
     }
 
-    // =====================================================================
-    // HÀM TIỆN ÍCH
-    // =====================================================================
     private JPanel createSectionPanel(String title) {
         JPanel panel = new JPanel(new BorderLayout(0, 8));
         panel.setBackground(Color.WHITE);
@@ -316,18 +290,13 @@ public class ThongKePanel extends JPanel {
         header.setBackground(new Color(233, 236, 239));
         header.setOpaque(false);
 
-        // Cột số căn phải
         DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
         rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
         table.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
 
         return table;
     }
-
-    // =====================================================================
-    // INNER CLASS: BIỂU ĐỒ CỘT CUSTOM (Java2D)
-    // =====================================================================
-    private static class BarChartPanel extends JPanel {
+private static class BarChartPanel extends JPanel {
 
         private String chartTitle;
         private Color barColorTop;
@@ -344,7 +313,6 @@ public class ThongKePanel extends JPanel {
         }
 
         public void setData(Map<String, Integer> data) {
-            // Chuyển đổi Map sang mảng thủ công (không dùng stream)
             List<String> labelList = new ArrayList<>(data.keySet());
             List<Integer> valueList = new ArrayList<>(data.values());
 
@@ -373,7 +341,6 @@ public class ThongKePanel extends JPanel {
             int w = getWidth();
             int h = getHeight();
 
-            // Tiêu đề biểu đồ
             g2.setFont(new Font(tenFont, Font.BOLD, 14));
             g2.setColor(new Color(33, 37, 41));
             FontMetrics fmTitle = g2.getFontMetrics();
@@ -389,7 +356,6 @@ public class ThongKePanel extends JPanel {
                 return;
             }
 
-            // Vùng vẽ biểu đồ
             int paddingLeft = 60;
             int paddingRight = 20;
             int paddingTop = 45;
@@ -409,7 +375,6 @@ public class ThongKePanel extends JPanel {
             if (maxVal == 0)
                 maxVal = 1;
 
-            // Vẽ đường lưới ngang + nhãn trục Y
             g2.setFont(new Font(tenFont, Font.PLAIN, 11));
             int gridLines = 5;
             for (int i = 0; i <= gridLines; i++) {
@@ -424,14 +389,12 @@ public class ThongKePanel extends JPanel {
                 g2.drawString(label, paddingLeft - fm.stringWidth(label) - 8, y + 4);
             }
 
-            // Vẽ trục
             g2.setColor(new Color(180, 180, 180));
             g2.setStroke(new BasicStroke(1.5f));
             g2.drawLine(paddingLeft, paddingTop, paddingLeft, paddingTop + chartHeight);
             g2.drawLine(paddingLeft, paddingTop + chartHeight,
                     paddingLeft + chartWidth, paddingTop + chartHeight);
 
-            // Vẽ các cột
             int numBars = labels.length;
             int totalBarArea = chartWidth / numBars;
             int barWidth = Math.max(12, Math.min(50, (int) (totalBarArea * 0.6)));
@@ -442,19 +405,15 @@ public class ThongKePanel extends JPanel {
                 int x = paddingLeft + i * totalBarArea + gap / 2;
                 int y = paddingTop + chartHeight - barHeight;
 
-                // Gradient cho cột
                 GradientPaint gradient = new GradientPaint(
                         x, y, barColorTop,
                         x, y + barHeight, barColorBottom);
                 g2.setPaint(gradient);
                 g2.fillRoundRect(x, y, barWidth, barHeight, 4, 4);
-
-                // Viền cột
                 g2.setColor(barColorBottom.darker());
                 g2.setStroke(new BasicStroke(1f));
                 g2.drawRoundRect(x, y, barWidth, barHeight, 4, 4);
 
-                // Giá trị trên đầu cột
                 g2.setColor(new Color(33, 37, 41));
                 g2.setFont(new Font(tenFont, Font.BOLD, 11));
                 String valStr = String.valueOf(values[i]);
@@ -462,7 +421,6 @@ public class ThongKePanel extends JPanel {
                 int valX = x + (barWidth - fmVal.stringWidth(valStr)) / 2;
                 g2.drawString(valStr, valX, y - 5);
 
-                // Nhãn trục X (xoay nghiêng)
                 g2.setFont(new Font(tenFont, Font.PLAIN, 10));
                 g2.setColor(new Color(73, 80, 87));
 

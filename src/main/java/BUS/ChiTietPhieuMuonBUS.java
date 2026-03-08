@@ -10,7 +10,6 @@ public class ChiTietPhieuMuonBUS {
         ctpmDAO = new ChiTietPhieuMuonDAO();
     }
 
-    // Hàm gọi xuống DAO để thêm
     public boolean add(ChiTietPhieuMuonDTO ctpm) {
         if (ctpm.getMaPM() == null || ctpm.getMaCuonSach() == null) {
             return false;

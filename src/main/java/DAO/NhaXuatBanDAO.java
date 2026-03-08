@@ -1,4 +1,3 @@
-
 package DAO;
 
 import DTO.NhaXuatBanDTO;
@@ -7,10 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
-/**
- *
- * @author Admin
- */
 public class NhaXuatBanDAO {
     public ArrayList<NhaXuatBanDTO> getAll() {
         Connection conn = DatabaseConnection.getConnection();
@@ -42,14 +37,15 @@ public class NhaXuatBanDAO {
         }
         return null;
     }
-    public NhaXuatBanDTO getById(String MaNXB){
+
+    public NhaXuatBanDTO getById(String MaNXB) {
         Connection conn = DatabaseConnection.getConnection();
         String sql = "SELECT * FROM NHAXUATBAN WHERE MaNXB = ?";
         try {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, MaNXB);
             ResultSet rs = stmt.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 NhaXuatBanDTO nxb = new NhaXuatBanDTO(
                         rs.getString("MaNXB"),
                         rs.getString("TenNXB"),
@@ -72,7 +68,8 @@ public class NhaXuatBanDAO {
         }
         return null;
     }
-    public boolean add(NhaXuatBanDTO nxb){
+
+    public boolean add(NhaXuatBanDTO nxb) {
         Connection conn = DatabaseConnection.getConnection();
         String sql = "INSERT INTO NHAXUATBAN (MaNXB, TenNXB, DiaChi, Email, SoDienThoai) VALUES (?, ?, ?, ?, ?)";
         try {
@@ -96,7 +93,8 @@ public class NhaXuatBanDAO {
         }
         return false;
     }
-    public boolean update(NhaXuatBanDTO nxb){
+
+    public boolean update(NhaXuatBanDTO nxb) {
         Connection conn = DatabaseConnection.getConnection();
         String sql = "UPDATE NHAXUATBAN SET TenNXB = ?, DiaChi = ?, Email = ?, SoDienThoai = ? WHERE MaNXB = ?";
         try {
@@ -120,7 +118,8 @@ public class NhaXuatBanDAO {
         }
         return false;
     }
-    public boolean delete(String MaNXB){
+
+    public boolean delete(String MaNXB) {
         Connection conn = DatabaseConnection.getConnection();
         String sql = "DELETE FROM NHAXUATBAN WHERE MaNXB = ?";
         try {
@@ -140,5 +139,4 @@ public class NhaXuatBanDAO {
         }
         return false;
     }
-    
 }

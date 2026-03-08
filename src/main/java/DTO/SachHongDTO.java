@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DTO;
 
-/**
- *
- * @author Admin
- */
 public class SachHongDTO {
     private int MaSachHong;
     private String TenSachHong;
@@ -19,7 +11,8 @@ public class SachHongDTO {
     public SachHongDTO() {
     }
 
-    public SachHongDTO(int MaSachHong, String TenSachHong, String MaVach, int SoLuong, String NgayGhiNhan, String LyDo) {
+    public SachHongDTO(int MaSachHong, String TenSachHong, String MaVach, int SoLuong, String NgayGhiNhan,
+            String LyDo) {
         this.MaSachHong = MaSachHong;
         this.TenSachHong = TenSachHong;
         this.MaVach = MaVach;
@@ -75,5 +68,5 @@ public class SachHongDTO {
     public void setLyDo(String LyDo) {
         this.LyDo = LyDo;
     }
-    
+
 }

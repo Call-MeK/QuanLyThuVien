@@ -103,7 +103,6 @@ public class TimKiemSachPanel extends JPanel {
         topPanel.add(Box.createVerticalStrut(15));
         topPanel.add(filterPanel);
 
-        // BẢNG KẾT QUẢ - FIX: isCellEditable = false
         String[] cols = {"Mã Sách", "Tên Sách", "Tác Giả", "Thể Loại", "NXB", "Còn Sẵn"};
         model = new DefaultTableModel(cols, 0) {
             @Override
@@ -129,7 +128,6 @@ public class TimKiemSachPanel extends JPanel {
         table.setFont(new Font(tenFont, Font.PLAIN, 14));
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // Tô màu cột "Còn Sẵn"
         table.getColumnModel().getColumn(5).setCellRenderer(new javax.swing.table.DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable t, Object value,
@@ -184,19 +182,16 @@ public class TimKiemSachPanel extends JPanel {
             SachCopyDAO sachCopyDAO = new SachCopyDAO();
 
             for (SachDTO s : listSach) {
-                // Tên thể loại
                 String tenTheLoai = s.getTheLoai();
                 if (tenTheLoai != null) {
                     TheLoaiDTO tl = theLoaiBUS.getById(tenTheLoai.trim());
                     if (tl != null && tl.getTenTheLoai() != null) tenTheLoai = tl.getTenTheLoai();
                 }
 
-                // Lọc combobox
                 if (!theLoaiFilter.equals("Tất cả")) {
                     if (tenTheLoai == null || !tenTheLoai.equals(theLoaiFilter)) continue;
                 }
 
-                // Tên tác giả
                 String tenTacGia = "Không rõ";
                 if (s.getDanhSachTacGia() != null && !s.getDanhSachTacGia().isEmpty()) {
                     StringBuilder sb = new StringBuilder();
@@ -207,14 +202,12 @@ public class TimKiemSachPanel extends JPanel {
                     tenTacGia = sb.toString();
                 }
 
-                // Tên NXB
                 String tenNxb = s.getMaNXB();
                 if (tenNxb != null) {
                     NhaXuatBanDTO nxb = nxbBUS.getById(tenNxb.trim());
                     if (nxb != null && nxb.getTenNXB() != null) tenNxb = nxb.getTenNXB();
                 }
 
-                // FIX: đếm số bản sao còn sẵn sàng
                 int soCuonConSan = 0;
                 try {
                     var dsBanSao = sachCopyDAO.getAll();
@@ -225,7 +218,7 @@ public class TimKiemSachPanel extends JPanel {
                             soCuonConSan++;
                         }
                     }
-                } catch (Exception ex) { /* bỏ qua */ }
+                } catch (Exception ex) { }
 
                 String conSan = soCuonConSan > 0 ? "Còn " + soCuonConSan + " cuốn" : "Hết sách";
 

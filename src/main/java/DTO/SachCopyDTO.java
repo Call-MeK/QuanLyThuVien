@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DTO;
 
-/**
- *
- * @author Admin
- */
 public class SachCopyDTO {
     private String MaVach;
     private String MaSach;
@@ -18,7 +10,8 @@ public class SachCopyDTO {
     private Boolean IsDeleted;
     private String MaKeSach;
 
-    public SachCopyDTO(String MaVach, String MaSach, String TenSachBanSao, String TinhTrang, String GhiChuTinhTrang, String NgayNhap, Boolean IsDeleted, String MaKeSach) {
+    public SachCopyDTO(String MaVach, String MaSach, String TenSachBanSao, String TinhTrang, String GhiChuTinhTrang,
+            String NgayNhap, Boolean IsDeleted, String MaKeSach) {
         this.MaVach = MaVach;
         this.MaSach = MaSach;
         this.TenSachBanSao = TenSachBanSao;
@@ -95,5 +88,5 @@ public class SachCopyDTO {
     public void setMaKeSach(String MaKeSach) {
         this.MaKeSach = MaKeSach;
     }
-    
+
 }

@@ -16,7 +16,7 @@ public class AdminThongTinCaNhanPanel extends JPanel {
 
     public AdminThongTinCaNhanPanel() {
         initComponents();
-        // Dữ liệu sẽ được load từ AdminFrame gọi loadData(maNV) sau khi khởi tạo
+        
     }
 
     private void initComponents() {
@@ -24,9 +24,6 @@ public class AdminThongTinCaNhanPanel extends JPanel {
         setBackground(Color.WHITE);
         setBorder(new EmptyBorder(25, 30, 25, 30));
 
-        // ==========================================
-        // PHẦN TRÊN: TIÊU ĐỀ
-        // ==========================================
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.setBackground(Color.WHITE);
@@ -46,9 +43,6 @@ public class AdminThongTinCaNhanPanel extends JPanel {
         topPanel.add(lblSubtitle);
         topPanel.add(Box.createVerticalStrut(10));
 
-        // ==========================================
-        // PHẦN GIỮA: FORM THÔNG TIN
-        // ==========================================
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(Color.WHITE);
         formPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -62,9 +56,9 @@ public class AdminThongTinCaNhanPanel extends JPanel {
         txtHoTen = createTextField("", false);
         txtNgaySinh = createTextField("", false);
         txtGioiTinh = createTextField("", false);
-        txtSoDienThoai = createTextField("", true);  // Sửa được
-        txtEmail = createTextField("", true);         // Sửa được
-        txtDiaChi = createTextField("", true);        // Sửa được
+        txtSoDienThoai = createTextField("", true);  
+        txtEmail = createTextField("", true);         
+        txtDiaChi = createTextField("", true);        
         txtVaiTro = createTextField("", false);
 
         int row = 0;
@@ -81,9 +75,6 @@ public class AdminThongTinCaNhanPanel extends JPanel {
         centerWrapper.setBackground(Color.WHITE);
         centerWrapper.add(formPanel);
 
-        // ==========================================
-        // PHẦN DƯỚI: CÁC NÚT CHỨC NĂNG
-        // ==========================================
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         bottomPanel.setBackground(Color.WHITE);
         bottomPanel.setBorder(new EmptyBorder(10, 0, 0, 0));
@@ -97,7 +88,6 @@ public class AdminThongTinCaNhanPanel extends JPanel {
         btnCapNhat.setOpaque(true);
         btnCapNhat.setBorderPainted(false);
 
-        // --- SỰ KIỆN CẬP NHẬT ---
         btnCapNhat.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(this,
                     "Bạn có muốn lưu thay đổi không?", "Xác nhận", JOptionPane.YES_NO_OPTION);
@@ -127,7 +117,6 @@ public class AdminThongTinCaNhanPanel extends JPanel {
         btnDoiMatKhau.setOpaque(true);
         btnDoiMatKhau.setBorderPainted(false);
 
-        // --- SỰ KIỆN ĐỔI MẬT KHẨU ---
         btnDoiMatKhau.addActionListener(e -> {
             String maNV = txtMaNV.getText().trim();
             NguoiQuanLyDTO nql = nqlBUS.getById(maNV);
@@ -187,11 +176,8 @@ public class AdminThongTinCaNhanPanel extends JPanel {
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    // =======================================================
-    // LOAD DATA TỪ DB
-    // =======================================================
     public void loadData(String maNV) {
-        // Đảm bảo load dữ liệu từ DB trước
+
         nqlBUS.getAll();
         NguoiQuanLyDTO nql = nqlBUS.getById(maNV);
         if (nql != null) {
@@ -210,9 +196,6 @@ public class AdminThongTinCaNhanPanel extends JPanel {
         }
     }
 
-    // =======================================================
-    // TIỆN ÍCH UI
-    // =======================================================
     private JTextField createTextField(String text, boolean isEditable) {
         JTextField txt = new JTextField(text, 25);
         txt.setFont(new Font(tenFont, Font.PLAIN, 14));

@@ -19,7 +19,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
     private Color colorBackground = new Color(248, 249, 250);
 
     private JTextField    txtMaPhieu, txtMaDG, txtMaThe, txtNgayMuon, txtHanTra, txtNgayTra, txtTrangThai;
-    private JTextField    txtMaNQL, txtTenSach; // THÊM MỚI
+    private JTextField    txtMaNQL, txtTenSach; 
     private JTextField    txtMaSachLookup;
     private JComboBox<String> cbBanSao;
     private JComboBox<String> cbSearchCriteria, cbSearchTrangThai;
@@ -133,11 +133,9 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         pnlLookup.add(txtMaSachLookup, BorderLayout.CENTER);
         pnlLookup.add(btnLookupSach,   BorderLayout.EAST);
         pnlInput.add(pnlLookup);
-        // Row 6: Chọn bản sao
         pnlInput.add(lbl("Chọn bản sao:", fontLabel)); pnlInput.add(cbBanSao);
         pnlInput.add(new JLabel()); pnlInput.add(new JLabel());
 
-        // THANH TÌM KIẾM
         JPanel pnlSearch = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         pnlSearch.setBackground(colorBackground);
         pnlSearch.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
@@ -174,7 +172,6 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         pnlTopCenter.add(pnlSearch, BorderLayout.CENTER);
         pnlCenter.add(pnlTopCenter, BorderLayout.NORTH);
 
-        // BẢNG
         String[] cols = {"Mã Phiếu Mượn", "Mã Thẻ", "Ngày Mượn", "Hạn Trả", "Ngày Trả", "Trạng Thái"};
         model = new DefaultTableModel(cols, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
@@ -204,7 +201,6 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         pnlCenter.add(scrollPane, BorderLayout.CENTER);
         add(pnlCenter, BorderLayout.CENTER);
 
-        // NÚT DƯỚI
         JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         pnlButtons.setBackground(colorBackground);
         btnImport = actionBtn("Import",       new Color(33, 115, 70));
@@ -220,7 +216,6 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
 
     private void initEvents() {
 
-        // Click bảng → fill form + load chi tiết sách
         table.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 int row = table.getSelectedRow();
@@ -240,11 +235,9 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
                 txtTrangThai.setText(tt);
                 capNhatMauTrangThai(tt);
 
-                // Tìm MaDG từ MaThe
                 TheThuVienDTO the = theThuVienBUS.getById(maThe);
                 txtMaDG.setText(the != null ? the.getMaDocGia() : "");
 
-                // Tải MaNQL và TenSach từ phiếu mượn + chi tiết
                 loadChiTietPhieu(maPM);
 
                 txtMaSachLookup.setText("");
@@ -253,7 +246,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
             }
         });
 
-        // Focus rời MaDG → tự fill MaThe
+
         txtMaDG.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override public void focusLost(java.awt.event.FocusEvent e) {
                 String maDG = txtMaDG.getText().trim();
@@ -401,14 +394,11 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         });
     }
 
-    // Load chi tiết phiếu: MaNQL + TenSach
     private void loadChiTietPhieu(String maPM) {
         try {
-            // Lấy MaNQL từ PhieuMuon
             PhieuMuonDTO pm = phieuMuonBUS.getById(maPM);
             txtMaNQL.setText(pm != null && pm.getMaNQL() != null ? pm.getMaNQL().trim() : "");
 
-            // Lấy tên sách từ ChiTietPhieuMuon → SachCopy → Sach
             List<ChiTietPhieuMuonDTO> ctList = new DAO.ChiTietPhieuMuonDAO().getByMaPM(maPM);
             if (ctList != null && !ctList.isEmpty()) {
                 StringBuilder sb = new StringBuilder();
@@ -482,7 +472,6 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
 
     private Object[] toRow(PhieuMuonDTO pm, String tt) {
         String ngayTra = pm.getNgayTra();
-        // FIX: lọc ngày mặc định 1900-01-01 và chuỗi rỗng
         if (ngayTra == null || ngayTra.isEmpty() || ngayTra.startsWith("1900")) {
             ngayTra = "Chưa trả";
         }

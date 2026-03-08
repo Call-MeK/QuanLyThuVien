@@ -13,11 +13,11 @@ public class AdminFrame extends JFrame {
     private CardLayout cardLayout;
     private JTree menuTree;
 
-    private String tenFont       = "Segoe UI";
-    private Color colorMenuBg    = new Color(33, 37, 41);
+    private String tenFont = "Segoe UI";
+    private Color colorMenuBg = new Color(33, 37, 41);
     private Color colorMenuHover = new Color(52, 58, 64);
     private Color colorBackground = new Color(248, 249, 250);
-    private Color colorPrimary   = new Color(13, 110, 253);
+    private Color colorPrimary = new Color(13, 110, 253);
 
     private String maNVDangNhap = "";
 
@@ -41,9 +41,6 @@ public class AdminFrame extends JFrame {
         setLayout(new BorderLayout());
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-        // ==========================================
-        // 1. CỘT MENU (JTREE)
-        // ==========================================
         JPanel panelSidebar = new JPanel(new BorderLayout());
         panelSidebar.setBackground(colorMenuBg);
         panelSidebar.setPreferredSize(new Dimension(260, 0));
@@ -59,7 +56,8 @@ public class AdminFrame extends JFrame {
         lblTitle.setBorder(BorderFactory.createEmptyBorder(20, 0, 5, 0));
 
         String tenHienThi = SessionManager.getInstance().isLoggedIn()
-                ? SessionManager.getInstance().getHoTen() : maNVDangNhap;
+                ? SessionManager.getInstance().getHoTen()
+                : maNVDangNhap;
         JLabel lblAdminName = new JLabel(tenHienThi);
         lblAdminName.setFont(new Font(tenFont, Font.ITALIC, 13));
         lblAdminName.setForeground(new Color(173, 181, 189));
@@ -72,13 +70,13 @@ public class AdminFrame extends JFrame {
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Hệ Thống");
         DefaultMutableTreeNode nodeTrangChu = new DefaultMutableTreeNode("Trang Chủ");
-        DefaultMutableTreeNode nodeQuanLy   = new DefaultMutableTreeNode("Quản Lý");
+        DefaultMutableTreeNode nodeQuanLy = new DefaultMutableTreeNode("Quản Lý");
         nodeQuanLy.add(new DefaultMutableTreeNode("Quản Lý Sách"));
         nodeQuanLy.add(new DefaultMutableTreeNode("Quản Lý Độc Giả"));
         nodeQuanLy.add(new DefaultMutableTreeNode("Quản Lý Mượn Trả"));
         nodeQuanLy.add(new DefaultMutableTreeNode("Quản Lý Nhập Sách"));
         nodeQuanLy.add(new DefaultMutableTreeNode("Quản Lý Phí Phạt"));
-        DefaultMutableTreeNode nodeThongKe  = new DefaultMutableTreeNode("Thống Kê");
+        DefaultMutableTreeNode nodeThongKe = new DefaultMutableTreeNode("Thống Kê");
         DefaultMutableTreeNode nodeThongTin = new DefaultMutableTreeNode("Thông Tin Cá Nhân");
         DefaultMutableTreeNode nodeDangXuat = new DefaultMutableTreeNode("Đăng Xuất");
 
@@ -110,27 +108,22 @@ public class AdminFrame extends JFrame {
         panelSidebar.add(scrollMenu, BorderLayout.CENTER);
         add(panelSidebar, BorderLayout.WEST);
 
-        // ==========================================
-        // 2. VÙNG NỘI DUNG (CARDLAYOUT)
-        // ==========================================
-        cardLayout    = new CardLayout();
-        panelContent  = new JPanel(cardLayout);
+        cardLayout = new CardLayout();
+        panelContent = new JPanel(cardLayout);
         panelContent.setBackground(colorBackground);
 
-        // ===== Lưu reference để nối callback =====
-        AdminQuanLySachPanel    sachPanel     = new AdminQuanLySachPanel();
+        AdminQuanLySachPanel sachPanel = new AdminQuanLySachPanel();
         AdminQuanLyNhapSachPanel nhapSachPanel = new AdminQuanLyNhapSachPanel();
 
-        // ===== KEY FIX: Khi lưu phiếu nhập xong → panel sách tự reload số cuốn =====
         nhapSachPanel.setOnSaveCallback(() -> sachPanel.loadData());
 
-        panelContent.add(new AdminTrangChuPanel(),          "CardTrangChu");
-        panelContent.add(sachPanel,                         "CardSach");
-        panelContent.add(new AdminQuanLyDocGiaPanel(),      "CardDocGia");
-        panelContent.add(new AdminQuanLyMuonTraPanel(),     "CardMuonTra");
-        panelContent.add(nhapSachPanel,                     "CardNhapSach");
-        panelContent.add(new AdminQuanLyPhiPhatPanel(),     "CardPhiPhat");
-        panelContent.add(new ThongKePanel(),                "CardThongKe");
+        panelContent.add(new AdminTrangChuPanel(), "CardTrangChu");
+        panelContent.add(sachPanel, "CardSach");
+        panelContent.add(new AdminQuanLyDocGiaPanel(), "CardDocGia");
+        panelContent.add(new AdminQuanLyMuonTraPanel(), "CardMuonTra");
+        panelContent.add(nhapSachPanel, "CardNhapSach");
+        panelContent.add(new AdminQuanLyPhiPhatPanel(), "CardPhiPhat");
+        panelContent.add(new ThongKePanel(), "CardThongKe");
 
         AdminThongTinCaNhanPanel panelThongTinCN = new AdminThongTinCaNhanPanel();
         panelContent.add(panelThongTinCN, "CardThongTinCN");
@@ -141,22 +134,19 @@ public class AdminFrame extends JFrame {
 
         add(panelContent, BorderLayout.CENTER);
 
-        // ==========================================
-        // 3. XỬ LÝ SỰ KIỆN CHUYỂN TRANG
-        // ==========================================
         menuTree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent e) {
-                DefaultMutableTreeNode selectedNode =
-                        (DefaultMutableTreeNode) menuTree.getLastSelectedPathComponent();
-                if (selectedNode == null) return;
+                DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) menuTree.getLastSelectedPathComponent();
+                if (selectedNode == null)
+                    return;
 
                 switch (selectedNode.toString()) {
                     case "Trang Chủ":
                         cardLayout.show(panelContent, "CardTrangChu");
                         break;
                     case "Quản Lý Sách":
-                        // Reload lại danh sách sách mỗi khi chuyển sang tab này
+
                         sachPanel.loadData();
                         cardLayout.show(panelContent, "CardSach");
                         break;

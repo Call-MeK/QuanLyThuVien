@@ -19,15 +19,11 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
     private final Color  clrWhite      = Color.WHITE;
     private final Color  clrBorder     = new Color(222, 226, 230);
 
-    // Form phiếu nhập
     private JTextField    txtMaPN, txtNgayNhap;
     private JComboBox<String> cbNXB;
     private JLabel        lblTongTien;
-
-    // Form nhân viên (readonly)
     private JTextField    txtMaNV, txtHoTenNV, txtVaiTro;
 
-    // Form thêm dòng
     private JTextField    txtMaSachNhap, txtTenSach, txtSoLuong, txtDonGia;
     private JButton       btnThemDong, btnCapNhatDong, btnXoaDong;
     private JTable        tblChiTiet;
@@ -35,10 +31,8 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
 
     private JButton btnLuu, btnHuyPhieu, btnLamMoi;
     
-    // Nút mới thêm
     private JButton btnRefresh, btnImport, btnSaveExcel, btnExport;
 
-    // Lịch sử phiếu nhập
     private JTextField        txtSearch;
     private JTable            tblLichSu;
     private DefaultTableModel modelLichSu;
@@ -67,15 +61,10 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         });
     }
 
-    // ==========================================================
-    // BUILD UI
-    // ==========================================================
     private void buildUI() {
         setLayout(new BorderLayout(0, 10));
         setBackground(clrBackground);
         setBorder(BorderFactory.createEmptyBorder(20, 25, 15, 25));
-
-        // TIÊU ĐỀ VÀ NÚT REFRESH ICON
         JPanel pnlHeader = new JPanel(new BorderLayout());
         pnlHeader.setBackground(clrBackground);
 
@@ -105,7 +94,6 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         pnlHeader.add(btnRefresh, BorderLayout.EAST);
         add(pnlHeader, BorderLayout.NORTH);
 
-        // NỘI DUNG CHÍNH
         JPanel pnlTop = new JPanel(new BorderLayout(0, 10));
         pnlTop.setBackground(clrBackground);
         pnlTop.add(buildPanelPhieu(),   BorderLayout.NORTH);
@@ -119,7 +107,6 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         split.setBackground(clrBackground);
         add(split, BorderLayout.CENTER);
 
-        // NÚT DƯỚI CÙNG
         JPanel pnlBtn = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 8));
         pnlBtn.setBackground(clrBackground);
         
@@ -146,12 +133,9 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         add(pnlBtn, BorderLayout.SOUTH);
     }
 
-    /** Panel trên: thông tin phiếu + thông tin nhân viên */
     private JPanel buildPanelPhieu() {
         JPanel p = new JPanel(new GridLayout(1, 2, 15, 0));
         p.setBackground(clrBackground);
-
-        // === TRÁI: Thông tin phiếu nhập ===
         JPanel pnlPhieu = card();
         pnlPhieu.setLayout(new GridLayout(3, 4, 12, 10));
         Font fl = new Font(tenFont, Font.BOLD, 13);
@@ -173,7 +157,6 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         pnlPhieu.add(new JLabel()); pnlPhieu.add(new JLabel());
         pnlPhieu.add(new JLabel()); pnlPhieu.add(new JLabel());
 
-        // === PHẢI: Thông tin nhân viên ===
         JPanel pnlNV = card();
         pnlNV.setLayout(new BorderLayout(0, 8));
 
@@ -200,7 +183,6 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         return p;
     }
 
-    /** Panel giữa: form thêm dòng + bảng chi tiết */
     private JPanel buildPanelChiTiet() {
         JPanel p = new JPanel(new BorderLayout(0, 8));
         p.setBackground(clrBackground);
@@ -244,8 +226,6 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         p.add(new JScrollPane(tblChiTiet), BorderLayout.CENTER);
         return p;
     }
-
-    /** Panel dưới: lịch sử phiếu nhập */
     private JPanel buildPanelLichSu() {
         JPanel p = new JPanel(new BorderLayout(0, 8));
         p.setBackground(clrBackground);
@@ -273,7 +253,6 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         pRight.add(btnTim); pRight.add(btnXoaLoc);
         top.add(t, BorderLayout.WEST); top.add(pRight, BorderLayout.EAST);
 
-        // Bảng lịch sử
         String[] cols = {"Mã Phiếu", "Ngày Nhập", "Nhà Cung Cấp", "Tổng Tiền (đ)", "Người Nhập"};
         modelLichSu = new DefaultTableModel(cols, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
@@ -289,12 +268,9 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         right.setHorizontalAlignment(SwingConstants.RIGHT);
         tblLichSu.getColumnModel().getColumn(3).setCellRenderer(right);
 
-        // Sự kiện tìm kiếm
         btnTim.addActionListener(e -> timLichSu(txtSearch.getText().trim()));
         txtSearch.addActionListener(e -> timLichSu(txtSearch.getText().trim()));
         btnXoaLoc.addActionListener(e -> { txtSearch.setText(""); loadLichSu(); });
-
-        // Click vào dòng → xem chi tiết
         tblLichSu.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 int row = tblLichSu.getSelectedRow();
@@ -307,9 +283,6 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         return p;
     }
 
-    // ==========================================================
-    // EVENTS
-    // ==========================================================
     private void initEvents() {
         txtMaSachNhap.addActionListener(e -> lookupTenSach());
         btnThemDong.addActionListener(e -> themDong());
@@ -339,7 +312,6 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         btnHuyPhieu.addActionListener(e -> huyPhieu());
         btnLamMoi.addActionListener(e -> lamMoiPhieu());
         
-        // Sự kiện các nút chức năng mới
         btnRefresh.addActionListener(e -> {
             lamMoiPhieu();
             loadLichSu();
@@ -347,7 +319,7 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
 
         btnImport.addActionListener(e -> {
             Utils.ExcelImporter.importExcelToTable(tblChiTiet, modelChiTiet);
-            capNhatTongTien(); // Cập nhật lại tổng tiền sau khi import
+            capNhatTongTien(); 
         });
 
         btnExport.addActionListener(e -> {
@@ -363,14 +335,11 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Bảng Chi Tiết đang trống, vui lòng Import dữ liệu trước!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            // Gọi lại hàm lưu phiếu chính vì logic đã xử lý lưu DB ở đó
+
             luuPhieu();
         });
     }
 
-    // ==========================================================
-    // LOGIC
-    // ==========================================================
     private void hienThiThongTinNV() {
         SessionManager sm = SessionManager.getInstance();
         if (sm.isLoggedIn()) {
@@ -553,7 +522,6 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
     }
 
     private void huyPhieu() {
-        String maPN = txtMaPN.getText().trim();
         int confirm = JOptionPane.showConfirmDialog(this,
                 "Làm mới phiếu nhập hiện tại?\nDữ liệu chưa lưu sẽ bị xóa.",
                 "Xác nhận", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -631,9 +599,6 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         return "";
     }
 
-    // ==========================================================
-    // UI HELPERS
-    // ==========================================================
     private JPanel card() {
         JPanel p = new JPanel();
         p.setBackground(clrWhite);

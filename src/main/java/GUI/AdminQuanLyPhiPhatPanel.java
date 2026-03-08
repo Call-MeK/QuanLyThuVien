@@ -7,8 +7,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
 import BUS.*;
 import DTO.*;
 
@@ -26,8 +24,7 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
     private CardLayout searchInputLayout;
     private JTable table;
     private DefaultTableModel model;
-    private JButton btnThem, btnCapNhat, btnThuTien, btnHuy, btnLamMoi, btnSearch, btnResetSearch;
-    // Thêm các nút mới
+    private JButton btnThem, btnCapNhat, btnThuTien, btnHuy, btnSearch, btnResetSearch;
     private JButton btnRefresh, btnImport, btnExport, btnSave; 
 
     private PhieuPhatBUS phieuPhatBUS = new PhieuPhatBUS();
@@ -43,7 +40,6 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         setBackground(colorBackground);
         setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
 
-        // --- HEADER BÊN TRÊN (Chứa Tiêu đề + Nút Làm Mới Icon) ---
         JPanel pnlHeader = new JPanel(new BorderLayout());
         pnlHeader.setBackground(colorBackground);
 
@@ -52,7 +48,6 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         lblTitle.setForeground(new Color(33, 37, 41));
         pnlHeader.add(lblTitle, BorderLayout.WEST);
 
-        // Nút Làm Mới bằng Icon
         btnRefresh = new JButton();
         btnRefresh.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnRefresh.setContentAreaFilled(false); 
@@ -76,7 +71,6 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         JPanel pnlCenter = new JPanel(new BorderLayout(0, 15));
         pnlCenter.setBackground(colorBackground);
 
-        // --- FORM NHẬP LIỆU ---
         JPanel pnlInput = new JPanel(new GridLayout(3, 4, 15, 15));
         pnlInput.setBackground(Color.WHITE);
         pnlInput.setBorder(BorderFactory.createCompoundBorder(
@@ -101,21 +95,17 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         
         txtSoTien = new JTextField("0"); txtSoTien.setFont(fontInput);
 
-        // Hàng 1
         pnlInput.add(createLabel("Mã phiếu phạt:", fontLabel)); pnlInput.add(txtMaPhieuPhat);
         pnlInput.add(createLabel("Mã phiếu mượn:", fontLabel)); pnlInput.add(txtMaPhieuMuon);
         
-        // Hàng 2
         pnlInput.add(createLabel("Mã cuốn sách:", fontLabel));  
         pnlInput.add(cbMaCuonSach);
         pnlInput.add(createLabel("Lý do phạt:", fontLabel));     pnlInput.add(cbLyDo);
         
-        // Hàng 3
         pnlInput.add(createLabel("Số tiền (VNĐ):", fontLabel)); pnlInput.add(txtSoTien);
-        pnlInput.add(new JLabel("")); // Cột trống để cân bằng layout
-        pnlInput.add(new JLabel("")); // Cột trống để cân bằng layout
-
-        // --- THANH TÌM KIẾM ---
+        pnlInput.add(new JLabel("")); 
+        pnlInput.add(new JLabel("")); 
+        
         JPanel pnlSearch = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         pnlSearch.setBackground(colorBackground);
         pnlSearch.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
@@ -156,7 +146,7 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         pnlTopCenter.add(pnlSearch, BorderLayout.CENTER);
         pnlCenter.add(pnlTopCenter, BorderLayout.NORTH);
 
-        // --- BẢNG ---
+
         String[] columns = {"Mã Phạt", "Mã Phiếu Mượn", "Ngày Lập", "Lý Do", "Tổng Tiền", "Trạng Thái"};
         model = new DefaultTableModel(columns, 0) {
             @Override
@@ -195,7 +185,6 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         pnlCenter.add(scrollPane, BorderLayout.CENTER);
         add(pnlCenter, BorderLayout.CENTER);
 
-        // --- NÚT CHỨC NĂNG ---
         JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         pnlButtons.setBackground(colorBackground);
 
@@ -204,7 +193,6 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         btnCapNhat.setForeground(Color.BLACK);
         btnThuTien = createActionButton("Xác Nhận Thu", new Color(13, 110, 253));
         btnHuy = createActionButton("Hủy Phiếu", new Color(220, 53, 69));
-        // Đã gỡ nút btnLamMoi ở dưới để dùng nút icon ở trên
         
         btnImport = createActionButton("Import", new Color(33, 115, 70)); 
         btnSave = createActionButton("Save", new Color(111, 66, 193));
@@ -223,23 +211,17 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
         txtMaPhieuPhat.setText(phieuPhatBUS.generateMaPP());
     }
 
-    // ==========================================================
-    // SỰ KIỆN
-    // ==========================================================
     private void initEvents() {
         
-        // Sự kiện: Khi gõ xong Mã Phiếu Mượn và ấn Enter -> Tải danh sách sách
         txtMaPhieuMuon.addActionListener(e -> {
             String maPM = txtMaPhieuMuon.getText().trim();
             if (!maPM.isEmpty()) {
-                // Gọi BUS để lấy danh sách
                 ArrayList<String> dsMaSach = phieuPhatBUS.getDanhSachMaSachByMaPM(maPM);
-                cbMaCuonSach.removeAllItems(); // Xóa dữ liệu cũ
+                cbMaCuonSach.removeAllItems(); 
                 
                 if (dsMaSach.isEmpty()) {
                     JOptionPane.showMessageDialog(this, "Không tìm thấy cuốn sách nào thuộc mã phiếu mượn này!", "Thông báo", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    // Đổ dữ liệu mới vào ComboBox
                     for (String ma : dsMaSach) {
                         cbMaCuonSach.addItem(ma);
                     }
@@ -248,7 +230,6 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
             }
         });
 
-        // 1. Click bảng -> đổ dữ liệu lên form
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -257,7 +238,7 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
                     txtMaPhieuPhat.setText(safeGet(row, 0));
                     txtMaPhieuMuon.setText(safeGet(row, 1));
                     txtMaPhieuMuon.setEditable(false);
-                    cbMaCuonSach.removeAllItems(); // Bảng chính không hiện mã sách, nên reset tạm
+                    cbMaCuonSach.removeAllItems(); 
 
                     String lyDo = safeGet(row, 3);
                     boolean found = false;
@@ -275,15 +256,13 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
             }
         });
 
-        // 2. LÀM MỚI (Icon trên cùng)
         btnRefresh.addActionListener(e -> {
             lamMoiForm();
             phieuPhatBUS.reloadFromDB();
             loadDataToTable();
         });
 
-        // 3. LẬP PHIẾU PHẠT
-        btnThem.addActionListener(e -> {
+        btnThem.addActionListener(e -> {    
             if (txtMaPhieuMuon.getText().trim().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Vui lòng nhập mã phiếu mượn!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
                 return;
@@ -316,10 +295,7 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
             ChiTietPhieuPhatDTO ctpp = new ChiTietPhieuPhatDTO();
             ctpp.setMaCTPP("CT" + maPP.substring(2));
             ctpp.setMaPP(maPP);
-            
-            // Lấy mã cuốn sách từ JComboBox
             ctpp.setMaCuonSach(cbMaCuonSach.getSelectedItem().toString());
-            
             ctpp.setLyDo(lyDo);
             ctpp.setSoTien(String.valueOf(soTien));
 
@@ -336,7 +312,6 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
             }
         });
 
-        // 4. CẬP NHẬT (chỉ phiếu chưa TT)
         btnCapNhat.addActionListener(e -> {
             if (table.getSelectedRow() < 0) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 phiếu phạt trong bảng!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
@@ -366,7 +341,6 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
             }
         });
 
-        // 5. XÁC NHẬN THU TIỀN (chỉ phiếu chưa TT)
         btnThuTien.addActionListener(e -> {
             if (table.getSelectedRow() < 0) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 phiếu phạt trong bảng!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
@@ -391,7 +365,6 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
             }
         });
 
-        // 6. HỦY PHIẾU (chỉ phiếu chưa TT)
         btnHuy.addActionListener(e -> {
             if (table.getSelectedRow() < 0) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 phiếu phạt trong bảng!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
@@ -416,7 +389,6 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
             }
         });
 
-        // 7. Đổi tiêu chí tìm kiếm
         cbSearchCriteria.addActionListener(e -> {
             if ("Trạng Thái".equals(cbSearchCriteria.getSelectedItem())) {
                 searchInputLayout.show(pnlSearchInput, "COMBO");
@@ -425,7 +397,6 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
             }
         });
 
-        // 8. TÌM KIẾM
         btnSearch.addActionListener(e -> {
             String criteria = (String) cbSearchCriteria.getSelectedItem();
             String keyword = "Trạng Thái".equals(criteria)
@@ -434,7 +405,6 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
             hienThiKetQua(phieuPhatBUS.search(keyword, criteria));
         });
 
-        // 9. HỦY LỌC
         btnResetSearch.addActionListener(e -> {
             txtSearch.setText("");
             cbSearchCriteria.setSelectedIndex(0);
@@ -443,12 +413,9 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
             loadDataToTable();
         });
         
-        // 10. Nút IMPORT EXCEL
         btnImport.addActionListener(e -> {
             Utils.ExcelImporter.importExcelToTable(table, model);
         });
-
-        // 11. Nút EXPORT EXCEL
         btnExport.addActionListener(e -> {
             if (model.getRowCount() == 0) {
                 JOptionPane.showMessageDialog(this, "Không có dữ liệu để xuất!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
@@ -457,8 +424,6 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
             Utils.ExcelExporter.exportTableToExcel(table, "DanhSach_PhieuPhat");
         });
         
-        // 12. Nút SAVE (Dành cho Import Excel)
-        // 12. Nút SAVE (Dành cho Import Excel)
         btnSave.addActionListener(e -> {
             int rowCount = table.getRowCount();
             if (rowCount == 0) {
@@ -479,7 +444,6 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
 
                 for (int i = 0; i < rowCount; i++) {
                     try {
-                        // Cột 0: Mã Phạt, 1: Mã Phiếu Mượn, 2: Ngày Lập, 3: Lý Do, 4: Tổng Tiền, 5: Trạng Thái
                         String maPP = model.getValueAt(i, 0).toString().trim();
                         String maPM = model.getValueAt(i, 1).toString().trim();
                         String ngayLap = model.getValueAt(i, 2).toString().trim();
@@ -489,7 +453,6 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
                         
                         int trangThai = trangThaiStr.equals("Đã thanh toán") ? 1 : (trangThaiStr.equals("Đã hủy") ? 2 : 0);
 
-                        // Tạo Phiếu Phạt
                         PhieuPhatDTO pp = new PhieuPhatDTO();
                         pp.setMaPP(maPP);
                         pp.setMaPM(maPM);
@@ -498,18 +461,16 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
                         pp.setTongTien(tongTien);
                         pp.setTrangThai(trangThai);
 
-                        // Tạo 1 dòng Chi Tiết Phiếu Phạt giả định (Vì Excel chỉ có 1 dòng tổng)
                         ChiTietPhieuPhatDTO ctpp = new ChiTietPhieuPhatDTO();
                         ctpp.setMaCTPP("CT" + maPP.substring(2));
                         ctpp.setMaPP(maPP);
-                        ctpp.setMaCuonSach("MV000000000000000001"); // Mã sách mặc định do Excel ko có
+                        ctpp.setMaCuonSach("MV000000000000000001");
                         ctpp.setLyDo(lyDo);
                         ctpp.setSoTien(tongTien);
 
                         ArrayList<ChiTietPhieuPhatDTO> dsChiTiet = new ArrayList<>();
                         dsChiTiet.add(ctpp);
 
-                        // Gọi BUS lưu vào Database
                         String result = phieuPhatBUS.taoPhieuPhat(pp, dsChiTiet);
                         if (result.contains("thành công")) {
                             successCount++;
@@ -525,18 +486,12 @@ public class AdminQuanLyPhiPhatPanel extends JPanel {
                         "Lưu hoàn tất!\n- Thành công: " + successCount + " phiếu\n- Bỏ qua (Trùng mã/Lỗi): " + failCount + " phiếu", 
                         "Thông báo", JOptionPane.INFORMATION_MESSAGE);
                 
-                // Load lại bảng
                 phieuPhatBUS.reloadFromDB();
                 loadDataToTable();
             }
         });
     }
 
-    // ==========================================================
-    // HÀM HỖ TRỢ
-    // ==========================================================
-
-    // Kiểm tra dòng đang chọn đã thanh toán chưa
     private boolean isDaTT() {
         return safeGet(table.getSelectedRow(), 5).equals("Đã thanh toán");
     }

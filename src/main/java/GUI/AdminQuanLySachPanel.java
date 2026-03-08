@@ -23,7 +23,7 @@ public class AdminQuanLySachPanel extends JPanel {
     private JTable table;
     private DefaultTableModel model;
 
-    private JButton btnThem, btnSua, btnXoa, btnLamMoi, btnSearch, btnResetSearch;
+    private JButton btnThem, btnSua, btnXoa, btnSearch, btnResetSearch;
     private JButton btnRefresh, btnImport, btnExport, btnSave;
 
     private SachBUS sachBUS = new SachBUS();
@@ -40,7 +40,6 @@ public class AdminQuanLySachPanel extends JPanel {
         lamMoiForm();
         loadDataToTable();
 
-        // Tự reload mỗi khi panel được hiển thị (switch tab)
         this.addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentShown(java.awt.event.ComponentEvent e) {
@@ -49,16 +48,10 @@ public class AdminQuanLySachPanel extends JPanel {
         });
     }
 
-    // =====================================================
-    // PUBLIC METHOD để AdminFrame gọi refresh từ bên ngoài
-    // =====================================================
     public void loadData() {
         loadDataToTable();
     }
 
-    // =====================================================
-    // KHỞI TẠO GIAO DIỆN
-    // =====================================================
     private void initComponents() {
         setLayout(new BorderLayout(15, 15));
         setBackground(colorBackground);
@@ -211,9 +204,6 @@ public class AdminQuanLySachPanel extends JPanel {
         add(pnlButtons, BorderLayout.SOUTH);
     }
 
-    // =====================================================
-    // LOAD COMBOBOX
-    // =====================================================
     private void loadComboBoxes() {
         cbTheLoai.removeAllItems();
         listTheLoai = theLoaiBUS.getAll();
@@ -228,9 +218,6 @@ public class AdminQuanLySachPanel extends JPanel {
                 cbNXB.addItem(nxb.getTenNXB());
     }
 
-    // =====================================================
-    // SỰ KIỆN
-    // =====================================================
     private void initEvents() {
 
         table.addMouseListener(new MouseAdapter() {
@@ -369,17 +356,14 @@ public class AdminQuanLySachPanel extends JPanel {
                         String namXBStr = model.getValueAt(i, 4).toString().trim();
                         sach.setNamXB(Integer.parseInt(namXBStr.isEmpty() ? "0" : namXBStr));
                         sach.setNgonNgu(model.getValueAt(i, 5).toString().trim());
-                        // Parse giá bìa từ bảng (loại bỏ dấu phân cách và ký tự "đ")
                         String giaStr = model.getValueAt(i, 6).toString()
                                 .replace(".", "").replace(",", "").replace(" đ", "").replace("đ", "").trim();
                         sach.setGiaBia(giaStr.isEmpty() ? 0f : Float.parseFloat(giaStr));
                         sach.setIsDeleted(Boolean.FALSE);
-                        // Upsert: thử insert trước, nếu đã tồn tại thì update
                         String result = sachBUS.insert(sach);
                         if (result.contains("thành công")) {
                             insertCount++;
                         } else if (result.contains("đã tồn tại")) {
-                            // Sách đã có → cập nhật thay vì bỏ qua
                             String updateResult = sachBUS.update(sach);
                             if (updateResult.contains("thành công"))
                                 updateCount++;
@@ -401,9 +385,6 @@ public class AdminQuanLySachPanel extends JPanel {
         });
     }
 
-    // =====================================================
-    // HÀM HỖ TRỢ
-    // =====================================================
     private void loadDataToTable() {
         model.setRowCount(0);
         try {

@@ -25,9 +25,6 @@ public class PhieuPhatPanel extends JPanel {
         setBackground(Color.WHITE);
         setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30));
 
-        // ==========================================
-        // PHẦN TRÊN: TIÊU ĐỀ & BỘ LỌC
-        // ==========================================
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.setBackground(Color.WHITE);
@@ -42,7 +39,6 @@ public class PhieuPhatPanel extends JPanel {
         lblSubtitle.setForeground(new Color(108, 117, 125));
         lblSubtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // Bộ lọc trạng thái
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         filterPanel.setBackground(Color.WHITE);
         filterPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -65,7 +61,6 @@ public class PhieuPhatPanel extends JPanel {
             if (selected.equals("Tất cả")) {
                 sorter.setRowFilter(null);
             } else {
-                // ĐÃ SỬA: Cột Trạng Thái giờ là index 5 (vì thêm cột Ngày Lập)
                 sorter.setRowFilter(RowFilter.regexFilter("^" + selected + "$", 5));
             }
         });
@@ -79,9 +74,6 @@ public class PhieuPhatPanel extends JPanel {
         topPanel.add(Box.createVerticalStrut(20));
         topPanel.add(filterPanel);
 
-        // ==========================================
-        // PHẦN GIỮA: BẢNG - ĐÃ SỬA: 6 cột khớp với DAO
-        // ==========================================
         String[] cols = {"Mã Phạt", "Mã Phiếu Mượn", "Ngày Lập", "Lý Do Phạt", "Số Tiền (VNĐ)", "Trạng Thái"};
         DefaultTableModel model = new DefaultTableModel(new Object[][]{}, cols) {
             @Override
@@ -94,7 +86,6 @@ public class PhieuPhatPanel extends JPanel {
         table.getTableHeader().setBackground(new Color(241, 245, 249));
         table.setFont(new Font(tenFont, Font.PLAIN, 14));
 
-        // Tô màu theo trạng thái
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -124,9 +115,6 @@ public class PhieuPhatPanel extends JPanel {
         scrollPane.getViewport().setBackground(Color.WHITE);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240)));
 
-        // ==========================================
-        // PHẦN DƯỚI: CÁC NÚT CHỨC NĂNG
-        // ==========================================
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
         bottomPanel.setBackground(Color.WHITE);
 
@@ -149,11 +137,9 @@ public class PhieuPhatPanel extends JPanel {
                 String ngayLap = table.getModel().getValueAt(modelRow, 2).toString();
                 String trangThai = table.getModel().getValueAt(modelRow, 5).toString();
 
-                // Lấy chi tiết CÓ TÊN SÁCH từ Database (cần import BUS.ChiTietPhieuPhatBUS ở đầu file nếu chưa có)
                 BUS.ChiTietPhieuPhatBUS chiTietBUS = new BUS.ChiTietPhieuPhatBUS();
                 ArrayList<Object[]> dsChiTiet = chiTietBUS.getChiTietCoTenSachByMaPP(maPhat);
 
-                // Dựng chuỗi hiển thị chi tiết
                 StringBuilder sb = new StringBuilder();
                 sb.append("--- THÔNG TIN CHUNG ---\n");
                 sb.append("Mã Phiếu Phạt: ").append(maPhat).append("\n");
@@ -167,12 +153,10 @@ public class PhieuPhatPanel extends JPanel {
                     double tongTien = 0;
                     for (int i = 0; i < dsChiTiet.size(); i++) {
                         Object[] ct = dsChiTiet.get(i);
-                        // ct[0]: Mã sách, ct[1]: Tên sách, ct[2]: Lý do, ct[3]: Số tiền (dạng chuỗi có dấu phẩy)
                         sb.append(i + 1).append(". Sách: ").append(ct[1]).append(" (Mã vạch: ").append(ct[0]).append(")\n");
                         sb.append("   - Lỗi vi phạm: ").append(ct[2]).append("\n");
                         sb.append("   - Phạt: ").append(ct[3]).append(" VNĐ\n\n");
                         
-                        // Tính tổng tiền (phải xóa dấu phẩy mới parse sang số được)
                         String tienChuoi = ct[3].toString().replace(",", "");
                         try {
                             tongTien += Double.parseDouble(tienChuoi);
@@ -182,7 +166,6 @@ public class PhieuPhatPanel extends JPanel {
                     sb.append("TỔNG TIỀN PHẠT: ").append(String.format("%,.0f", tongTien)).append(" VNĐ");
                 }
 
-                // Hiển thị lên màn hình
                 JTextArea textArea = new JTextArea(sb.toString());
                 textArea.setFont(new Font(tenFont, Font.PLAIN, 14));
                 textArea.setEditable(false);
@@ -233,27 +216,22 @@ public class PhieuPhatPanel extends JPanel {
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    // --- GETTER ---
     public JTable getTable() { return table; }
     public JButton getBtnXemChiTiet() { return btnXemChiTiet; }
     public JButton getBtnThanhToan() { return btnThanhToan; }
 
-    // --- LOAD DATA ---
     public void loadDataToTable() {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.setRowCount(0);
         
-        // Lấy mã Độc giả đang đăng nhập từ Session
         String maDocGiaDangNhap = BUS.SessionManager.getInstance().getMaNguoi();
         
         ArrayList<Object[]> dsHienThi;
         
-        // Kiểm tra xem có người đăng nhập không
         if (maDocGiaDangNhap != null && !maDocGiaDangNhap.isEmpty()) {
-            // Chỉ lấy phiếu phạt của người này
+            
             dsHienThi = phieuPhatBUS.getDanhSachHienThiGUIByMaDocGia(maDocGiaDangNhap); 
         } else {
-            // Nếu lỗi session (không có ai đăng nhập), cho mảng rỗng để không hiện gì cả
             dsHienThi = new ArrayList<>();
         }
 

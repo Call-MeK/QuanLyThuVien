@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DAO;
 
 import java.sql.Connection;
@@ -10,13 +6,8 @@ import java.sql.ResultSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- *
- * @author uly28
- */
 public class ThongKeDAO {
 
-    // 1. Thống kê số lượng sách theo thể loại
     public Map<String, Integer> thongKeSachTheoTheLoai() {
         Map<String, Integer> result = new LinkedHashMap<>();
         String sql = "SELECT tl.TenTheLoai, COUNT(*) AS SoLuong "
@@ -41,7 +32,6 @@ public class ThongKeDAO {
         return result;
     }
 
-    // 2. Thống kê top 5 độc giả mượn nhiều sách nhất
     public Map<String, Integer> thongKeTop5DocGiaMuonNhieu() {
         Map<String, Integer> result = new LinkedHashMap<>();
         String sql = "SELECT TOP 5 dg.MaDocGia, cn.HoTen, COUNT(ct.MaCuonSach) AS SoLuongMuon "
@@ -70,7 +60,6 @@ public class ThongKeDAO {
         return result;
     }
 
-    // 3. Thống kê sách được mượn nhiều nhất
     public Map<String, Integer> thongKeSachMuonNhieuNhat() {
         Map<String, Integer> result = new LinkedHashMap<>();
         String sql = "SELECT TOP 10 s.MaSach, s.tenSach, COUNT(ct.MaCuonSach) AS SoLanMuon "

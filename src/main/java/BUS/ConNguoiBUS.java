@@ -4,10 +4,6 @@ import DAO.ConNguoiDAO;
 import DTO.ConNguoiDTO;
 import java.util.ArrayList;
 
-/**
- *
- * @author Admin
- */
 public class ConNguoiBUS {
     private ConNguoiDAO conNguoiDAO;
     private ArrayList<ConNguoiDTO> listConNguoi;

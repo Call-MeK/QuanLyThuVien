@@ -21,7 +21,6 @@ public class SachDangMuonPanel extends JPanel {
     private JButton btnXemChiTiet;
     private JButton btnTraSach;
 
-    // MaThe của user đang đăng nhập
     private String maTheCurrent = null;
 
     public SachDangMuonPanel() {
@@ -30,7 +29,6 @@ public class SachDangMuonPanel extends JPanel {
         loadDataToTable();
     }
 
-    /** Lấy MaDocGia từ session -> tìm MaThe tương ứng */
     private void timMaThe() {
         String maDG = SessionManager.getInstance().getMaNguoi();
         if (maDG == null || maDG.isEmpty()) return;
@@ -44,9 +42,6 @@ public class SachDangMuonPanel extends JPanel {
         setBackground(Color.WHITE);
         setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30));
 
-        // ==========================================
-        // PHẦN TRÊN: TIÊU ĐỀ & BỘ LỌC
-        // ==========================================
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.setBackground(Color.WHITE);
@@ -75,7 +70,6 @@ public class SachDangMuonPanel extends JPanel {
         cbStatus.setFont(new Font(tenFont, Font.PLAIN, 13));
         cbStatus.setBackground(Color.WHITE);
 
-        // Lọc theo cột 5 (Trạng Thái)
         cbStatus.addActionListener(e -> {
             String selected = cbStatus.getSelectedItem().toString();
             TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
@@ -96,10 +90,6 @@ public class SachDangMuonPanel extends JPanel {
         topPanel.add(Box.createVerticalStrut(20));
         topPanel.add(filterPanel);
 
-        // ==========================================
-        // PHẦN GIỮA: BẢNG
-        // Cột 0: Mã Phiếu (ẩn) | 1: Tên Sách | 2: Ngày Mượn | 3: Hạn Trả | 4: Ngày Trả | 5: Trạng Thái
-        // ==========================================
         String[] cols = {"Mã Phiếu", "Tên Sách", "Ngày Mượn", "Hạn Trả", "Ngày Trả", "Trạng Thái"};
         model = new DefaultTableModel(cols, 0) {
             @Override public boolean isCellEditable(int row, int col) { return false; }
@@ -115,7 +105,6 @@ public class SachDangMuonPanel extends JPanel {
         table.setIntercellSpacing(new Dimension(0, 0));
         table.setShowVerticalLines(false);
 
-        // Màu sắc theo trạng thái
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable t, Object value,
@@ -144,7 +133,6 @@ public class SachDangMuonPanel extends JPanel {
             }
         });
 
-        // Ẩn cột Mã Phiếu (vẫn giữ trong model để dùng trong sự kiện)
         table.getColumnModel().getColumn(0).setMinWidth(0);
         table.getColumnModel().getColumn(0).setMaxWidth(0);
         table.getColumnModel().getColumn(0).setWidth(0);
@@ -153,9 +141,6 @@ public class SachDangMuonPanel extends JPanel {
         scrollPane.getViewport().setBackground(Color.WHITE);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240)));
 
-        // ==========================================
-        // PHẦN DƯỚI: NÚT CHỨC NĂNG
-        // ==========================================
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
         bottomPanel.setBackground(Color.WHITE);
 
@@ -230,9 +215,6 @@ public class SachDangMuonPanel extends JPanel {
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    // =======================================================
-    // LOAD DỮ LIỆU — chỉ lấy phiếu của user đang đăng nhập
-    // =======================================================
     public void loadDataToTable() {
         model.setRowCount(0);
 

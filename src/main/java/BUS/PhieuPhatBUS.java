@@ -11,56 +11,77 @@ public class PhieuPhatBUS {
     private ChiTietPhieuPhatDAO chiTietDAO;
     private ArrayList<PhieuPhatDTO> listPP;
 
-    // LOGIC NGHIỆP VỤ:
-    // Chưa TT (0): Cập nhật ✓, Thu tiền ✓, Hủy ✓
-    // Đã TT  (1): Cập nhật ✗, Thu tiền ✗, Hủy ✗  (khóa hết)
-
     public PhieuPhatBUS() {
         phieuPhatDAO = new PhieuPhatDAO();
         chiTietDAO = new ChiTietPhieuPhatDAO();
         listPP = phieuPhatDAO.getAll();
     }
 
-    public ArrayList<PhieuPhatDTO> getAll() { return phieuPhatDAO.getAll(); }
-    public ArrayList<PhieuPhatDTO> getListPP() { return listPP; }
-    public void reloadFromDB() { listPP = phieuPhatDAO.getAll(); }
-    public PhieuPhatDTO getById(String maPP) { return phieuPhatDAO.getById(maPP); }
-    public ArrayList<ChiTietPhieuPhatDTO> getChiTiet(String maPP) { return chiTietDAO.getByMaPP(maPP); }
-    public ArrayList<Object[]> getDanhSachHienThiGUI() { return phieuPhatDAO.getDanhSachHienThiGUI(); }
-    // Lọc phiếu phạt theo Mã Độc Giả (Dành cho User GUI)
-    public ArrayList<Object[]> getDanhSachHienThiGUIByMaDocGia(String maDocGia) { 
-        return phieuPhatDAO.getDanhSachHienThiGUIByMaDocGia(maDocGia); 
+    public ArrayList<PhieuPhatDTO> getAll() {
+        return phieuPhatDAO.getAll();
     }
-    public String generateMaPP() { return phieuPhatDAO.generateMaPP(); }
 
-    // Kiểm tra phiếu đã thanh toán chưa (dùng chung cho các hàm)
+    public ArrayList<PhieuPhatDTO> getListPP() {
+        return listPP;
+    }
+
+    public void reloadFromDB() {
+        listPP = phieuPhatDAO.getAll();
+    }
+
+    public PhieuPhatDTO getById(String maPP) {
+        return phieuPhatDAO.getById(maPP);
+    }
+
+    public ArrayList<ChiTietPhieuPhatDTO> getChiTiet(String maPP) {
+        return chiTietDAO.getByMaPP(maPP);
+    }
+
+    public ArrayList<Object[]> getDanhSachHienThiGUI() {
+        return phieuPhatDAO.getDanhSachHienThiGUI();
+    }
+
+    public ArrayList<Object[]> getDanhSachHienThiGUIByMaDocGia(String maDocGia) {
+        return phieuPhatDAO.getDanhSachHienThiGUIByMaDocGia(maDocGia);
+    }
+
+    public String generateMaPP() {
+        return phieuPhatDAO.generateMaPP();
+    }
+
     private int getTrangThai(String maPP) {
         for (PhieuPhatDTO pp : listPP) {
-            if (pp.getMaPP().equals(maPP)) return pp.getTrangThai();
+            if (pp.getMaPP().equals(maPP))
+                return pp.getTrangThai();
         }
-        return -1; // không tìm thấy
+        return -1;
     }
 
-    // XÁC NHẬN THU TIỀN (0 -> 1)
     public String thanhToan(String maPP) {
         int tt = getTrangThai(maPP);
-        if (tt == -1) return "Không tìm thấy phiếu phạt";
-        if (tt == 1)  return "Phiếu này đã thanh toán rồi";
+        if (tt == -1)
+            return "Không tìm thấy phiếu phạt";
+        if (tt == 1)
+            return "Phiếu này đã thanh toán rồi";
 
         if (phieuPhatDAO.thanhToan(maPP)) {
             for (PhieuPhatDTO pp : listPP) {
-                if (pp.getMaPP().equals(maPP)) { pp.setTrangThai(1); break; }
+                if (pp.getMaPP().equals(maPP)) {
+                    pp.setTrangThai(1);
+                    break;
+                }
             }
             return "Xác nhận thanh toán thành công";
         }
         return "Xác nhận thanh toán thất bại";
     }
 
-    // HỦY PHIẾU (0 -> 2): chỉ hủy phiếu CHƯA thanh toán
     public String deletePhieuPhat(String maPP) {
         int tt = getTrangThai(maPP);
-        if (tt == -1) return "Không tìm thấy phiếu phạt";
-        if (tt == 1)  return "Không thể hủy phiếu đã thanh toán";
+        if (tt == -1)
+            return "Không tìm thấy phiếu phạt";
+        if (tt == 1)
+            return "Không thể hủy phiếu đã thanh toán";
 
         if (phieuPhatDAO.delete(maPP)) {
             listPP.removeIf(pp -> pp.getMaPP().equals(maPP));
@@ -69,27 +90,27 @@ public class PhieuPhatBUS {
         return "Hủy phiếu phạt thất bại";
     }
 
-    // CẬP NHẬT (sửa lý do, số tiền): chỉ sửa phiếu CHƯA thanh toán
     public String capNhatPhieuPhat(String maPP, String lyDoMoi, double soTienMoi) {
         int tt = getTrangThai(maPP);
-        if (tt == -1) return "Không tìm thấy phiếu phạt";
-        if (tt == 1)  return "Không thể sửa phiếu đã thanh toán";
+        if (tt == -1)
+            return "Không tìm thấy phiếu phạt";
+        if (tt == 1)
+            return "Không thể sửa phiếu đã thanh toán";
 
-        // Bước 1: Cập nhật tổng tiền bảng PHIEUPHAT
         PhieuPhatDTO target = null;
         for (PhieuPhatDTO pp : listPP) {
-            if (pp.getMaPP().equals(maPP)) { target = pp; break; }
+            if (pp.getMaPP().equals(maPP)) {
+                target = pp;
+                break;
+            }
         }
         target.setTongTien(String.valueOf(soTienMoi));
-        if (!phieuPhatDAO.update(target)) return "Cập nhật phiếu phạt thất bại";
+        if (!phieuPhatDAO.update(target))
+            return "Cập nhật phiếu phạt thất bại";
 
-        // Bước 2: Cập nhật lý do + số tiền bảng CHITIETPHIEUPHAT
-        // Dùng updateByMaPP để cập nhật trực tiếp theo mã phiếu phạt
         boolean ctUpdated = chiTietDAO.updateByMaPP(maPP, lyDoMoi, String.valueOf(soTienMoi));
 
         if (!ctUpdated) {
-            // Không có chi tiết nào được cập nhật -> tạo mới
-            // Sinh mã không trùng bằng timestamp
             String maCTPP = "CT" + System.currentTimeMillis() % 100000000;
             ChiTietPhieuPhatDTO ctMoi = new ChiTietPhieuPhatDTO();
             ctMoi.setMaCTPP(maCTPP);
@@ -106,7 +127,6 @@ public class PhieuPhatBUS {
         return "Cập nhật phiếu phạt thành công";
     }
 
-    // TẠO PHIẾU PHẠT MỚI
     public String taoPhieuPhat(PhieuPhatDTO phieuPhat, ArrayList<ChiTietPhieuPhatDTO> dsChiTiet) {
         double tongTien = 0;
         for (ChiTietPhieuPhatDTO ct : dsChiTiet) {
@@ -126,16 +146,15 @@ public class PhieuPhatBUS {
         return "Tạo phiếu phạt thất bại: " + result;
     }
 
-    // TÌM KIẾM (bao gồm phiếu đã hủy nếu lọc theo trạng thái)
     public ArrayList<Object[]> search(String keyword, String criteria) {
-        // Nếu tìm theo trạng thái thì dùng danh sách đầy đủ (bao gồm đã hủy)
         ArrayList<Object[]> all;
         if ("Trạng Thái".equals(criteria)) {
             all = phieuPhatDAO.getDanhSachBaoGomDaHuy();
         } else {
-            all = getDanhSachHienThiGUI(); // Mặc định chỉ lấy chưa TT + đã TT
+            all = getDanhSachHienThiGUI();
         }
-        if (keyword == null || keyword.trim().isEmpty()) return all;
+        if (keyword == null || keyword.trim().isEmpty())
+            return all;
 
         ArrayList<Object[]> result = new ArrayList<>();
         String lowerKeyword = keyword.toLowerCase().trim();
@@ -152,15 +171,23 @@ public class PhieuPhatBUS {
                     match = maPP.contains(lowerKeyword) || maPM.contains(lowerKeyword) ||
                             lyDo.contains(lowerKeyword) || trangThai.contains(lowerKeyword);
                     break;
-                case "Mã Phạt":    match = maPP.contains(lowerKeyword); break;
-                case "Mã Phiếu Mượn": match = maPM.contains(lowerKeyword); break;
-                case "Trạng Thái": match = trangThai.contains(lowerKeyword); break;
+                case "Mã Phạt":
+                    match = maPP.contains(lowerKeyword);
+                    break;
+                case "Mã Phiếu Mượn":
+                    match = maPM.contains(lowerKeyword);
+                    break;
+                case "Trạng Thái":
+                    match = trangThai.contains(lowerKeyword);
+                    break;
             }
-            if (match) result.add(row);
+            if (match)
+                result.add(row);
         }
         return result;
     }
+
     public ArrayList<String> getDanhSachMaSachByMaPM(String maPM) {
-    return chiTietDAO.getDanhSachMaSachByMaPM(maPM);
-}
+        return chiTietDAO.getDanhSachMaSachByMaPM(maPM);
+    }
 }

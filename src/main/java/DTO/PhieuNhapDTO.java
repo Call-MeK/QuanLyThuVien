@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DTO;
 
-/**
- *
- * @author Admin
- */
 public class PhieuNhapDTO {
     private String MaPN;
     private String NgayNhap;
@@ -65,5 +57,5 @@ public class PhieuNhapDTO {
     public void setMaNQL(String MaNQL) {
         this.MaNQL = MaNQL;
     }
-    
+
 }

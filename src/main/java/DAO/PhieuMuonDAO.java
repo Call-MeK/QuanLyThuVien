@@ -108,31 +108,31 @@ public class PhieuMuonDAO {
         try (Connection conn = DatabaseConnection.getConnection();
                 Statement st = conn.createStatement();
                 ResultSet rs = st.executeQuery(sql)) {
-            if (rs.next()) return rs.getInt(1);
+            if (rs.next())
+                return rs.getInt(1);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return 0;
     }
 
-    // Dùng cho admin: lấy tất cả (không lọc theo user)
     public ArrayList<Object[]> getDanhSachSachDangMuon() {
         ArrayList<Object[]> list = new ArrayList<>();
         String sql = "SELECT pm.MaPM, s.TenSach, pm.NgayMuon, pm.HenTra, pm.TinhTrang " +
-                     "FROM PHIEUMUON pm " +
-                     "JOIN CHITIETPHIEUMUON ct ON pm.MaPM = ct.MaPM " +
-                     "JOIN SACHCOPY sc ON ct.MaCuonSach = sc.MaVach " +
-                     "JOIN SACH s ON sc.MaSach = s.MaSach";
+                "FROM PHIEUMUON pm " +
+                "JOIN CHITIETPHIEUMUON ct ON pm.MaPM = ct.MaPM " +
+                "JOIN SACHCOPY sc ON ct.MaCuonSach = sc.MaVach " +
+                "JOIN SACH s ON sc.MaSach = s.MaSach";
         try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                list.add(new Object[]{
-                    rs.getString("MaPM"),
-                    rs.getString("TenSach"),
-                    rs.getString("NgayMuon"),
-                    rs.getString("HenTra"),
-                    rs.getString("TinhTrang")
+                list.add(new Object[] {
+                        rs.getString("MaPM"),
+                        rs.getString("TenSach"),
+                        rs.getString("NgayMuon"),
+                        rs.getString("HenTra"),
+                        rs.getString("TinhTrang")
                 });
             }
         } catch (Exception e) {
@@ -141,40 +141,40 @@ public class PhieuMuonDAO {
         return list;
     }
 
-    // Dùng cho user: chỉ lấy phiếu của thẻ đang đăng nhập
     public ArrayList<Object[]> getDanhSachSachDangMuonByMaThe(String maThe) {
         ArrayList<Object[]> list = new ArrayList<>();
         String sql = "SELECT pm.MaPM, s.TenSach, pm.NgayMuon, pm.HenTra, pm.NgayTra, pm.TinhTrang " +
-                     "FROM PHIEUMUON pm " +
-                     "JOIN CHITIETPHIEUMUON ct ON pm.MaPM = ct.MaPM " +
-                     "JOIN SACHCOPY sc ON ct.MaCuonSach = sc.MaVach " +
-                     "JOIN SACH s ON sc.MaSach = s.MaSach " +
-                     "WHERE pm.MaThe = ? AND pm.TinhTrang != 'Đã xóa' " +
-                     "ORDER BY pm.NgayMuon DESC";
+                "FROM PHIEUMUON pm " +
+                "JOIN CHITIETPHIEUMUON ct ON pm.MaPM = ct.MaPM " +
+                "JOIN SACHCOPY sc ON ct.MaCuonSach = sc.MaVach " +
+                "JOIN SACH s ON sc.MaSach = s.MaSach " +
+                "WHERE pm.MaThe = ? AND pm.TinhTrang != 'Đã xóa' " +
+                "ORDER BY pm.NgayMuon DESC";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, maThe);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     String tinhTrang = rs.getString("TinhTrang");
-                    String henTra    = rs.getString("HenTra");
-                    String ngayTra   = rs.getString("NgayTra");
+                    String henTra = rs.getString("HenTra");
+                    String ngayTra = rs.getString("NgayTra");
 
-                    // Tự tính "Trễ hạn" nếu đang mượn quá ngày
                     if ("Đang mượn".equals(tinhTrang) && henTra != null) {
                         try {
                             java.time.LocalDate han = java.time.LocalDate.parse(henTra);
-                            if (java.time.LocalDate.now().isAfter(han)) tinhTrang = "Trễ hạn";
-                        } catch (Exception ignored) {}
+                            if (java.time.LocalDate.now().isAfter(han))
+                                tinhTrang = "Trễ hạn";
+                        } catch (Exception ignored) {
+                        }
                     }
 
-                    list.add(new Object[]{
-                        rs.getString("MaPM"),
-                        rs.getString("TenSach"),
-                        rs.getString("NgayMuon"),
-                        henTra,
-                        (ngayTra == null || ngayTra.isEmpty()) ? "Chưa trả" : ngayTra,
-                        tinhTrang
+                    list.add(new Object[] {
+                            rs.getString("MaPM"),
+                            rs.getString("TenSach"),
+                            rs.getString("NgayMuon"),
+                            henTra,
+                            (ngayTra == null || ngayTra.isEmpty()) ? "Chưa trả" : ngayTra,
+                            tinhTrang
                     });
                 }
             }
@@ -187,8 +187,8 @@ public class PhieuMuonDAO {
     public String generateMaPM() {
         String sql = "SELECT MaPM FROM PHIEUMUON ORDER BY MaPM DESC";
         try (Connection conn = DatabaseConnection.getConnection();
-             Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
+                Statement st = conn.createStatement();
+                ResultSet rs = st.executeQuery(sql)) {
             if (rs.next()) {
                 String lastMa = rs.getString("MaPM");
                 int num = Integer.parseInt(lastMa.substring(2)) + 1;

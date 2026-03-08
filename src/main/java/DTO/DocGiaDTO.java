@@ -1,25 +1,18 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DTO;
 
-/**
- *
- * @author Admin
- */
-public class DocGiaDTO extends ConNguoiDTO{
+public class DocGiaDTO extends ConNguoiDTO {
     private String MaDocGia;
     private String NgayDangKi;
     private String LoaiDocGia;
     private Boolean IsDeleted;
     private String NgayXoa;
 
-    // 1. THÊM HÀM TẠO RỖNG NÀY VÀO ĐÂY LÀ HẾT LỖI
     public DocGiaDTO() {
     }
-    
-    public DocGiaDTO(String MaDocGia, String NgayDangKi, String LoaiDocGia, Boolean IsDeleted, String NgayXoa, String MaNguoi, String HoTen, String NgaySinh, String TenDangNhap, String MatKhau, String GioiTinh, String DiaChi, String SoDienThoai, String Email, String TrangThai) {
+
+    public DocGiaDTO(String MaDocGia, String NgayDangKi, String LoaiDocGia, Boolean IsDeleted, String NgayXoa,
+            String MaNguoi, String HoTen, String NgaySinh, String TenDangNhap, String MatKhau, String GioiTinh,
+            String DiaChi, String SoDienThoai, String Email, String TrangThai) {
         super(MaNguoi, HoTen, NgaySinh, TenDangNhap, MatKhau, GioiTinh, DiaChi, SoDienThoai, Email, TrangThai);
         this.MaDocGia = MaDocGia;
         this.NgayDangKi = NgayDangKi;
@@ -28,7 +21,8 @@ public class DocGiaDTO extends ConNguoiDTO{
         this.NgayXoa = NgayXoa;
     }
 
-    public DocGiaDTO(String MaNguoi, String HoTen, String NgaySinh, String TenDangNhap, String MatKhau, String GioiTinh, String DiaChi, String SoDienThoai, String Email, String TrangThai) {
+    public DocGiaDTO(String MaNguoi, String HoTen, String NgaySinh, String TenDangNhap, String MatKhau, String GioiTinh,
+            String DiaChi, String SoDienThoai, String Email, String TrangThai) {
         super(MaNguoi, HoTen, NgaySinh, TenDangNhap, MatKhau, GioiTinh, DiaChi, SoDienThoai, Email, TrangThai);
     }
 
@@ -71,5 +65,5 @@ public class DocGiaDTO extends ConNguoiDTO{
     public void setNgayXoa(String NgayXoa) {
         this.NgayXoa = NgayXoa;
     }
-    
+
 }

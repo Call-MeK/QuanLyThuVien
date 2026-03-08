@@ -119,21 +119,4 @@ public class AdminTrangChuPanel extends JPanel {
         return card;
     }
 
-    private JPanel createActivityRow(String action, String time) {
-        JPanel row = new JPanel(new BorderLayout());
-        row.setBackground(Color.WHITE);
-
-        JLabel lblAction = new JLabel("▪ " + action);
-        lblAction.setFont(new Font(tenFont, Font.PLAIN, 15));
-        lblAction.setForeground(new Color(73, 80, 87));
-
-        JLabel lblTime = new JLabel(time);
-        lblTime.setFont(new Font(tenFont, Font.ITALIC, 13));
-        lblTime.setForeground(new Color(173, 181, 189));
-
-        row.add(lblAction, BorderLayout.WEST);
-        row.add(lblTime, BorderLayout.EAST);
-        row.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(241, 243, 245)));
-        return row;
-    }
 }

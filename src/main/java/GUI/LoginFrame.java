@@ -13,7 +13,6 @@ public class LoginFrame extends JFrame {
 
     private String tenFont = "Segoe UI";
     private Color colorPrimary = new Color(13, 110, 253);
-    private Color colorBackground = new Color(248, 249, 250);
     private Color colorText = new Color(33, 37, 41);
 
     public LoginFrame() {
@@ -31,7 +30,6 @@ public class LoginFrame extends JFrame {
         JPanel mainPanel = new JPanel(new GridLayout(1, 2));
         mainPanel.setBackground(Color.WHITE);
 
-        // LEFT PANEL
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.setBackground(colorPrimary);
 
@@ -64,7 +62,6 @@ public class LoginFrame extends JFrame {
         leftPanel.add(brandingPanel, BorderLayout.NORTH);
         leftPanel.add(lblImage, BorderLayout.CENTER);
 
-        // RIGHT PANEL
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
         rightPanel.setBackground(Color.WHITE);

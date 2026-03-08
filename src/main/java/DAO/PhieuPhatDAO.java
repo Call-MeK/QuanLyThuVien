@@ -6,8 +6,6 @@ import java.util.ArrayList;
 
 public class PhieuPhatDAO {
 
-    // TrangThai: 0 = Chưa thanh toán, 1 = Đã thanh toán, 2 = Đã hủy
-
     public String add(PhieuPhatDTO pp) {
         String sql = "INSERT INTO PHIEUPHAT (MaPP, MaPM, MaNQL, NgayLap, TongTien, TrangThai) VALUES (?, ?, ?, ?, ?, 0)";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -84,7 +82,6 @@ public class PhieuPhatDAO {
         return false;
     }
 
-    // Hủy phiếu: CHỈ hủy phiếu CHƯA thanh toán (0 -> 2)
     public boolean delete(String maPP) {
         String sql = "UPDATE PHIEUPHAT SET TrangThai = 2 WHERE MaPP = ? AND TrangThai = 0";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -97,7 +94,6 @@ public class PhieuPhatDAO {
         return false;
     }
 
-    // Xác nhận thanh toán: CHỈ phiếu CHƯA thanh toán (0 -> 1)
     public boolean thanhToan(String maPP) {
         String sql = "UPDATE PHIEUPHAT SET TrangThai = 1 WHERE MaPP = ? AND TrangThai = 0";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -126,7 +122,8 @@ public class PhieuPhatDAO {
                 String maPM = rs.getString("MaPM");
                 String ngayLap = rs.getString("NgayLap");
                 String lyDo = rs.getString("LyDo");
-                if (lyDo == null) lyDo = "Chưa có chi tiết";
+                if (lyDo == null)
+                    lyDo = "Chưa có chi tiết";
 
                 double tien = rs.getDouble("TongTien");
                 String soTien = String.format("%,.0f", tien);
@@ -134,7 +131,7 @@ public class PhieuPhatDAO {
                 int tt = rs.getInt("TrangThai");
                 String trangThai = (tt == 1) ? "Đã thanh toán" : "Chưa thanh toán";
 
-                list.add(new Object[]{maPP, maPM, ngayLap, lyDo, soTien, trangThai});
+                list.add(new Object[] { maPP, maPM, ngayLap, lyDo, soTien, trangThai });
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -142,7 +139,6 @@ public class PhieuPhatDAO {
         return list;
     }
 
-    // Lấy danh sách BAO GỒM phiếu đã hủy (dùng cho tìm kiếm)
     public ArrayList<Object[]> getDanhSachBaoGomDaHuy() {
         ArrayList<Object[]> list = new ArrayList<>();
         String sql = "SELECT p.MaPP, p.MaPM, p.NgayLap, "
@@ -158,18 +154,22 @@ public class PhieuPhatDAO {
                 String maPM = rs.getString("MaPM");
                 String ngayLap = rs.getString("NgayLap");
                 String lyDo = rs.getString("LyDo");
-                if (lyDo == null) lyDo = "Chưa có chi tiết";
+                if (lyDo == null)
+                    lyDo = "Chưa có chi tiết";
 
                 double tien = rs.getDouble("TongTien");
                 String soTien = String.format("%,.0f", tien);
 
                 int tt = rs.getInt("TrangThai");
                 String trangThai;
-                if (tt == 1) trangThai = "Đã thanh toán";
-                else if (tt == 2) trangThai = "Đã hủy";
-                else trangThai = "Chưa thanh toán";
+                if (tt == 1)
+                    trangThai = "Đã thanh toán";
+                else if (tt == 2)
+                    trangThai = "Đã hủy";
+                else
+                    trangThai = "Chưa thanh toán";
 
-                list.add(new Object[]{maPP, maPM, ngayLap, lyDo, soTien, trangThai});
+                list.add(new Object[] { maPP, maPM, ngayLap, lyDo, soTien, trangThai });
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -192,11 +192,9 @@ public class PhieuPhatDAO {
         }
         return "PP01";
     }
-    
-   // Lấy danh sách phiếu phạt HIỂN THỊ LÊN GUI dành riêng cho 1 Độc Giả (User)
+
     public ArrayList<Object[]> getDanhSachHienThiGUIByMaDocGia(String maDocGia) {
         ArrayList<Object[]> list = new ArrayList<>();
-        // Truy vấn nối 4 bảng: PhieuPhat -> ChiTietPhieuPhat -> PhieuMuon -> TheThuVien
         String sql = "SELECT p.MaPP, p.MaPM, p.NgayLap, "
                 + "c.LyDo, p.TongTien, p.TrangThai "
                 + "FROM PHIEUPHAT p "
@@ -205,19 +203,20 @@ public class PhieuPhatDAO {
                 + "JOIN THETHUVIEN t ON pm.MaThe = t.MaThe "
                 + "WHERE t.MaDocGia = ? AND p.TrangThai < 2 "
                 + "ORDER BY p.NgayLap DESC";
-        
+
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setString(1, maDocGia); // Truyền mã độc giả đang đăng nhập vào đây
+
+            ps.setString(1, maDocGia);
             ResultSet rs = ps.executeQuery();
-            
+
             while (rs.next()) {
                 String maPP = rs.getString("MaPP");
                 String maPM = rs.getString("MaPM");
                 String ngayLap = rs.getString("NgayLap");
                 String lyDo = rs.getString("LyDo");
-                if (lyDo == null) lyDo = "Chưa có chi tiết";
+                if (lyDo == null)
+                    lyDo = "Chưa có chi tiết";
 
                 double tien = rs.getDouble("TongTien");
                 String soTien = String.format("%,.0f", tien);
@@ -225,7 +224,7 @@ public class PhieuPhatDAO {
                 int tt = rs.getInt("TrangThai");
                 String trangThai = (tt == 1) ? "Đã thanh toán" : "Chưa thanh toán";
 
-                list.add(new Object[]{maPP, maPM, ngayLap, lyDo, soTien, trangThai});
+                list.add(new Object[] { maPP, maPM, ngayLap, lyDo, soTien, trangThai });
             }
         } catch (Exception e) {
             e.printStackTrace();

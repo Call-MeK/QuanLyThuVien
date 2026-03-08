@@ -1,22 +1,15 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DTO;
 
-/**
- *
- * @author Admin
- */
 public class NhaXuatBanDTO {
     private String MaNXB;
     private String TenNXB;
     private String DiaChi;
     private String Email;
     private String SoDienThoai;
-    
+
     public NhaXuatBanDTO() {
     }
+
     public NhaXuatBanDTO(String MaNXB, String TenNXB, String DiaChi, String Email, String SoDienThoai) {
         this.MaNXB = MaNXB;
         this.TenNXB = TenNXB;
@@ -64,5 +57,5 @@ public class NhaXuatBanDTO {
     public void setSoDienThoai(String SoDienThoai) {
         this.SoDienThoai = SoDienThoai;
     }
-    
+
 }

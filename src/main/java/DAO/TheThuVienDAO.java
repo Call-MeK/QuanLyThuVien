@@ -18,10 +18,18 @@ public class TheThuVienDAO {
             while (rs.next()) {
                 list.add(mapRow(rs));
             }
-            rs.close(); stmt.close();
+            rs.close();
+            stmt.close();
             return list;
-        } catch (Exception e) { e.printStackTrace(); }
-        finally { try { conn.close(); } catch (Exception e) { e.printStackTrace(); } }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return null;
     }
 
@@ -32,17 +40,22 @@ public class TheThuVienDAO {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, maThe.trim());
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) return mapRow(rs);
-            rs.close(); stmt.close();
-        } catch (Exception e) { e.printStackTrace(); }
-        finally { try { conn.close(); } catch (Exception e) { e.printStackTrace(); } }
+            if (rs.next())
+                return mapRow(rs);
+            rs.close();
+            stmt.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return null;
     }
 
-    /**
-     * ✅ Method còn thiếu — tìm thẻ theo MaDocGia.
-     * Dùng RTRIM để xử lý kiểu CHAR có khoảng trắng thừa.
-     */
     public TheThuVienDTO getByMaDocGia(String maDocGia) {
         Connection conn = DatabaseConnection.getConnection();
         String sql = "SELECT * FROM THETHUVIEN WHERE RTRIM(MaDocGia) = ?";
@@ -50,10 +63,19 @@ public class TheThuVienDAO {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, maDocGia.trim());
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) return mapRow(rs);
-            rs.close(); stmt.close();
-        } catch (Exception e) { e.printStackTrace(); }
-        finally { try { conn.close(); } catch (Exception e) { e.printStackTrace(); } }
+            if (rs.next())
+                return mapRow(rs);
+            rs.close();
+            stmt.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return null;
     }
 
@@ -71,8 +93,15 @@ public class TheThuVienDAO {
             int result = stmt.executeUpdate();
             stmt.close();
             return result > 0;
-        } catch (Exception e) { e.printStackTrace(); }
-        finally { try { conn.close(); } catch (Exception e) { e.printStackTrace(); } }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return false;
     }
 
@@ -90,8 +119,15 @@ public class TheThuVienDAO {
             int result = stmt.executeUpdate();
             stmt.close();
             return result > 0;
-        } catch (Exception e) { e.printStackTrace(); }
-        finally { try { conn.close(); } catch (Exception e) { e.printStackTrace(); } }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return false;
     }
 
@@ -104,19 +140,25 @@ public class TheThuVienDAO {
             int result = stmt.executeUpdate();
             stmt.close();
             return result > 0;
-        } catch (Exception e) { e.printStackTrace(); }
-        finally { try { conn.close(); } catch (Exception e) { e.printStackTrace(); } }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return false;
     }
 
-    // ===== Helper =====
     private TheThuVienDTO mapRow(ResultSet rs) throws Exception {
         return new TheThuVienDTO(
-                rs.getString("MaThe")      != null ? rs.getString("MaThe").trim()      : "",
-                rs.getString("TenThe")     != null ? rs.getString("TenThe").trim()     : "",
-                rs.getString("MaDocGia")   != null ? rs.getString("MaDocGia").trim()   : "",
-                rs.getString("NgayCap")    != null ? rs.getString("NgayCap")           : "",
-                rs.getString("NgayHetHan") != null ? rs.getString("NgayHetHan")        : "",
-                rs.getString("MaNQL")      != null ? rs.getString("MaNQL").trim()      : "");
+                rs.getString("MaThe") != null ? rs.getString("MaThe").trim() : "",
+                rs.getString("TenThe") != null ? rs.getString("TenThe").trim() : "",
+                rs.getString("MaDocGia") != null ? rs.getString("MaDocGia").trim() : "",
+                rs.getString("NgayCap") != null ? rs.getString("NgayCap") : "",
+                rs.getString("NgayHetHan") != null ? rs.getString("NgayHetHan") : "",
+                rs.getString("MaNQL") != null ? rs.getString("MaNQL").trim() : "");
     }
 }

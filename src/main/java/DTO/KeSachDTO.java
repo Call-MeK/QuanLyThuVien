@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DTO;
 
-/**
- *
- * @author Admin
- */
 public class KeSachDTO {
     private String MaKeSach;
     private String TenKe;
@@ -45,5 +37,5 @@ public class KeSachDTO {
     public void setMaTheLoai(String MaTheLoai) {
         this.MaTheLoai = MaTheLoai;
     }
-    
+
 }

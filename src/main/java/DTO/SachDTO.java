@@ -1,15 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DTO;
 
 import java.util.ArrayList;
 
-/**
- *
- * @author Admin
- */
 public class SachDTO {
     private String MaSach;
     private String tenSach;
@@ -17,21 +9,23 @@ public class SachDTO {
     private String MaNXB;
     private int NamXB;
     private String NgonNgu;
-    private int SoLuong; // Thêm dòng này
+    private int SoLuong;
 
     private Float GiaBia;
     private Boolean isDeleted;
-    
+
     private ArrayList<TacGiaDTO> DanhSachTacGia;
-    
+
     public SachDTO(String MaSach, String tenSach) {
         this.MaSach = MaSach;
         this.tenSach = tenSach;
     }
+
     public SachDTO() {
     }
 
-    public SachDTO(String MaSach, String tenSach, String TheLoai, String MaNXB, int NamXB, String NgonNgu, Float GiaBia, Boolean isDeleted, ArrayList<TacGiaDTO> DanhSachTacGia) {
+    public SachDTO(String MaSach, String tenSach, String TheLoai, String MaNXB, int NamXB, String NgonNgu, Float GiaBia,
+            Boolean isDeleted, ArrayList<TacGiaDTO> DanhSachTacGia) {
         this.MaSach = MaSach;
         this.tenSach = tenSach;
         this.TheLoai = TheLoai;
@@ -40,7 +34,7 @@ public class SachDTO {
         this.NgonNgu = NgonNgu;
         this.GiaBia = GiaBia;
         this.isDeleted = isDeleted;
-        this.DanhSachTacGia=DanhSachTacGia;
+        this.DanhSachTacGia = DanhSachTacGia;
     }
 
     public String getMaSach() {
@@ -106,6 +100,7 @@ public class SachDTO {
     public void setIsDeleted(Boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
+
     public int getSoLuong() {
         return SoLuong;
     }
@@ -121,5 +116,5 @@ public class SachDTO {
     public void setDanhSachTacGia(ArrayList<TacGiaDTO> DanhSachTacGia) {
         this.DanhSachTacGia = DanhSachTacGia;
     }
-    
+
 }

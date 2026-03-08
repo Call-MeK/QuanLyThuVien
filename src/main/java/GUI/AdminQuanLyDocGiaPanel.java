@@ -182,7 +182,6 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         pnlCenter.add(scrollPane, BorderLayout.CENTER);
         add(pnlCenter, BorderLayout.CENTER);
 
-        // NÚT CHỨC NĂNG
         JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         pnlButtons.setBackground(colorBackground);
 
@@ -193,7 +192,6 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         btnSua    = createActionButton("Cập Nhật",  new Color(255, 193, 7)); btnSua.setForeground(Color.BLACK);
         btnKhoa   = createActionButton("Khóa Thẻ", new Color(220, 53, 69));
         
-        // Đổi tên nút thành Mở Thẻ theo yêu cầu
         btnMoKhoa = createActionButton("Mở Thẻ",  new Color(13, 110, 253));
 
         pnlButtons.add(btnImport);
@@ -208,7 +206,6 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
 
     private void initEvents() {
 
-        // Click bảng -> đổ dữ liệu lên form
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -237,7 +234,6 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
                     for (DocGiaDTO dg : docGiaBUS.getListDocGia()) {
                         if (dg.getMaDocGia().trim().equals(maDG.trim())) {
                             txtNgayDK.setText(dg.getNgayDangKi() != null ? dg.getNgayDangKi() : "");
-                            // Cập nhật Loại độc giả từ DB lên form
                             if(dg.getLoaiDocGia() != null && !dg.getLoaiDocGia().isEmpty()){
                                 cbLoaiDocGia.setSelectedItem(dg.getLoaiDocGia());
                             }
@@ -256,7 +252,7 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
 
         btnThem.addActionListener(e -> {
             if (!validateInput("")) return;
-            String maNQL = "NV00000001";
+            String maNQL = "NV01";
             try {
                 if (BUS.SessionManager.getInstance() != null && BUS.SessionManager.getInstance().getMaNguoi() != null)
                     maNQL = BUS.SessionManager.getInstance().getMaNguoi();
@@ -305,8 +301,6 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
                 } else { JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE); }
             }
         });
-
-        // Đổi thông báo để khớp với nút "Mở Thẻ"
         btnMoKhoa.addActionListener(e -> {
             String maDG = txtMaDG.getText().trim();
             if (maDG.isEmpty()) { JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 độc giả!", "Cảnh báo", JOptionPane.WARNING_MESSAGE); return; }

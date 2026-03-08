@@ -1,18 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DTO;
 
-/**
- *
- * @author Admin
- */
 public class ChiTietPhieuMuonDTO {
     private String MaPM;
     private String MaCuonSach;
     private String TinhTrangSach;
-    
+
     public ChiTietPhieuMuonDTO(String MaPM, String MaCuonSach, String TinhTrangSach) {
         this.MaPM = MaPM;
         this.MaCuonSach = MaCuonSach;
@@ -45,5 +37,5 @@ public class ChiTietPhieuMuonDTO {
     public void setTinhTrangSach(String TinhTrangSach) {
         this.TinhTrangSach = TinhTrangSach;
     }
-    
+
 }

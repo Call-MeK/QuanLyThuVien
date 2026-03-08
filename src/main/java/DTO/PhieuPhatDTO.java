@@ -6,9 +6,8 @@ public class PhieuPhatDTO {
     private String MaNQL;
     private String NgayLap;
     private String TongTien;
-    private int TrangThai; // Thêm biến trạng thái để quản lý xóa mềm (1: Hiện, 0: Ẩn)
+    private int TrangThai;
 
-    // 1. Constructor đầy đủ 6 tham số
     public PhieuPhatDTO(String MaPP, String MaPM, String MaNQL, String NgayLap, String TongTien, int TrangThai) {
         this.MaPP = MaPP;
         this.MaPM = MaPM;
@@ -18,20 +17,17 @@ public class PhieuPhatDTO {
         this.TrangThai = TrangThai;
     }
 
-    // 2. Constructor 5 tham số (Giữ lại để không bị lỗi code bên DAO đã viết)
     public PhieuPhatDTO(String MaPP, String MaPM, String MaNQL, String NgayLap, String TongTien) {
         this.MaPP = MaPP;
         this.MaPM = MaPM;
         this.MaNQL = MaNQL;
         this.NgayLap = NgayLap;
         this.TongTien = TongTien;
-        this.TrangThai = 1; // Mặc định khi tạo đối tượng mới là 1 (Tồn tại)
+        this.TrangThai = 1;
     }
 
     public PhieuPhatDTO() {
     }
-
-    // --- Các hàm Getter & Setter ---
 
     public String getMaPP() {
         return MaPP;

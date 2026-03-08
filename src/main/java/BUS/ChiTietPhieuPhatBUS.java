@@ -43,10 +43,8 @@ public class ChiTietPhieuPhatBUS {
         return false;
     }
 
-    // THÊM MỚI: Cập nhật theo MaPP (update tất cả chi tiết của 1 phiếu phạt)
     public boolean updateByMaPP(String maPP, String lyDo, String soTien) {
         if (ctppDAO.updateByMaPP(maPP, lyDo, soTien)) {
-            // Cập nhật lại cache
             for (ChiTietPhieuPhatDTO ct : listCTPP) {
                 if (ct.getMaPP().equals(maPP)) {
                     ct.setLyDo(lyDo);
@@ -74,9 +72,8 @@ public class ChiTietPhieuPhatBUS {
         }
         return null;
     }
-    // Thêm hàm này vào class ChiTietPhieuPhatBUS
+
     public ArrayList<Object[]> getChiTietCoTenSachByMaPP(String maPP) {
-        // Tùy theo cách bạn khai báo biến DAO trong file này (có thể là chiTietDAO hoặc chiTietPhieuPhatDAO)
-        return ctppDAO.getChiTietCoTenSachByMaPP(maPP); 
+        return ctppDAO.getChiTietCoTenSachByMaPP(maPP);
     }
 }

@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DTO;
 
-/**
- *
- * @author Admin
- */
 public class TacGiaDTO {
     private String MaTacGia;
     private String TenTacGia;
@@ -24,7 +16,8 @@ public class TacGiaDTO {
     public TacGiaDTO() {
     }
 
-    public TacGiaDTO(String MaTacGia, String TenTacGia, String QuocTich, String DiaChi, String SoDienThoai, String Email) {
+    public TacGiaDTO(String MaTacGia, String TenTacGia, String QuocTich, String DiaChi, String SoDienThoai,
+            String Email) {
         this.MaTacGia = MaTacGia;
         this.TenTacGia = TenTacGia;
         this.QuocTich = QuocTich;
@@ -80,5 +73,5 @@ public class TacGiaDTO {
     public void setEmail(String Email) {
         this.Email = Email;
     }
-    
+
 }

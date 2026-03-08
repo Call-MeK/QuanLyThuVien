@@ -11,17 +11,17 @@ import java.util.List;
 
 public class SachDAO {
 
-   public List<SachDTO> getAll() {
+    public List<SachDTO> getAll() {
         List<SachDTO> list = new ArrayList<>();
-        // SỬA LỖI: Đếm SoLuong từ bảng SACHCOPY thay vì lấy trực tiếp từ bảng SACH
         String sql = "SELECT s.*, " +
-                 "(SELECT COUNT(*) FROM SACHCOPY sc WHERE RTRIM(sc.MaSach) = RTRIM(s.MaSach) AND sc.IsDeleted = 0) AS SoLuong " +
-                 "FROM SACH s WHERE s.isdeleted = 0";
-    
+                "(SELECT COUNT(*) FROM SACHCOPY sc WHERE RTRIM(sc.MaSach) = RTRIM(s.MaSach) AND sc.IsDeleted = 0) AS SoLuong "
+                +
+                "FROM SACH s WHERE s.isdeleted = 0";
+
         try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            
+                PreparedStatement ps = con.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
                 SachDTO sach = new SachDTO(
                         rs.getString("MaSach"),
@@ -32,14 +32,13 @@ public class SachDAO {
                         rs.getString("NgonNgu"),
                         rs.getFloat("GiaBia"),
                         rs.getBoolean("isdeleted"),
-                        new ArrayList<>() 
-                );
-                
+                        new ArrayList<>());
+
                 sach.setSoLuong(rs.getInt("SoLuong"));
                 list.add(sach);
             }
-        } catch (Exception e) { 
-            e.printStackTrace(); 
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return list;
     }
@@ -47,7 +46,7 @@ public class SachDAO {
     public SachDTO getById(String maSach) {
         String sql = "SELECT * FROM SACH WHERE MaSach = ? AND isdeleted = 0";
         try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, maSach);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -63,75 +62,79 @@ public class SachDAO {
                             new ArrayList<>());
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
     public List<Object[]> getDanhSachDayDu() {
-    List<Object[]> list = new ArrayList<>();
-    // SỬA LỖI 0: Dùng NOT EXISTS thay cho NOT IN và thêm RTRIM(sc.MaSach) = RTRIM(s.MaSach)
-    String sql = 
-"SELECT s.MaSach, s.tenSach, " +
-"       ISNULL(tl.TenTheLoai, s.TheLoai) AS TenTheLoai, " +
-"       ISNULL(n.TenNXB, s.MaNXB) AS TenNXB, " +
-"       s.NamXB, s.NgonNgu, s.GiaBia, " +
-"       ISNULL(STUFF((" +
-"           SELECT ', ' + tg.TenTacGia " +
-"           FROM TACGIA tg " +
-"           JOIN SACH_TACGIA st ON tg.MaTacGia = st.MaTacGia " +
-"           WHERE RTRIM(st.MaSach) = RTRIM(s.MaSach) " +
-"           FOR XML PATH(''), TYPE).value('.','NVARCHAR(MAX)'), 1, 2, ''), " +
-"       N'Chưa cập nhật') AS TenTacGia, " +
-"       (SELECT COUNT(*) FROM SACHCOPY sc " +
-"        WHERE RTRIM(sc.MaSach) = RTRIM(s.MaSach) " +
-"        AND sc.IsDeleted = 0 " +
-"        AND sc.TinhTrang = N'Tốt' " +
-"        AND NOT EXISTS (" +
-"            SELECT 1 " +
-"            FROM CHITIETPHIEUMUON ct " +
-"            JOIN PHIEUMUON pm ON ct.MaPM = pm.MaPM " +
-"            WHERE pm.TinhTrang = N'Đang mượn' " +
-"            AND RTRIM(ct.MaCuonSach) = RTRIM(sc.MaVach)" +
-"        )) AS SoLuong " +
-"FROM SACH s " +
-"LEFT JOIN THELOAI tl ON s.TheLoai = tl.MaTheLoai " +
-"LEFT JOIN NHAXUATBAN n ON s.MaNXB = n.MaNXB " +
-"WHERE s.isdeleted = 0 " +
-"ORDER BY s.MaSach";
-        
-    try (Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
-        while (rs.next()) {
-            list.add(new Object[]{
-                rs.getString("MaSach"),
-                rs.getString("tenSach"),
-                rs.getString("TenTheLoai"),
-                rs.getString("TenNXB"),
-                rs.getInt("NamXB"),
-                rs.getString("NgonNgu"),
-                String.format("%,.0f đ", rs.getFloat("GiaBia")),
-                rs.getString("TenTacGia"),
-                rs.getInt("SoLuong")
-            });
+        List<Object[]> list = new ArrayList<>();
+        String sql = "SELECT s.MaSach, s.tenSach, " +
+                "       ISNULL(tl.TenTheLoai, s.TheLoai) AS TenTheLoai, " +
+                "       ISNULL(n.TenNXB, s.MaNXB) AS TenNXB, " +
+                "       s.NamXB, s.NgonNgu, s.GiaBia, " +
+                "       ISNULL(STUFF((" +
+                "           SELECT ', ' + tg.TenTacGia " +
+                "           FROM TACGIA tg " +
+                "           JOIN SACH_TACGIA st ON tg.MaTacGia = st.MaTacGia " +
+                "           WHERE RTRIM(st.MaSach) = RTRIM(s.MaSach) " +
+                "           FOR XML PATH(''), TYPE).value('.','NVARCHAR(MAX)'), 1, 2, ''), " +
+                "       N'Chưa cập nhật') AS TenTacGia, " +
+                "       (SELECT COUNT(*) FROM SACHCOPY sc " +
+                "        WHERE RTRIM(sc.MaSach) = RTRIM(s.MaSach) " +
+                "        AND sc.IsDeleted = 0 " +
+                "        AND sc.TinhTrang = N'Tốt' " +
+                "        AND NOT EXISTS (" +
+                "            SELECT 1 " +
+                "            FROM CHITIETPHIEUMUON ct " +
+                "            JOIN PHIEUMUON pm ON ct.MaPM = pm.MaPM " +
+                "            WHERE pm.TinhTrang = N'Đang mượn' " +
+                "            AND RTRIM(ct.MaCuonSach) = RTRIM(sc.MaVach)" +
+                "        )) AS SoLuong " +
+                "FROM SACH s " +
+                "LEFT JOIN THELOAI tl ON s.TheLoai = tl.MaTheLoai " +
+                "LEFT JOIN NHAXUATBAN n ON s.MaNXB = n.MaNXB " +
+                "WHERE s.isdeleted = 0 " +
+                "ORDER BY s.MaSach";
+
+        try (Connection con = DatabaseConnection.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(new Object[] {
+                        rs.getString("MaSach"),
+                        rs.getString("tenSach"),
+                        rs.getString("TenTheLoai"),
+                        rs.getString("TenNXB"),
+                        rs.getInt("NamXB"),
+                        rs.getString("NgonNgu"),
+                        String.format("%,.0f đ", rs.getFloat("GiaBia")),
+                        rs.getString("TenTacGia"),
+                        rs.getInt("SoLuong")
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) { e.printStackTrace(); }
-    return list;
-}
+        return list;
+    }
 
     public boolean isDangMuon(String maSach) {
-        String sql =
-            "SELECT COUNT(*) FROM PHIEUMUON pm " +
-            "JOIN CHITIETPHIEUMUON ct ON pm.MaPM = ct.MaPM " +
-            "JOIN SACHCOPY sc ON ct.MaCuonSach = sc.MaVach " +
-            "WHERE sc.MaSach = ? AND pm.TinhTrang = N'Đang mượn'";
+        String sql = "SELECT COUNT(*) FROM PHIEUMUON pm " +
+                "JOIN CHITIETPHIEUMUON ct ON pm.MaPM = ct.MaPM " +
+                "JOIN SACHCOPY sc ON ct.MaCuonSach = sc.MaVach " +
+                "WHERE sc.MaSach = ? AND pm.TinhTrang = N'Đang mượn'";
         try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, maSach);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return rs.getInt(1) > 0;
+                if (rs.next())
+                    return rs.getInt(1) > 0;
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
@@ -139,7 +142,7 @@ public class SachDAO {
         List<TacGiaDTO> list = new ArrayList<>();
         String sql = "SELECT tg.* FROM TACGIA tg JOIN SACH_TACGIA st ON tg.MaTacGia = st.MaTacGia WHERE st.MaSach = ?";
         try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, maSach);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -149,14 +152,16 @@ public class SachDAO {
                             rs.getString("SoDienThoai"), rs.getString("Email")));
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return list;
     }
 
     public boolean insert(SachDTO sach) {
         String sql = "INSERT INTO SACH (MaSach, tenSach, TheLoai, MaNXB, NamXB, NgonNgu, GiaBia, isdeleted) VALUES (?, ?, ?, ?, ?, ?, ?, 0)";
         try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, sach.getMaSach());
             ps.setString(2, sach.getTenSach());
             ps.setString(3, sach.getTheLoai());
@@ -165,14 +170,16 @@ public class SachDAO {
             ps.setString(6, sach.getNgonNgu());
             ps.setFloat(7, sach.getGiaBia());
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     public boolean update(SachDTO sach) {
         String sql = "UPDATE SACH SET tenSach=?, TheLoai=?, MaNXB=?, NamXB=?, NgonNgu=?, GiaBia=? WHERE MaSach=? AND isdeleted=0";
         try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, sach.getTenSach());
             ps.setString(2, sach.getTheLoai());
             ps.setString(3, sach.getMaNXB());
@@ -181,52 +188,62 @@ public class SachDAO {
             ps.setFloat(6, sach.getGiaBia());
             ps.setString(7, sach.getMaSach());
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     public boolean delete(String maSach) {
         String sql = "UPDATE SACH SET isdeleted=1 WHERE MaSach=?";
         try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, maSach);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     public boolean insertSachTacGia(String maSach, String maTacGia) {
         String sql = "INSERT INTO SACH_TACGIA (MaTacGia, MaSach) VALUES (?, ?)";
         try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, maTacGia);
             ps.setString(2, maSach);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     public boolean deleteSachTacGia(String maSach) {
         String sql = "DELETE FROM SACH_TACGIA WHERE MaSach = ?";
         try (Connection con = DatabaseConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, maSach);
             ps.executeUpdate();
             return true;
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     public String generateMaSach() {
         String sql = "SELECT MAX(MaSach) FROM SACH";
         try (Connection con = DatabaseConnection.getConnection();
-             Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
+                Statement st = con.createStatement();
+                ResultSet rs = st.executeQuery(sql)) {
             if (rs.next() && rs.getString(1) != null) {
                 int num = Integer.parseInt(rs.getString(1).trim().substring(1)) + 1;
                 return String.format("S%02d", num);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return "S01";
     }
 }

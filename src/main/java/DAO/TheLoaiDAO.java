@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DAO;
 
 import DTO.TheLoaiDTO;
@@ -11,13 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-/**
- *
- * @author Admin
- */
 public class TheLoaiDAO {
 
-    // Lấy tất cả thể loại
     public ArrayList<TheLoaiDTO> getAll() {
         ArrayList<TheLoaiDTO> danhSach = new ArrayList<>();
         Connection conn = DatabaseConnection.getConnection();
@@ -42,7 +33,6 @@ public class TheLoaiDAO {
         return danhSach;
     }
 
-    // Lấy thể loại theo mã
     public TheLoaiDTO getById(String maTheLoai) {
         TheLoaiDTO theLoai = null;
         Connection conn = DatabaseConnection.getConnection();
@@ -68,7 +58,6 @@ public class TheLoaiDAO {
         return theLoai;
     }
 
-    // Thêm thể loại mới
     public boolean add(TheLoaiDTO theLoai) {
         Connection conn = DatabaseConnection.getConnection();
         String sql = "INSERT INTO THELOAI (MaTheLoai, TenTheLoai) VALUES (?, ?)";
@@ -89,7 +78,6 @@ public class TheLoaiDAO {
         return false;
     }
 
-    // Cập nhật thể loại
     public boolean update(TheLoaiDTO theLoai) {
         Connection conn = DatabaseConnection.getConnection();
         String sql = "UPDATE THELOAI SET TenTheLoai = ? WHERE MaTheLoai = ?";
@@ -110,7 +98,6 @@ public class TheLoaiDAO {
         return false;
     }
 
-    // Xóa thể loại
     public boolean delete(String maTheLoai) {
         Connection conn = DatabaseConnection.getConnection();
         String sql = "DELETE FROM THELOAI WHERE MaTheLoai = ?";

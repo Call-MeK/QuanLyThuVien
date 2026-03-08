@@ -2,8 +2,6 @@ package GUI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import BUS.DocGiaBUS;
@@ -60,7 +58,7 @@ public class UserHomeFrame extends JFrame {
 
         JLabel lblMsg = new JLabel(
                 "Thẻ thư viện của bạn đang bị khóa — Bạn không thể mượn sách mới. "
-                + "Vui lòng đến thư viện để được hỗ trợ mở khóa.");
+                        + "Vui lòng đến thư viện để được hỗ trợ mở khóa.");
         lblMsg.setFont(new Font(tenFont, Font.BOLD, 14));
         lblMsg.setForeground(Color.WHITE);
 
@@ -72,7 +70,6 @@ public class UserHomeFrame extends JFrame {
     }
 
     private void initComponents() {
-        // 1. MENU BÊN TRÁI
         sidebarPanel = new JPanel();
         sidebarPanel.setLayout(new BorderLayout());
         sidebarPanel.setBackground(new Color(30, 41, 59));
@@ -89,12 +86,12 @@ public class UserHomeFrame extends JFrame {
         logoLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         menuPanel.add(logoLabel);
 
-        JButton btnTrangChu     = createMenuButton("Trang Chủ");
-        JButton btnTimSach      = createMenuButton("Tìm Sách");
+        JButton btnTrangChu = createMenuButton("Trang Chủ");
+        JButton btnTimSach = createMenuButton("Tìm Sách");
         JButton btnSachDangMuon = createMenuButton("Sách Đang Mượn");
-        JButton btnPhieuPhat    = createMenuButton("Phiếu Phạt & Thanh Toán");
-        JButton btnThongTin     = createMenuButton("Thông Tin Cá Nhân");
-        JButton btnDangXuat     = createMenuButton("Đăng Xuất");
+        JButton btnPhieuPhat = createMenuButton("Phiếu Phạt & Thanh Toán");
+        JButton btnThongTin = createMenuButton("Thông Tin Cá Nhân");
+        JButton btnDangXuat = createMenuButton("Đăng Xuất");
         btnDangXuat.setForeground(new Color(248, 113, 113));
 
         menuPanel.add(btnTrangChu);
@@ -106,34 +103,32 @@ public class UserHomeFrame extends JFrame {
 
         sidebarPanel.add(menuPanel, BorderLayout.NORTH);
 
-        // 2. CARDLAYOUT
         cardLayout = new CardLayout();
         mainContentPanel = new JPanel();
         mainContentPanel.setLayout(cardLayout);
         mainContentPanel.setBackground(new Color(248, 250, 252));
 
         JPanel panelTrangChu = createHomePanel();
-        panelTimSach         = new TimKiemSachPanel();
-        panelSachDangMuon    = new SachDangMuonPanel();
-        panelPhieuPhat       = new PhieuPhatPanel();
-        panelThongTin        = new ThongTinCaNhanPanel();
-        panelChiTietSach     = new ChiTietSachPanel();
+        panelTimSach = new TimKiemSachPanel();
+        panelSachDangMuon = new SachDangMuonPanel();
+        panelPhieuPhat = new PhieuPhatPanel();
+        panelThongTin = new ThongTinCaNhanPanel();
+        panelChiTietSach = new ChiTietSachPanel();
 
-        mainContentPanel.add(panelTrangChu,     "TrangChu");
-        mainContentPanel.add(panelTimSach,      "TimSach");
+        mainContentPanel.add(panelTrangChu, "TrangChu");
+        mainContentPanel.add(panelTimSach, "TimSach");
         mainContentPanel.add(panelSachDangMuon, "SachDangMuon");
-        mainContentPanel.add(panelPhieuPhat,    "PhieuPhat");
-        mainContentPanel.add(panelThongTin,     "ThongTin");
-        mainContentPanel.add(panelChiTietSach,  "ChiTietSach");
+        mainContentPanel.add(panelPhieuPhat, "PhieuPhat");
+        mainContentPanel.add(panelThongTin, "ThongTin");
+        mainContentPanel.add(panelChiTietSach, "ChiTietSach");
 
-        panelChiTietSach.getBtnQuayLai().addActionListener(e ->
-                cardLayout.show(mainContentPanel, previousCard));
+        panelChiTietSach.getBtnQuayLai().addActionListener(e -> cardLayout.show(mainContentPanel, previousCard));
 
         panelChiTietSach.getBtnMuonSach().addActionListener(e -> {
             if (isBiKhoa) {
                 JOptionPane.showMessageDialog(UserHomeFrame.this,
                         "Thẻ thư viện của bạn đang bị khóa!\n"
-                        + "Vui lòng đến thư viện để được hỗ trợ mở khóa trước khi mượn sách.",
+                                + "Vui lòng đến thư viện để được hỗ trợ mở khóa trước khi mượn sách.",
                         "Không thể mượn sách", JOptionPane.WARNING_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(UserHomeFrame.this,
@@ -142,12 +137,26 @@ public class UserHomeFrame extends JFrame {
             }
         });
 
-        // 3. SỰ KIỆN CHUYỂN TRANG
-        btnTrangChu.addActionListener(e -> { cardLayout.show(mainContentPanel, "TrangChu");    previousCard = "TrangChu"; });
-        btnTimSach.addActionListener(e ->  { cardLayout.show(mainContentPanel, "TimSach");     previousCard = "TimSach"; });
-        btnSachDangMuon.addActionListener(e -> { cardLayout.show(mainContentPanel, "SachDangMuon"); previousCard = "SachDangMuon"; });
-        btnPhieuPhat.addActionListener(e -> { cardLayout.show(mainContentPanel, "PhieuPhat");  previousCard = "PhieuPhat"; });
-        btnThongTin.addActionListener(e ->  { cardLayout.show(mainContentPanel, "ThongTin");   previousCard = "ThongTin"; });
+        btnTrangChu.addActionListener(e -> {
+            cardLayout.show(mainContentPanel, "TrangChu");
+            previousCard = "TrangChu";
+        });
+        btnTimSach.addActionListener(e -> {
+            cardLayout.show(mainContentPanel, "TimSach");
+            previousCard = "TimSach";
+        });
+        btnSachDangMuon.addActionListener(e -> {
+            cardLayout.show(mainContentPanel, "SachDangMuon");
+            previousCard = "SachDangMuon";
+        });
+        btnPhieuPhat.addActionListener(e -> {
+            cardLayout.show(mainContentPanel, "PhieuPhat");
+            previousCard = "PhieuPhat";
+        });
+        btnThongTin.addActionListener(e -> {
+            cardLayout.show(mainContentPanel, "ThongTin");
+            previousCard = "ThongTin";
+        });
         btnDangXuat.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(UserHomeFrame.this,
                     "Bạn có muốn đăng xuất không?", "Xác nhận", JOptionPane.YES_NO_OPTION);
@@ -161,8 +170,6 @@ public class UserHomeFrame extends JFrame {
         add(sidebarPanel, BorderLayout.WEST);
         add(mainContentPanel, BorderLayout.CENTER);
 
-        // Xem chi tiết từ Tìm Sách
-        // Cột bảng: 0=MaSach, 1=TenSach, 2=TacGia, 3=TheLoai, 4=NXB, 5=ConSan
         panelTimSach.getBtnXemChiTiet().addActionListener(e -> {
             JTable t = panelTimSach.getTable();
             int row = t.getSelectedRow();
@@ -170,12 +177,12 @@ public class UserHomeFrame extends JFrame {
                 JOptionPane.showMessageDialog(UserHomeFrame.this, "Vui lòng chọn 1 sách trong bảng!");
             } else {
                 panelChiTietSach.setThongTinSach(
-                        t.getValueAt(row, 1).toString(),  // Tên sách
-                        t.getValueAt(row, 2).toString(),  // Tác giả
-                        t.getValueAt(row, 3).toString(),  // Thể loại
-                        t.getValueAt(row, 4).toString(),  // NXB ✅
-                        "—",                              // Năm XB (bảng không có)
-                        t.getValueAt(row, 5).toString(),  // Còn X cuốn ✅ FIX
+                        t.getValueAt(row, 1).toString(), // Tên sách
+                        t.getValueAt(row, 2).toString(), // Tác giả
+                        t.getValueAt(row, 3).toString(), // Thể loại
+                        t.getValueAt(row, 4).toString(), // NXB ✅
+                        "—", // Năm XB (bảng không có)
+                        t.getValueAt(row, 5).toString(), // Còn X cuốn ✅ FIX
                         "Mô tả chi tiết cho sách: " + t.getValueAt(row, 1));
                 previousCard = "TimSach";
                 cardLayout.show(mainContentPanel, "ChiTietSach");
@@ -207,7 +214,9 @@ public class UserHomeFrame extends JFrame {
                 Image img = originalIcon.getImage().getScaledInstance(900, 150, Image.SCALE_SMOOTH);
                 banner.setIcon(new ImageIcon(img));
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         centerPanel.add(banner, BorderLayout.NORTH);
 
         JPanel booksArea = new JPanel(new BorderLayout(0, 15));
@@ -227,7 +236,8 @@ public class UserHomeFrame extends JFrame {
         if (dsSach != null && !dsSach.isEmpty()) {
             int count = 0;
             for (DTO.SachDTO sach : dsSach) {
-                if (count >= 5) break;
+                if (count >= 5)
+                    break;
                 booksList.add(createBookCard(sach));
                 count++;
             }
@@ -248,11 +258,10 @@ public class UserHomeFrame extends JFrame {
     }
 
     private JPanel createBookCard(DTO.SachDTO sach) {
-        String title    = sach.getTenSach() != null ? sach.getTenSach() : "Chưa cập nhật tên";
+        String title = sach.getTenSach() != null ? sach.getTenSach() : "Chưa cập nhật tên";
         String category = sach.getTheLoai() != null ? sach.getTheLoai() : "Khác";
-        String namXB    = String.valueOf(sach.getNamXB());
+        String namXB = String.valueOf(sach.getNamXB());
 
-        // Đếm số bản sao còn sẵn cho card trang chủ
         DAO.SachCopyDAO sachCopyDAO = new DAO.SachCopyDAO();
         java.util.List<DTO.SachCopyDTO> dsBanSao = sachCopyDAO.getAvailable(sach.getMaSach());
         String tinhTrang = dsBanSao.isEmpty() ? "Hết sách" : "Còn " + dsBanSao.size() + " cuốn";
@@ -273,7 +282,7 @@ public class UserHomeFrame extends JFrame {
         JPanel info = new JPanel(new GridLayout(3, 1, 0, 2));
         info.setBackground(Color.WHITE);
 
-        JLabel lblTitle    = new JLabel(" " + title);
+        JLabel lblTitle = new JLabel(" " + title);
         lblTitle.setFont(new Font(tenFont, Font.BOLD, 14));
         lblTitle.setForeground(new Color(15, 23, 42));
 
@@ -297,8 +306,15 @@ public class UserHomeFrame extends JFrame {
         btn.setBorderPainted(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.addMouseListener(new MouseAdapter() {
-            @Override public void mouseEntered(MouseEvent e) { btn.setBackground(new Color(79, 70, 229)); }
-            @Override public void mouseExited(MouseEvent e)  { btn.setBackground(new Color(99, 102, 241)); }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(new Color(79, 70, 229));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(new Color(99, 102, 241));
+            }
         });
 
         String finalTinhTrang = tinhTrang;
@@ -309,16 +325,16 @@ public class UserHomeFrame extends JFrame {
                     category,
                     sach.getMaNXB(),
                     namXB,
-                    finalTinhTrang,   // ✅ Dùng số bản sao thực tế
+                    finalTinhTrang,
                     "Mã sách: " + sach.getMaSach()
-                    + "\nGiá bìa: " + sach.getGiaBia() + " VNĐ"
-                    + "\nNgôn ngữ: " + sach.getNgonNgu());
+                            + "\nGiá bìa: " + sach.getGiaBia() + " VNĐ"
+                            + "\nNgôn ngữ: " + sach.getNgonNgu());
             cardLayout.show(mainContentPanel, "ChiTietSach");
         });
 
         card.add(cover, BorderLayout.NORTH);
-        card.add(info,  BorderLayout.CENTER);
-        card.add(btn,   BorderLayout.SOUTH);
+        card.add(info, BorderLayout.CENTER);
+        card.add(btn, BorderLayout.SOUTH);
 
         return card;
     }
@@ -332,8 +348,15 @@ public class UserHomeFrame extends JFrame {
         button.setBorderPainted(false);
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.addMouseListener(new MouseAdapter() {
-            @Override public void mouseEntered(MouseEvent e) { button.setBackground(new Color(51, 65, 85)); }
-            @Override public void mouseExited(MouseEvent e)  { button.setBackground(new Color(30, 41, 59)); }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(new Color(51, 65, 85));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(new Color(30, 41, 59));
+            }
         });
         return button;
     }

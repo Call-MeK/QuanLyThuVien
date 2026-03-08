@@ -8,16 +8,14 @@ import java.awt.*;
 public class ThongTinCaNhanPanel extends JPanel {
 
     private String tenFont = "Segoe UI";
-    private DocGiaBUS docGiaBUS = new DocGiaBUS(); // Khai báo BUS
+    private DocGiaBUS docGiaBUS = new DocGiaBUS(); 
 
-    // Các trường dữ liệu
     private JTextField txtMaDocGia, txtHoTen, txtNgaySinh, txtSoDienThoai, txtEmail, txtNgayDangKy, txtHanThe;
     private JButton btnCapNhat, btnDoiMatKhau;
 
     public ThongTinCaNhanPanel() {
         initComponents();
-        // Gọi dữ liệu thật để test (Mã DG00000002 có trong CSDL mẫu của bạn)
-        //loadData("DG00000002"); 
+        
     }
 
     private void initComponents() {
@@ -25,9 +23,6 @@ public class ThongTinCaNhanPanel extends JPanel {
         setBackground(Color.WHITE); 
         setBorder(new EmptyBorder(25, 30, 25, 30));
 
-        // ==========================================
-        // PHẦN TRÊN: TIÊU ĐỀ
-        // ==========================================
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.setBackground(Color.WHITE);
@@ -47,9 +42,6 @@ public class ThongTinCaNhanPanel extends JPanel {
         topPanel.add(lblSubtitle);
         topPanel.add(Box.createVerticalStrut(10));
 
-        // ==========================================
-        // PHẦN GIỮA: FORM ĐIỀN THÔNG TIN
-        // ==========================================
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(Color.WHITE);
         formPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -60,12 +52,11 @@ public class ThongTinCaNhanPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(10, 15, 10, 15); 
 
-        // Khởi tạo các ô nhập liệu rỗng (Sẽ được đổ dữ liệu sau)
         txtMaDocGia = createTextField("", false);
         txtHoTen = createTextField("", false);
         txtNgaySinh = createTextField("", false);
-        txtSoDienThoai = createTextField("", true); // Chỉ SĐT là sửa được
-        txtEmail = createTextField("", true);       // Chỉ Email là sửa được
+        txtSoDienThoai = createTextField("", true); 
+        txtEmail = createTextField("", true);       
         txtNgayDangKy = createTextField("", false);
         txtHanThe = createTextField("", false);
 
@@ -82,9 +73,6 @@ public class ThongTinCaNhanPanel extends JPanel {
         centerWrapper.setBackground(Color.WHITE);
         centerWrapper.add(formPanel);
 
-        // ==========================================
-        // PHẦN DƯỚI: CÁC NÚT CHỨC NĂNG
-        // ==========================================
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         bottomPanel.setBackground(Color.WHITE);
         bottomPanel.setBorder(new EmptyBorder(10, 0, 0, 0));
@@ -95,12 +83,10 @@ public class ThongTinCaNhanPanel extends JPanel {
         btnCapNhat.setFont(new Font(tenFont, Font.BOLD, 14));
         btnCapNhat.setPreferredSize(new Dimension(150, 40));
         btnCapNhat.setFocusPainted(false);
-        // THÊM 2 DÒNG NÀY ĐỂ ÉP MÀU:
         btnCapNhat.setOpaque(true); 
         btnCapNhat.setBorderPainted(false);
         
 
-        // --- SỰ KIỆN NÚT CẬP NHẬT ---
         btnCapNhat.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(this, "Bạn có muốn lưu thay đổi không?", "Xác nhận", JOptionPane.YES_NO_OPTION);
             if(confirm == JOptionPane.YES_OPTION) {
@@ -108,7 +94,6 @@ public class ThongTinCaNhanPanel extends JPanel {
                 String sdtMoi = txtSoDienThoai.getText();
                 String emailMoi = txtEmail.getText();
                 
-                // Gọi BUS để update xuống Database
                 String msg = docGiaBUS.updateThongTinLienHe(ma, sdtMoi, emailMoi);
                 JOptionPane.showMessageDialog(this, msg);
             }
@@ -120,13 +105,9 @@ public class ThongTinCaNhanPanel extends JPanel {
         btnDoiMatKhau.setFont(new Font(tenFont, Font.BOLD, 14));
         btnDoiMatKhau.setPreferredSize(new Dimension(150, 40));
         btnDoiMatKhau.setFocusPainted(false);
-        // THÊM 2 DÒNG NÀY ĐỂ ÉP MÀU:
         btnDoiMatKhau.setOpaque(true); 
         btnDoiMatKhau.setBorderPainted(false);
         
-        // =========================================================
-        // THÊM SỰ KIỆN ĐỔI MẬT KHẨU NGAY TẠI ĐÂY
-        // =========================================================
         btnDoiMatKhau.addActionListener(e -> {
             JPasswordField txtPassCu = new JPasswordField();
             JPasswordField txtPassMoi = new JPasswordField();
@@ -145,19 +126,16 @@ public class ThongTinCaNhanPanel extends JPanel {
                 String passMoi = new String(txtPassMoi.getPassword());
                 String xacNhan = new String(txtXacNhan.getPassword());
                 
-                // Kiểm tra sơ bộ các lỗi nhập liệu cơ bản
                 if (passCu.isEmpty() || passMoi.isEmpty() || xacNhan.isEmpty()) {
                     JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 } else if (!passMoi.equals(xacNhan)) {
                     JOptionPane.showMessageDialog(this, "Mật khẩu xác nhận không khớp!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    // TODO: Chỗ này sau này sẽ gọi docGiaBUS để update mật khẩu xuống CSDL
                     JOptionPane.showMessageDialog(this, "Đổi mật khẩu thành công! Vui lòng sử dụng mật khẩu mới cho lần đăng nhập sau.");
                 }
             }
         });
-        // =========================================================
-
+        
         bottomPanel.add(btnCapNhat);
         bottomPanel.add(btnDoiMatKhau);
 
@@ -166,9 +144,6 @@ public class ThongTinCaNhanPanel extends JPanel {
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    // =======================================================
-    // HÀM KẾT NỐI DATA VÀ ĐỔ LÊN FORM
-    // =======================================================
     public void loadData(String maDocGia) {
         Object[] data = docGiaBUS.getThongTinCaNhan(maDocGia);
         if (data != null) {
@@ -205,7 +180,6 @@ public class ThongTinCaNhanPanel extends JPanel {
         gbc.gridx = 1;
         panel.add(txtField, gbc);
     }
-    // --- CÁC HÀM GETTER BẮT SỰ KIỆN CHO USERHOMEFRAME ---
     public JButton getBtnCapNhat() { return btnCapNhat; }
     public JButton getBtnDoiMatKhau() { return btnDoiMatKhau; }
     public String getSoDienThoai() { return txtSoDienThoai.getText(); }

@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DTO;
 
-/**
- *
- * @author Admin
- */
 public class ConNguoiDTO {
     private String MaNguoi;
     private String HoTen;
@@ -20,7 +12,8 @@ public class ConNguoiDTO {
     private String Email;
     private String TrangThai;
 
-    public ConNguoiDTO(String MaNguoi, String HoTen, String NgaySinh, String TenDangNhap, String MatKhau, String GioiTinh, String DiaChi, String SoDienThoai, String Email, String TrangThai) {
+    public ConNguoiDTO(String MaNguoi, String HoTen, String NgaySinh, String TenDangNhap, String MatKhau,
+            String GioiTinh, String DiaChi, String SoDienThoai, String Email, String TrangThai) {
         this.MaNguoi = MaNguoi;
         this.HoTen = HoTen;
         this.NgaySinh = NgaySinh;
@@ -115,5 +108,5 @@ public class ConNguoiDTO {
     public void setTrangThai(String TrangThai) {
         this.TrangThai = TrangThai;
     }
-    
+
 }
