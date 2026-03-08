@@ -18,19 +18,6 @@ public class NguoiQuanLyBUS {
         return listNQL;
     }
 
-    public ArrayList<NguoiQuanLyDTO> getAllActive() {
-        if (listNQL == null || listNQL.isEmpty()) {
-            getAll();
-        }
-        ArrayList<NguoiQuanLyDTO> activeList = new ArrayList<>();
-        for (NguoiQuanLyDTO nql : listNQL) {
-            if (nql.getIsDeleted() != null && !nql.getIsDeleted()) {
-                activeList.add(nql);
-            }
-        }
-        return activeList;
-    }
-
     public NguoiQuanLyDTO getById(String MaNQL) {
         if (listNQL != null && !listNQL.isEmpty()) {
             for (NguoiQuanLyDTO nql : listNQL) {

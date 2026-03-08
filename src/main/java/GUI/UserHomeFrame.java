@@ -262,8 +262,8 @@ public class UserHomeFrame extends JFrame {
         String category = sach.getTheLoai() != null ? sach.getTheLoai() : "Khác";
         String namXB = String.valueOf(sach.getNamXB());
 
-        DAO.SachCopyDAO sachCopyDAO = new DAO.SachCopyDAO();
-        java.util.List<DTO.SachCopyDTO> dsBanSao = sachCopyDAO.getAvailable(sach.getMaSach());
+        BUS.SachCopyBUS copyBUS = new BUS.SachCopyBUS();
+        java.util.List<DTO.SachCopyDTO> dsBanSao = copyBUS.getAvailable(sach.getMaSach());
         String tinhTrang = dsBanSao.isEmpty() ? "Hết sách" : "Còn " + dsBanSao.size() + " cuốn";
 
         JPanel card = new JPanel(new BorderLayout(0, 5));

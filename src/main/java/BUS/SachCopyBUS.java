@@ -4,6 +4,7 @@ import DAO.SachCopyDAO;
 import DTO.SachCopyDTO;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.Connection;
 
 public class SachCopyBUS {
     private SachCopyDAO scDAO;
@@ -115,5 +116,17 @@ public class SachCopyBUS {
             }
         }
         return result;
+    }
+
+    public List<SachCopyDTO> getAvailable(String maSach) {
+        return scDAO.getAvailable(maSach);
+    }
+
+    public boolean updateTinhTrang(String maVach, String tinhTrang, String ghiChu) {
+        return scDAO.updateTinhTrang(maVach, tinhTrang, ghiChu);
+    }
+
+    public int insertNewCopies(Connection con, String maSach, String tenSach, int quantity) throws Exception {
+        return scDAO.insertNewCopies(con, maSach, tenSach, quantity);
     }
 }

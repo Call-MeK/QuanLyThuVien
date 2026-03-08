@@ -8,7 +8,7 @@ import java.util.List;
 import BUS.SachBUS;
 import BUS.TheLoaiBUS;
 import BUS.NhaXuatBanBUS;
-import DAO.SachCopyDAO;
+import BUS.SachCopyBUS;
 import DTO.SachDTO;
 import DTO.TheLoaiDTO;
 import DTO.NhaXuatBanDTO;
@@ -57,12 +57,15 @@ public class TimKiemSachPanel extends JPanel {
         txtSearch.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent evt) {
                 if (txtSearch.getText().equals(placeholderText)) {
-                    txtSearch.setText(""); txtSearch.setForeground(Color.BLACK);
+                    txtSearch.setText("");
+                    txtSearch.setForeground(Color.BLACK);
                 }
             }
+
             public void focusLost(FocusEvent evt) {
                 if (txtSearch.getText().isEmpty()) {
-                    txtSearch.setForeground(Color.GRAY); txtSearch.setText(placeholderText);
+                    txtSearch.setForeground(Color.GRAY);
+                    txtSearch.setText(placeholderText);
                 }
             }
         });
@@ -72,7 +75,8 @@ public class TimKiemSachPanel extends JPanel {
         btnSearch.setFont(new Font(tenFont, Font.BOLD, 13));
         btnSearch.setBackground(new Color(13, 110, 253));
         btnSearch.setForeground(Color.WHITE);
-        btnSearch.setFocusPainted(false); btnSearch.setBorderPainted(false);
+        btnSearch.setFocusPainted(false);
+        btnSearch.setBorderPainted(false);
         btnSearch.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         searchBoxPanel.add(txtSearch);
@@ -86,14 +90,15 @@ public class TimKiemSachPanel extends JPanel {
         JLabel lblFilter = new JLabel("Lọc theo:");
         lblFilter.setFont(new Font(tenFont, Font.PLAIN, 14));
 
-        final JComboBox<String> cbType = new JComboBox<>(new String[]{
-            "Tất cả", "Văn học", "Khoa học", "Kỹ năng sống", "Lịch sử"
+        final JComboBox<String> cbType = new JComboBox<>(new String[] {
+                "Tất cả", "Văn học", "Khoa học", "Kỹ năng sống", "Lịch sử"
         });
         cbType.setPreferredSize(new Dimension(200, 30));
         cbType.setFont(new Font(tenFont, Font.PLAIN, 13));
         cbType.setBackground(Color.WHITE);
 
-        filterPanel.add(lblFilter); filterPanel.add(cbType);
+        filterPanel.add(lblFilter);
+        filterPanel.add(cbType);
 
         topPanel.add(lblTitle);
         topPanel.add(Box.createVerticalStrut(5));
@@ -103,10 +108,12 @@ public class TimKiemSachPanel extends JPanel {
         topPanel.add(Box.createVerticalStrut(15));
         topPanel.add(filterPanel);
 
-        String[] cols = {"Mã Sách", "Tên Sách", "Tác Giả", "Thể Loại", "NXB", "Còn Sẵn"};
+        String[] cols = { "Mã Sách", "Tên Sách", "Tác Giả", "Thể Loại", "NXB", "Còn Sẵn" };
         model = new DefaultTableModel(cols, 0) {
             @Override
-            public boolean isCellEditable(int row, int column) { return false; }
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
         };
 
         loadData("", "Tất cả");
@@ -156,11 +163,17 @@ public class TimKiemSachPanel extends JPanel {
         btnXemChiTiet.setFont(new Font(tenFont, Font.BOLD, 13));
         btnXemChiTiet.setBackground(new Color(99, 102, 241));
         btnXemChiTiet.setForeground(Color.WHITE);
-        btnXemChiTiet.setFocusPainted(false); btnXemChiTiet.setBorderPainted(false);
+        btnXemChiTiet.setFocusPainted(false);
+        btnXemChiTiet.setBorderPainted(false);
         btnXemChiTiet.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnXemChiTiet.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent evt) { btnXemChiTiet.setBackground(new Color(79, 70, 229)); }
-            public void mouseExited(MouseEvent evt)  { btnXemChiTiet.setBackground(new Color(99, 102, 241)); }
+            public void mouseEntered(MouseEvent evt) {
+                btnXemChiTiet.setBackground(new Color(79, 70, 229));
+            }
+
+            public void mouseExited(MouseEvent evt) {
+                btnXemChiTiet.setBackground(new Color(99, 102, 241));
+            }
         });
 
         bottomPanel.add(btnXemChiTiet);
@@ -177,19 +190,21 @@ public class TimKiemSachPanel extends JPanel {
                     ? new SachBUS().getAll()
                     : new SachBUS().search(keyword);
 
-            TheLoaiBUS theLoaiBUS   = new TheLoaiBUS();
-            NhaXuatBanBUS nxbBUS    = new NhaXuatBanBUS();
-            SachCopyDAO sachCopyDAO = new SachCopyDAO();
+            TheLoaiBUS theLoaiBUS = new TheLoaiBUS();
+            NhaXuatBanBUS nxbBUS = new NhaXuatBanBUS();
+            SachCopyBUS copyBUS = new SachCopyBUS();
 
             for (SachDTO s : listSach) {
                 String tenTheLoai = s.getTheLoai();
                 if (tenTheLoai != null) {
                     TheLoaiDTO tl = theLoaiBUS.getById(tenTheLoai.trim());
-                    if (tl != null && tl.getTenTheLoai() != null) tenTheLoai = tl.getTenTheLoai();
+                    if (tl != null && tl.getTenTheLoai() != null)
+                        tenTheLoai = tl.getTenTheLoai();
                 }
 
                 if (!theLoaiFilter.equals("Tất cả")) {
-                    if (tenTheLoai == null || !tenTheLoai.equals(theLoaiFilter)) continue;
+                    if (tenTheLoai == null || !tenTheLoai.equals(theLoaiFilter))
+                        continue;
                 }
 
                 String tenTacGia = "Không rõ";
@@ -197,7 +212,8 @@ public class TimKiemSachPanel extends JPanel {
                     StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < s.getDanhSachTacGia().size(); i++) {
                         sb.append(s.getDanhSachTacGia().get(i).getTenTacGia());
-                        if (i < s.getDanhSachTacGia().size() - 1) sb.append(", ");
+                        if (i < s.getDanhSachTacGia().size() - 1)
+                            sb.append(", ");
                     }
                     tenTacGia = sb.toString();
                 }
@@ -205,12 +221,13 @@ public class TimKiemSachPanel extends JPanel {
                 String tenNxb = s.getMaNXB();
                 if (tenNxb != null) {
                     NhaXuatBanDTO nxb = nxbBUS.getById(tenNxb.trim());
-                    if (nxb != null && nxb.getTenNXB() != null) tenNxb = nxb.getTenNXB();
+                    if (nxb != null && nxb.getTenNXB() != null)
+                        tenNxb = nxb.getTenNXB();
                 }
 
                 int soCuonConSan = 0;
                 try {
-                    var dsBanSao = sachCopyDAO.getAll();
+                    var dsBanSao = copyBUS.getAll();
                     for (var sc : dsBanSao) {
                         if (s.getMaSach().trim().equalsIgnoreCase(sc.getMaSach().trim())
                                 && !Boolean.TRUE.equals(sc.getIsDeleted())
@@ -218,17 +235,25 @@ public class TimKiemSachPanel extends JPanel {
                             soCuonConSan++;
                         }
                     }
-                } catch (Exception ex) { }
+                } catch (Exception ex) {
+                }
 
                 String conSan = soCuonConSan > 0 ? "Còn " + soCuonConSan + " cuốn" : "Hết sách";
 
-                model.addRow(new Object[]{
-                    s.getMaSach(), s.getTenSach(), tenTacGia, tenTheLoai, tenNxb, conSan
+                model.addRow(new Object[] {
+                        s.getMaSach(), s.getTenSach(), tenTacGia, tenTheLoai, tenNxb, conSan
                 });
             }
-        } catch (Exception ex) { ex.printStackTrace(); }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
-    public JButton getBtnXemChiTiet() { return btnXemChiTiet; }
-    public JTable getTable() { return table; }
+    public JButton getBtnXemChiTiet() {
+        return btnXemChiTiet;
+    }
+
+    public JTable getTable() {
+        return table;
+    }
 }

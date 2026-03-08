@@ -21,10 +21,6 @@ public class PhieuPhatBUS {
         return phieuPhatDAO.getAll();
     }
 
-    public ArrayList<PhieuPhatDTO> getListPP() {
-        return listPP;
-    }
-
     public void reloadFromDB() {
         listPP = phieuPhatDAO.getAll();
     }

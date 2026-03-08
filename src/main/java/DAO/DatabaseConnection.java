@@ -13,7 +13,7 @@ public class DatabaseConnection {
 
             String URL = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyThuVien;trustServerCertificate=true";
             String UserName = "sa";
-            String Password = "12345";
+            String Password = "sa";
 
             if (connection == null || connection.isClosed()) {
                 connection = DriverManager.getConnection(URL, UserName, Password);

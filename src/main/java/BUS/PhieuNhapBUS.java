@@ -17,12 +17,12 @@ public class PhieuNhapBUS {
         return phieuNhapDAO.findAll();
     }
 
-    public List<PhieuNhapDTO> getListPhieuNhap() {
-        return listPhieuNhap;
-    }
-
     public PhieuNhapDTO findById(String maPN) {
         return phieuNhapDAO.findById(maPN);
+    }
+
+    public String generateMaPN() {
+        return phieuNhapDAO.generateMaPN();
     }
 
     public boolean hasMaPN(String maPN) {

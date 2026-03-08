@@ -9,34 +9,33 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import BUS.*;
-import DAO.*;
 import DTO.*;
 
 public class TraSachDialog extends JDialog {
 
-    private static final double PHI_TRE_HAN_MOI_NGAY = 5_000; 
-    private static final String[] TINH_TRANG = {"Tốt", "Bình thường", "Cũ", "Hỏng"};
-    private static final String   tenFont    = "Segoe UI";
+    private static final double PHI_TRE_HAN_MOI_NGAY = 5_000;
+    private static final String[] TINH_TRANG = { "Tốt", "Bình thường", "Cũ", "Hỏng" };
+    private static final String tenFont = "Segoe UI";
 
-    private JTable            table;
+    private JTable table;
     private DefaultTableModel model;
-    private JLabel            lblEmptyHint;
-    private JLabel            lblTongPhat;   
-    private JButton           btnXacNhan;
-    private boolean           confirmed = false;
+    private JLabel lblEmptyHint;
+    private JLabel lblTongPhat;
+    private JButton btnXacNhan;
+    private boolean confirmed = false;
 
-    private final List<String[]>      ketQua  = new ArrayList<>();
-    private final String              maPM;
-    private final String              hanTra; 
-    private final ChiTietPhieuMuonDAO ctpmDAO = new ChiTietPhieuMuonDAO();
-    private final SachCopyDAO         copyDAO = new SachCopyDAO();
-    private final SachHongDAO         hongDAO = new SachHongDAO();
-    private final PhieuPhatBUS        phatBUS = new PhieuPhatBUS();
-    private final SachDAO             sachDAO = new SachDAO();
+    private final List<String[]> ketQua = new ArrayList<>();
+    private final String maPM;
+    private final String hanTra;
+    private final ChiTietPhieuMuonBUS ctpmBUS = new ChiTietPhieuMuonBUS();
+    private final SachCopyBUS copyBUS = new SachCopyBUS();
+    private final SachHongBUS hongBUS = new SachHongBUS();
+    private final PhieuPhatBUS phatBUS = new PhieuPhatBUS();
+    private final SachBUS sachBUS = new SachBUS();
 
     public TraSachDialog(Frame parent, String maPM) {
         super(parent, "Xác Nhận Trả Sách — Phiếu: " + maPM, true);
-        this.maPM    = maPM;
+        this.maPM = maPM;
         PhieuMuonBUS pmBUS = new PhieuMuonBUS();
         PhieuMuonDTO pm = pmBUS.getById(maPM);
         this.hanTra = (pm != null && pm.getHenTra() != null) ? pm.getHenTra() : "";
@@ -70,8 +69,11 @@ public class TraSachDialog extends JDialog {
         add(header, BorderLayout.NORTH);
 
         model = new DefaultTableModel(
-                new String[]{"Tên Sách Bản Sao", "T.Trạng Lúc Mượn", "T.Trạng Trả Về", "Ghi Chú (nếu có)"}, 0) {
-            @Override public boolean isCellEditable(int r, int c) { return c == 2 || c == 3; }
+                new String[] { "Tên Sách Bản Sao", "T.Trạng Lúc Mượn", "T.Trạng Trả Về", "Ghi Chú (nếu có)" }, 0) {
+            @Override
+            public boolean isCellEditable(int r, int c) {
+                return c == 2 || c == 3;
+            }
         };
         table = new JTable(model);
         table.setRowHeight(36);
@@ -86,13 +88,15 @@ public class TraSachDialog extends JDialog {
             @Override
             public boolean stopCellEditing() {
                 boolean result = super.stopCellEditing();
-                capNhatTongPhat(); 
+                capNhatTongPhat();
                 return result;
             }
         });
         table.getColumnModel().getColumn(2).setCellRenderer(new TinhTrangRenderer());
         table.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
-            { setForeground(new Color(108, 117, 125)); }
+            {
+                setForeground(new Color(108, 117, 125));
+            }
         });
         table.getColumnModel().getColumn(0).setPreferredWidth(230);
         table.getColumnModel().getColumn(1).setPreferredWidth(130);
@@ -111,12 +115,10 @@ public class TraSachDialog extends JDialog {
         pnlCenter.add(lblEmptyHint, BorderLayout.SOUTH);
         add(pnlCenter, BorderLayout.CENTER);
 
-        
         JPanel south = new JPanel(new BorderLayout(10, 0));
         south.setOpaque(false);
         south.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0));
 
-        
         lblTongPhat = new JLabel("Tổng phí phạt dự kiến: 0 đ");
         lblTongPhat.setFont(new Font(tenFont, Font.BOLD, 14));
         lblTongPhat.setForeground(new Color(220, 53, 69));
@@ -132,7 +134,7 @@ public class TraSachDialog extends JDialog {
         pnlBtn.add(btnXacNhan);
 
         south.add(lblTongPhat, BorderLayout.WEST);
-        south.add(pnlBtn,      BorderLayout.EAST);
+        south.add(pnlBtn, BorderLayout.EAST);
         add(south, BorderLayout.SOUTH);
     }
 
@@ -140,7 +142,7 @@ public class TraSachDialog extends JDialog {
         model.setRowCount(0);
         ketQua.clear();
 
-        List<ChiTietPhieuMuonDTO> list = ctpmDAO.getByMaPM(maPM);
+        List<ChiTietPhieuMuonDTO> list = ctpmBUS.getByMaPM(maPM);
         if (list.isEmpty()) {
             lblEmptyHint.setVisible(true);
             btnXacNhan.setText("✔  Xác Nhận Trả (Không có chi tiết)");
@@ -149,11 +151,11 @@ public class TraSachDialog extends JDialog {
         }
 
         for (ChiTietPhieuMuonDTO ct : list) {
-            SachCopyDTO sc = copyDAO.findById(ct.getMaCuonSach());
+            SachCopyDTO sc = copyBUS.findById(ct.getMaCuonSach());
             String ten = sc != null ? sc.getTenSachBanSao() : ct.getMaCuonSach();
-            String tt  = sc != null && sc.getTinhTrang() != null ? sc.getTinhTrang() : "Tốt";
-            model.addRow(new Object[]{ ten, tt, tt, "" });
-            ketQua.add(new String[]{ ct.getMaCuonSach(), ten, tt, "" });
+            String tt = sc != null && sc.getTinhTrang() != null ? sc.getTinhTrang() : "Tốt";
+            model.addRow(new Object[] { ten, tt, tt, "" });
+            ketQua.add(new String[] { ct.getMaCuonSach(), ten, tt, "" });
         }
         capNhatTongPhat();
     }
@@ -161,16 +163,18 @@ public class TraSachDialog extends JDialog {
     private void capNhatTongPhat() {
         double tong = 0;
         long soNgayTre = tinhSoNgayTre();
-        if (soNgayTre > 0) tong += soNgayTre * PHI_TRE_HAN_MOI_NGAY;
+        if (soNgayTre > 0)
+            tong += soNgayTre * PHI_TRE_HAN_MOI_NGAY;
 
         for (int i = 0; i < model.getRowCount(); i++) {
             String tt = model.getValueAt(i, 2) != null ? model.getValueAt(i, 2).toString() : "Tốt";
             if ("Hỏng".equals(tt) && i < ketQua.size()) {
-                SachCopyDTO sc = copyDAO.findById(ketQua.get(i)[0]);
+                SachCopyDTO sc = copyBUS.findById(ketQua.get(i)[0]);
                 double giaBia = 0;
                 if (sc != null && sc.getMaSach() != null) {
-                    SachDTO sach = sachDAO.getById(sc.getMaSach());
-                    if (sach != null && sach.getGiaBia() != null) giaBia = sach.getGiaBia();
+                    SachDTO sach = sachBUS.getById(sc.getMaSach());
+                    if (sach != null && sach.getGiaBia() != null)
+                        giaBia = sach.getGiaBia();
                 }
                 tong += giaBia;
             }
@@ -186,20 +190,20 @@ public class TraSachDialog extends JDialog {
     }
 
     private void xacNhan() {
-        if (table.isEditing()) table.getCellEditor().stopCellEditing();
+        if (table.isEditing())
+            table.getCellEditor().stopCellEditing();
 
         boolean coHong = false;
         String ngayNay = LocalDate.now().toString();
         StringBuilder dsSachHong = new StringBuilder();
 
         for (int i = 0; i < model.getRowCount(); i++) {
-            String ttTra  = model.getValueAt(i, 2).toString();
+            String ttTra = model.getValueAt(i, 2).toString();
             String ghiChu = model.getValueAt(i, 3) != null ? model.getValueAt(i, 3).toString() : "";
             ketQua.get(i)[2] = ttTra;
             ketQua.get(i)[3] = ghiChu;
 
-            
-            copyDAO.updateTinhTrang(ketQua.get(i)[0], ttTra, ghiChu);
+            copyBUS.updateTinhTrang(ketQua.get(i)[0], ttTra, ghiChu);
 
             if ("Hỏng".equals(ttTra)) {
                 coHong = true;
@@ -212,7 +216,7 @@ public class TraSachDialog extends JDialog {
                 sh.setLyDo(ghiChu.isEmpty()
                         ? "Phát hiện khi trả sách — Phiếu: " + maPM
                         : ghiChu);
-                hongDAO.insert(sh);
+                hongBUS.insert(sh);
                 dsSachHong.append("  • ").append(ketQua.get(i)[1]).append("\n");
             }
         }
@@ -221,7 +225,8 @@ public class TraSachDialog extends JDialog {
         double tongPhi = 0;
         ArrayList<ChiTietPhieuPhatDTO> dsChiTiet = new ArrayList<>();
         String maNQL = BUS.SessionManager.getInstance().getMaNguoi();
-        if (maNQL == null || maNQL.isEmpty()) maNQL = "NV01";
+        if (maNQL == null || maNQL.isEmpty())
+            maNQL = "NV01";
 
         if (soNgayTre > 0) {
             double phiTre = soNgayTre * PHI_TRE_HAN_MOI_NGAY;
@@ -239,11 +244,12 @@ public class TraSachDialog extends JDialog {
         for (String[] r : ketQua) {
             if ("Hỏng".equals(r[2])) {
                 // Lấy giá bìa từ DB
-                SachCopyDTO sc = copyDAO.findById(r[0]);
+                SachCopyDTO sc = copyBUS.findById(r[0]);
                 double giaBia = 0;
                 if (sc != null && sc.getMaSach() != null) {
-                    SachDTO sach = sachDAO.getById(sc.getMaSach());
-                    if (sach != null && sach.getGiaBia() != null) giaBia = sach.getGiaBia();
+                    SachDTO sach = sachBUS.getById(sc.getMaSach());
+                    if (sach != null && sach.getGiaBia() != null)
+                        giaBia = sach.getGiaBia();
                 }
                 tongPhi += giaBia;
                 ChiTietPhieuPhatDTO ct = new ChiTietPhieuPhatDTO();
@@ -267,25 +273,25 @@ public class TraSachDialog extends JDialog {
             pp.setTongTien(String.valueOf(tongPhi));
             pp.setTrangThai(0); // Chưa thanh toán
 
-            for (ChiTietPhieuPhatDTO ct : dsChiTiet) ct.setMaPP(maPP);
+            for (ChiTietPhieuPhatDTO ct : dsChiTiet)
+                ct.setMaPP(maPP);
 
-        
             StringBuilder msg = new StringBuilder("✔ Xác nhận trả thành công!\n\n");
             if (soNgayTre > 0) {
                 msg.append("⏰ Trễ ").append(soNgayTre).append(" ngày — Phí: ")
-                   .append(String.format("%,.0f đ\n", soNgayTre * PHI_TRE_HAN_MOI_NGAY));
+                        .append(String.format("%,.0f đ\n", soNgayTre * PHI_TRE_HAN_MOI_NGAY));
             }
             if (coHong) {
                 double tongHong = dsChiTiet.stream()
-                    .filter(ct -> ct.getLyDo().startsWith("Làm hỏng"))
-                    .mapToDouble(ct -> Double.parseDouble(ct.getSoTien()))
-                    .sum();
+                        .filter(ct -> ct.getLyDo().startsWith("Làm hỏng"))
+                        .mapToDouble(ct -> Double.parseDouble(ct.getSoTien()))
+                        .sum();
                 msg.append("📕 Sách hỏng:\n").append(dsSachHong)
-                   .append("Phí: ").append(String.format("%,.0f đ\n", tongHong));
+                        .append("Phí: ").append(String.format("%,.0f đ\n", tongHong));
             }
             msg.append("\n💰 Tổng phí phạt: ").append(String.format("%,.0f đ", tongPhi))
-               .append("\n→ Mã phiếu phạt: ").append(maPP)
-               .append("\n→ Vào Quản Lý Phí Phạt để thu tiền.");
+                    .append("\n→ Mã phiếu phạt: ").append(maPP)
+                    .append("\n→ Vào Quản Lý Phí Phạt để thu tiền.");
 
             JOptionPane.showMessageDialog(this, msg.toString(),
                     "Tạo Phiếu Phạt Thành Công", JOptionPane.WARNING_MESSAGE);
@@ -300,23 +306,33 @@ public class TraSachDialog extends JDialog {
     }
 
     private long tinhSoNgayTre() {
-        if (hanTra == null || hanTra.isEmpty()) return 0;
+        if (hanTra == null || hanTra.isEmpty())
+            return 0;
         try {
-            LocalDate han  = LocalDate.parse(hanTra);
-            LocalDate hom  = LocalDate.now();
-            long ngayTre   = ChronoUnit.DAYS.between(han, hom);
+            LocalDate han = LocalDate.parse(hanTra);
+            LocalDate hom = LocalDate.now();
+            long ngayTre = ChronoUnit.DAYS.between(han, hom);
             return ngayTre > 0 ? ngayTre : 0;
-        } catch (Exception e) { return 0; }
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
-    public boolean isConfirmed() { return confirmed; }
-    public boolean hasHong()     { return ketQua.stream().anyMatch(r -> "Hỏng".equals(r[2])); }
+    public boolean isConfirmed() {
+        return confirmed;
+    }
+
+    public boolean hasHong() {
+        return ketQua.stream().anyMatch(r -> "Hỏng".equals(r[2]));
+    }
 
     private JButton btn(String text, Color bg) {
         JButton b = new JButton(text);
         b.setFont(new Font(tenFont, Font.BOLD, 14));
-        b.setBackground(bg); b.setForeground(Color.WHITE);
-        b.setFocusPainted(false); b.setBorderPainted(false);
+        b.setBackground(bg);
+        b.setForeground(Color.WHITE);
+        b.setFocusPainted(false);
+        b.setBorderPainted(false);
         b.setPreferredSize(new Dimension(220, 38));
         b.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return b;
@@ -331,11 +347,20 @@ public class TraSachDialog extends JDialog {
             if (!sel) {
                 setBackground(Color.WHITE);
                 switch (val != null ? val.toString() : "") {
-                    case "Tốt":         setForeground(new Color(25, 135, 84));  break;
-                    case "Bình thường": setForeground(new Color(13, 110, 253)); break;
-                    case "Cũ":          setForeground(new Color(255, 153, 0));  break;
-                    case "Hỏng":        setForeground(new Color(220, 53, 69));  break;
-                    default:            setForeground(new Color(33, 37, 41));
+                    case "Tốt":
+                        setForeground(new Color(25, 135, 84));
+                        break;
+                    case "Bình thường":
+                        setForeground(new Color(13, 110, 253));
+                        break;
+                    case "Cũ":
+                        setForeground(new Color(255, 153, 0));
+                        break;
+                    case "Hỏng":
+                        setForeground(new Color(220, 53, 69));
+                        break;
+                    default:
+                        setForeground(new Color(33, 37, 41));
                 }
             }
             return this;

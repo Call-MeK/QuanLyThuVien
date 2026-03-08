@@ -85,17 +85,6 @@ public class DocGiaBUS {
         return "Cập nhật thất bại";
     }
 
-    public String deleteDocGia(String maDocGia) {
-        if (!hasMaDocGia(maDocGia))
-            return "Mã độc giả không tồn tại";
-        String result = docGiaDAO.delete(maDocGia);
-        if (result.equals("OK")) {
-            listdocGia.removeIf(dg -> dg.getMaDocGia().equals(maDocGia));
-            return "Xóa thành công";
-        }
-        return "Xóa thất bại: " + result;
-    }
-
     public String softDeleteDocGia(String maDocGia) {
         if (!hasMaDocGia(maDocGia))
             return "Mã độc giả không tồn tại";
@@ -237,26 +226,4 @@ public class DocGiaBUS {
         return false;
     }
 
-    public String xoaMemDocGia(String maDocGia) {
-        if (!hasMaDocGia(maDocGia))
-            return "Mã độc giả không tồn tại";
-
-        String dieuKien = docGiaDAO.kiemTraDieuKienXoa(maDocGia);
-        if (!dieuKien.equals("OK")) {
-            return dieuKien;
-        }
-
-        if (docGiaDAO.xoaMemThanhDaXoa(maDocGia)) {
-            for (DocGiaDTO dg : listdocGia) {
-                if (dg.getMaDocGia().equals(maDocGia)) {
-                    dg.setIsDeleted(true);
-                    dg.setTrangThai("Đã xóa");
-                    dg.setNgayXoa(java.time.LocalDate.now().toString());
-                    break;
-                }
-            }
-            return "Xóa thành công";
-        }
-        return "Xóa thất bại do lỗi cơ sở dữ liệu";
-    }
 }
