@@ -50,7 +50,6 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         setBackground(colorBackground);
         setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
 
-        // HEADER
         JPanel pnlHeader = new JPanel(new BorderLayout());
         pnlHeader.setBackground(colorBackground);
         JLabel lblTitle = new JLabel("Quản Lý Mượn - Trả Sách");
@@ -69,8 +68,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
             Image img = icon.getImage().getScaledInstance(28, 28, Image.SCALE_SMOOTH);
             btnLamMoi.setIcon(new ImageIcon(img));
             btnLamMoi.setText("");
-        } catch (Exception e) {
-            /* dùng text ↺ */ }
+        } catch (Exception e) { }
         pnlHeader.add(btnLamMoi, BorderLayout.EAST);
         add(pnlHeader, BorderLayout.NORTH);
 
@@ -80,7 +78,6 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         Font fontLabel = new Font(tenFont, Font.BOLD, 14);
         Font fontInput = new Font(tenFont, Font.PLAIN, 14);
 
-        // FORM (6 hàng x 4 cột)
         JPanel pnlInput = new JPanel(new GridLayout(6, 4, 15, 10));
         pnlInput.setBackground(Color.WHITE);
         pnlInput.setBorder(BorderFactory.createCompoundBorder(
@@ -98,8 +95,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         txtTrangThai = roField(fontInput);
         txtTrangThai.setBackground(new Color(227, 242, 253));
         txtTrangThai.setForeground(new Color(13, 71, 161));
-
-        // MỚI: Mã NV và Tên Sách
+  
         txtMaNQL = roField(fontInput);
         txtMaNQL.setBackground(new Color(233, 236, 239));
         txtTenSach = roField(fontInput);
@@ -120,27 +116,26 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         cbBanSao = new JComboBox<>();
         cbBanSao.setFont(fontInput);
 
-        // Row 1: Mã phiếu | Mã độc giả
         pnlInput.add(lbl("Mã phiếu mượn:", fontLabel));
         pnlInput.add(txtMaPhieu);
         pnlInput.add(lbl("Mã độc giả:", fontLabel));
         pnlInput.add(txtMaDG);
-        // Row 2: Mã thẻ | Ngày mượn
+        
         pnlInput.add(lbl("Mã thẻ (tự tìm):", fontLabel));
         pnlInput.add(txtMaThe);
         pnlInput.add(lbl("Ngày mượn:", fontLabel));
         pnlInput.add(txtNgayMuon);
-        // Row 3: Hạn trả | Ngày trả thực
+       
         pnlInput.add(lbl("Hạn trả:", fontLabel));
         pnlInput.add(txtHanTra);
         pnlInput.add(lbl("Ngày trả thực:", fontLabel));
         pnlInput.add(txtNgayTra);
-        // Row 4: Trạng thái | Mã NV lập phiếu
+       
         pnlInput.add(lbl("Trạng thái:", fontLabel));
         pnlInput.add(txtTrangThai);
         pnlInput.add(lbl("Mã NV lập phiếu:", fontLabel));
         pnlInput.add(txtMaNQL);
-        // Row 5: Tên sách | Mã sách lookup
+       
         pnlInput.add(lbl("Tên sách đang mượn:", fontLabel));
         pnlInput.add(txtTenSach);
         pnlInput.add(lbl("Mã sách:", fontLabel));
