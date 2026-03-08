@@ -110,29 +110,52 @@ public class LoginFrame extends JFrame {
                 BorderFactory.createLineBorder(new Color(206, 212, 218), 1, true),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 
-        final JToggleButton btnTogglePass = new JToggleButton("Hiện");
+        final JToggleButton btnTogglePass = new JToggleButton();
         btnTogglePass.setBackground(Color.WHITE);
         btnTogglePass.setFocusPainted(false);
         btnTogglePass.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
         btnTogglePass.setPreferredSize(new Dimension(60, 40));
         btnTogglePass.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        btnTogglePass.addActionListener(ev -> {
-            if (btnTogglePass.isSelected()) {
-                txtPassword.setEchoChar((char) 0);
-                btnTogglePass.setText("Ẩn");
-            } else {
-                txtPassword.setEchoChar('•');
-                btnTogglePass.setText("Hiện");
-            }
-        });
+        try {
+            ImageIcon showIcon = new ImageIcon(getClass().getResource("/Images/showpassword.jpg"));
+            Image showImg = showIcon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
+            final ImageIcon scaledShowIcon = new ImageIcon(showImg);
+
+            ImageIcon hideIcon = new ImageIcon(getClass().getResource("/Images/hidepassword.jpg"));
+            Image hideImg = hideIcon.getImage().getScaledInstance(25, 25, Image.SCALE_SMOOTH);
+            final ImageIcon scaledHideIcon = new ImageIcon(hideImg);
+
+            btnTogglePass.setIcon(scaledShowIcon);
+
+            btnTogglePass.addActionListener(ev -> {
+                if (btnTogglePass.isSelected()) {
+                    txtPassword.setEchoChar((char) 0);
+                    btnTogglePass.setIcon(scaledHideIcon);
+                } else {
+                    txtPassword.setEchoChar('•');
+                    btnTogglePass.setIcon(scaledShowIcon);
+                }
+            });
+        } catch (Exception e) {
+            btnTogglePass.setText("Hiện");
+            btnTogglePass.addActionListener(ev -> {
+                if (btnTogglePass.isSelected()) {
+                    txtPassword.setEchoChar((char) 0);
+                    btnTogglePass.setText("Ẩn");
+                } else {
+                    txtPassword.setEchoChar('•');
+                    btnTogglePass.setText("Hiện");
+                }
+            });
+        }
 
         passPanel.add(txtPassword, BorderLayout.CENTER);
         passPanel.add(btnTogglePass, BorderLayout.EAST);
 
         JLabel lblRole = new JLabel("Vai trò:");
         lblRole.setFont(labelFont);
-        JComboBox<String> cbRole = new JComboBox<>(new String[]{"Độc giả (User)", "Quản trị viên (Admin)"});
+        JComboBox<String> cbRole = new JComboBox<>(new String[] { "Độc giả (User)", "Quản trị viên (Admin)" });
         cbRole.setFont(inputFont);
         cbRole.setBackground(Color.WHITE);
 
@@ -155,8 +178,13 @@ public class LoginFrame extends JFrame {
         this.getRootPane().setDefaultButton(btnLogin);
 
         btnLogin.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent evt) { btnLogin.setBackground(new Color(11, 94, 215)); }
-            public void mouseExited(MouseEvent evt)  { btnLogin.setBackground(colorPrimary); }
+            public void mouseEntered(MouseEvent evt) {
+                btnLogin.setBackground(new Color(11, 94, 215));
+            }
+
+            public void mouseExited(MouseEvent evt) {
+                btnLogin.setBackground(colorPrimary);
+            }
         });
 
         btnLogin.addActionListener(e -> {
@@ -254,7 +282,9 @@ public class LoginFrame extends JFrame {
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ex) { ex.printStackTrace(); }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
     }
 }
