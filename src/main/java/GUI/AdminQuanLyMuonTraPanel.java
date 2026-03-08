@@ -28,7 +28,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
     private JTable table;
     private DefaultTableModel model;
 
-    private JButton btnThem, btnTra, btnXoa, btnLamMoi, btnSearch, btnResetSearch, btnLookupSach;
+    private JButton btnThem, btnTra, btnLamMoi, btnSearch, btnResetSearch, btnLookupSach;
     private JButton btnImport, btnExport, btnSave;
 
     private PhieuMuonBUS phieuMuonBUS = new PhieuMuonBUS();
@@ -246,13 +246,11 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         btnExport = actionBtn("Export", new Color(33, 115, 70));
         btnThem = actionBtn("Lập Phiếu", new Color(25, 135, 84));
         btnTra = actionBtn("Xác Nhận Trả", new Color(13, 110, 253));
-        btnXoa = actionBtn("Xóa Phiếu", new Color(220, 53, 69));
         pnlButtons.add(btnImport);
         pnlButtons.add(btnSave);
         pnlButtons.add(btnExport);
         pnlButtons.add(btnThem);
         pnlButtons.add(btnTra);
-        pnlButtons.add(btnXoa);
         add(pnlButtons, BorderLayout.SOUTH);
     }
 
@@ -432,34 +430,6 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
             } else {
                 JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
-        });
-
-        btnXoa.addActionListener(e -> {
-            String maPM = txtMaPhieu.getText().trim();
-            if (maPM.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 phiếu!");
-                return;
-            }
-            String tt = txtTrangThai.getText();
-            if ("Đang mượn".equals(tt) || "Trễ hạn".equals(tt)) {
-                JOptionPane.showMessageDialog(this, "Không thể xóa phiếu đang mượn!", "Từ chối",
-                        JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-            int confirm = JOptionPane.showConfirmDialog(this, "Xóa phiếu " + maPM + "?", "Xác nhận",
-                    JOptionPane.YES_NO_OPTION);
-            if (confirm != JOptionPane.YES_OPTION)
-                return;
-            PhieuMuonDTO pm = phieuMuonBUS.getById(maPM);
-            if (pm == null)
-                return;
-            pm.setTinhTrang("Đã xóa");
-            String result = phieuMuonBUS.update(pm);
-            if (result.contains("thành công")) {
-                lamMoiForm();
-                loadDataToTable();
-            } else
-                JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
         });
 
         btnSearch.addActionListener(e -> {

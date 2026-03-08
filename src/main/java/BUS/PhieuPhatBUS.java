@@ -47,7 +47,7 @@ public class PhieuPhatBUS {
 
     private int getTrangThai(String maPP) {
         for (PhieuPhatDTO pp : listPP) {
-            if (pp.getMaPP().equals(maPP))
+            if (pp.getMaPP() != null && pp.getMaPP().trim().equalsIgnoreCase(maPP.trim()))
                 return pp.getTrangThai();
         }
         return -1;
@@ -62,7 +62,7 @@ public class PhieuPhatBUS {
 
         if (phieuPhatDAO.thanhToan(maPP)) {
             for (PhieuPhatDTO pp : listPP) {
-                if (pp.getMaPP().equals(maPP)) {
+                if (pp.getMaPP() != null && pp.getMaPP().trim().equalsIgnoreCase(maPP.trim())) {
                     pp.setTrangThai(1);
                     break;
                 }
@@ -80,7 +80,7 @@ public class PhieuPhatBUS {
             return "Không thể hủy phiếu đã thanh toán";
 
         if (phieuPhatDAO.delete(maPP)) {
-            listPP.removeIf(pp -> pp.getMaPP().equals(maPP));
+            listPP.removeIf(pp -> pp.getMaPP() != null && pp.getMaPP().trim().equalsIgnoreCase(maPP.trim()));
             return "Hủy phiếu phạt thành công";
         }
         return "Hủy phiếu phạt thất bại";
@@ -95,7 +95,7 @@ public class PhieuPhatBUS {
 
         PhieuPhatDTO target = null;
         for (PhieuPhatDTO pp : listPP) {
-            if (pp.getMaPP().equals(maPP)) {
+            if (pp.getMaPP() != null && pp.getMaPP().trim().equalsIgnoreCase(maPP.trim())) {
                 target = pp;
                 break;
             }

@@ -23,7 +23,7 @@ public class SachBUS {
     public SachDTO getById(String maSach) {
         if (listSach != null && !listSach.isEmpty()) {
             for (SachDTO s : listSach) {
-                if (s.getMaSach() != null && s.getMaSach().equals(maSach))
+                if (s.getMaSach() != null && s.getMaSach().trim().equalsIgnoreCase(maSach.trim()))
                     return s;
             }
         }

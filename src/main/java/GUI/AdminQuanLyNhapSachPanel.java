@@ -410,8 +410,26 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
 
     private void themDong() {
         String maSach = txtMaSachNhap.getText().trim();
+        if (maSach.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập Mã Sách!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         String tenSach = txtTenSach.getText().trim();
-        if (maSach.isEmpty() || tenSach.isEmpty() || tenSach.startsWith("⚠")) {
+        if (tenSach.isEmpty() || tenSach.equals("Không tìm thấy")) {
+            SachDTO s = sachBUS.getById(maSach);
+            if (s != null) {
+                txtTenSach.setText(s.getTenSach());
+                tenSach = s.getTenSach();
+            } else {
+                txtTenSach.setText("Không tìm thấy");
+                JOptionPane.showMessageDialog(this, "Không tìm thấy sách: " + maSach, "Cảnh báo",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        }
+
+        if (tenSach.startsWith("⚠")) {
             JOptionPane.showMessageDialog(this, "Nhập Mã Sách hợp lệ trước!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -455,8 +473,26 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
             return;
         }
         String maSach = txtMaSachNhap.getText().trim();
+        if (maSach.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập Mã Sách!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         String tenSach = txtTenSach.getText().trim();
-        if (maSach.isEmpty() || tenSach.isEmpty() || tenSach.startsWith("⚠")) {
+        if (tenSach.isEmpty() || tenSach.equals("Không tìm thấy")) {
+            SachDTO s = sachBUS.getById(maSach);
+            if (s != null) {
+                txtTenSach.setText(s.getTenSach());
+                tenSach = s.getTenSach();
+            } else {
+                txtTenSach.setText("Không tìm thấy");
+                JOptionPane.showMessageDialog(this, "Không tìm thấy sách: " + maSach, "Cảnh báo",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        }
+
+        if (tenSach.startsWith("⚠")) {
             JOptionPane.showMessageDialog(this, "Nhập Mã Sách hợp lệ trước!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
