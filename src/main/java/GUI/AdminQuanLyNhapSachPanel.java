@@ -255,7 +255,6 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         p.setBackground(clrBackground);
         p.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
 
-        // Header
         JPanel top = new JPanel(new BorderLayout(10, 0));
         top.setBackground(clrBackground);
         JLabel t = new JLabel("Lịch Sử Phiếu Nhập");
@@ -755,7 +754,7 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         b.setForeground(Color.WHITE);
         b.setFocusPainted(false);
         b.setBorderPainted(false);
-        b.setPreferredSize(new Dimension(105, 38)); // Thu nhỏ nút lại tí cho đỡ chật
+        b.setPreferredSize(new Dimension(105, 38)); 
         b.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return b;
     }

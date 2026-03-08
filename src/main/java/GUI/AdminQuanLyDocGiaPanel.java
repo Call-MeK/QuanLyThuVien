@@ -40,7 +40,6 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         setBackground(colorBackground);
         setBorder(BorderFactory.createEmptyBorder(20, 25, 20, 25));
 
-        // HEADER
         JPanel pnlHeader = new JPanel(new BorderLayout());
         pnlHeader.setBackground(colorBackground);
         JLabel lblTitle = new JLabel("Quản Lý Thông Tin Độc Giả");
@@ -64,11 +63,9 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         pnlHeader.add(btnLamMoi, BorderLayout.EAST);
         add(pnlHeader, BorderLayout.NORTH);
 
-        // PHẦN GIỮA
         JPanel pnlCenter = new JPanel(new BorderLayout(0, 15));
         pnlCenter.setBackground(colorBackground);
 
-        // FORM NHẬP LIỆU (Tăng lên 5 dòng để chứa thêm Loại Độc Giả)
         JPanel pnlInput = new JPanel(new GridLayout(5, 4, 15, 15));
         pnlInput.setBackground(Color.WHITE);
         pnlInput.setBorder(BorderFactory.createCompoundBorder(
@@ -86,7 +83,6 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         txtEmail     = new JTextField(); txtEmail.setFont(fontInput);
         txtNgayDK    = new JTextField(java.time.LocalDate.now().toString()); txtNgayDK.setFont(fontInput);
         
-        // ComboBox Loại Độc Giả mới
         cbLoaiDocGia = new JComboBox<>(new String[]{"Sinh viên", "Giáo viên", "Khách"}); 
         cbLoaiDocGia.setFont(fontInput);
 
@@ -105,10 +101,8 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         pnlInput.add(createLabel("Ngày đăng ký:", fontLabel));           pnlInput.add(txtNgayDK);
         pnlInput.add(createLabel("Trạng thái:", fontLabel));             pnlInput.add(txtTrangThai);
         pnlInput.add(createLabel("Loại độc giả:", fontLabel));           pnlInput.add(cbLoaiDocGia);
-        // Thêm 2 ô trống để cân đối bố cục Grid
         pnlInput.add(new JLabel()); pnlInput.add(new JLabel());
 
-        // THANH TÌM KIẾM
         JPanel pnlSearch = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         pnlSearch.setBackground(colorBackground);
         pnlSearch.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
@@ -150,7 +144,6 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         pnlTopCenter.add(pnlSearch, BorderLayout.CENTER);
         pnlCenter.add(pnlTopCenter, BorderLayout.NORTH);
 
-        // BẢNG - cột 6 = Trạng Thái
         String[] columns = {"Mã ĐG", "Họ Tên", "Giới Tính", "Ngày Sinh", "Điện Thoại", "EMail", "Trạng Thái"};
         model = new DefaultTableModel(columns, 0) {
             @Override public boolean isCellEditable(int row, int column) { return false; }
@@ -176,7 +169,6 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
                 return c;
             }
         });
-
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230), 1));
         pnlCenter.add(scrollPane, BorderLayout.CENTER);
@@ -188,7 +180,8 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         btnSave   = createActionButton("Save",      new Color(111, 66, 193));
         btnExport = createActionButton("Export",    new Color(33, 115, 70));
         btnThem   = createActionButton("Thêm",      new Color(25, 135, 84));
-        btnSua    = createActionButton("Cập Nhật",  new Color(255, 193, 7)); btnSua.setForeground(Color.BLACK);
+        btnSua    = createActionButton("Cập Nhật",  new Color(255, 193, 7)); 
+        btnSua.setForeground(Color.BLACK);
         btnKhoa   = createActionButton("Khóa Thẻ", new Color(220, 53, 69));
         
         btnMoKhoa = createActionButton("Mở Thẻ",  new Color(13, 110, 253));
@@ -201,9 +194,7 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         pnlButtons.add(btnMoKhoa);
         add(pnlButtons, BorderLayout.SOUTH);
     }
-
     private void initEvents() {
-
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -227,7 +218,6 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
                         txtTrangThai.setForeground(new Color(25, 135, 84));
                         txtTrangThai.setBackground(new Color(233, 236, 239));
                     }
-
                     String maDG = txtMaDG.getText();
                     for (DocGiaDTO dg : docGiaBUS.getListDocGia()) {
                         if (dg.getMaDocGia().trim().equals(maDG.trim())) {
@@ -408,7 +398,6 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         dg.setTenDangNhap(txtMaDG.getText().trim());
         dg.setMatKhau("12345");
         dg.setIsDeleted(false);
-        // Lấy loại độc giả thay vì để mặc định "Thường"
         dg.setLoaiDocGia(cbLoaiDocGia.getSelectedItem().toString());
         dg.setNgayXoa("");
         dg.setDiaChi("");
