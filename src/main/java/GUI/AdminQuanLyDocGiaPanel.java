@@ -25,7 +25,7 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
     private JTable table;
     private DefaultTableModel model;
     private JButton btnThem, btnSua, btnKhoa, btnMoKhoa, btnLamMoi, btnSearch, btnResetSearch;
-    private JButton  btnExport, btnSave;
+    private JButton  btnImport, btnExport, btnSave;
     private DocGiaBUS docGiaBUS = new DocGiaBUS();
 
     public AdminQuanLyDocGiaPanel() {
@@ -176,8 +176,8 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
 
         JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         pnlButtons.setBackground(colorBackground);
-
         btnSave   = createActionButton("Save",      new Color(111, 66, 193));
+        btnImport = createActionButton("Import",    new Color(33, 115, 70));
         btnExport = createActionButton("Export",    new Color(33, 115, 70));
         btnThem   = createActionButton("Thêm",      new Color(25, 135, 84));
         btnSua    = createActionButton("Cập Nhật",  new Color(255, 193, 7)); 
@@ -187,6 +187,7 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         btnMoKhoa = createActionButton("Mở Thẻ",  new Color(13, 110, 253));
 
         pnlButtons.add(btnSave);
+        pnlButtons.add(btnImport);
         pnlButtons.add(btnExport);
         pnlButtons.add(btnThem);
         pnlButtons.add(btnSua);
@@ -326,6 +327,8 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
             loadDataToTable();
         });
 
+        btnImport.addActionListener(e -> Utils.ExcelImporter.importExcelToTable(table, model));
+        
         btnExport.addActionListener(e -> {
             if (model.getRowCount() == 0) { JOptionPane.showMessageDialog(this, "Không có dữ liệu!", "Cảnh báo", JOptionPane.WARNING_MESSAGE); return; }
             Utils.ExcelExporter.exportTableToExcel(table, "DanhSach_DocGia");
