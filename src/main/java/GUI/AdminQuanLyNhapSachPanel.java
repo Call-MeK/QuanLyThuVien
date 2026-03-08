@@ -34,6 +34,9 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
     private DefaultTableModel modelChiTiet;
 
     private JButton btnLuu, btnHuyPhieu, btnLamMoi;
+    
+    // Nút mới thêm
+    private JButton btnRefresh, btnImport, btnSaveExcel, btnExport;
 
     // Lịch sử phiếu nhập
     private JTextField        txtSearch;
@@ -72,12 +75,35 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         setBackground(clrBackground);
         setBorder(BorderFactory.createEmptyBorder(20, 25, 15, 25));
 
-        // TIÊU ĐỀ
+        // TIÊU ĐỀ VÀ NÚT REFRESH ICON
+        JPanel pnlHeader = new JPanel(new BorderLayout());
+        pnlHeader.setBackground(clrBackground);
+
         JLabel lbl = new JLabel("Quản Lý Nhập Sách");
         lbl.setFont(new Font(tenFont, Font.BOLD, 24));
         lbl.setForeground(new Color(33, 37, 41));
         lbl.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-        add(lbl, BorderLayout.NORTH);
+        pnlHeader.add(lbl, BorderLayout.WEST);
+
+        btnRefresh = new JButton();
+        btnRefresh.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnRefresh.setContentAreaFilled(false);
+        btnRefresh.setBorderPainted(false);
+        btnRefresh.setFocusPainted(false);
+        btnRefresh.setToolTipText("Làm mới dữ liệu (F5)");
+        btnRefresh.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
+
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/Images/refresh.png"));
+            Image img = icon.getImage().getScaledInstance(28, 28, Image.SCALE_SMOOTH);
+            btnRefresh.setIcon(new ImageIcon(img));
+            btnRefresh.setPressedIcon(new ImageIcon(img.getScaledInstance(24, 24, Image.SCALE_SMOOTH)));
+            btnRefresh.setRolloverEnabled(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        pnlHeader.add(btnRefresh, BorderLayout.EAST);
+        add(pnlHeader, BorderLayout.NORTH);
 
         // NỘI DUNG CHÍNH
         JPanel pnlTop = new JPanel(new BorderLayout(0, 10));
@@ -96,15 +122,21 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         // NÚT DƯỚI CÙNG
         JPanel pnlBtn = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 8));
         pnlBtn.setBackground(clrBackground);
-
+        
+        btnImport      = btnS("Import",      new Color(33, 115, 70));
+        btnSaveExcel   = btnS("Save",        new Color(111, 66, 193));
+        btnExport      = btnS("Export",      new Color(33, 115, 70));
         btnThemDong    = btnS("Thêm Dòng",    new Color(13, 110, 253));
-        btnCapNhatDong = btnS("Cập Nhật Dòng", new Color(255, 193, 7));
+        btnCapNhatDong = btnS("Cập Nhật",     new Color(255, 193, 7));
         btnCapNhatDong.setForeground(Color.BLACK);
-        btnXoaDong     = btnS("Xóa Dòng",      new Color(220, 53, 69));
-        btnHuyPhieu    = btnS("Hủy Phiếu",     new Color(153, 51, 204));
-        btnLamMoi      = btnS("Làm Mới",        new Color(108, 117, 125));
-        btnLuu         = btnS("Lưu Phiếu",     new Color(25, 135, 84));
+        btnXoaDong     = btnS("Xóa Dòng",     new Color(220, 53, 69));
+        btnHuyPhieu    = btnS("Hủy Phiếu",    new Color(153, 51, 204));
+        btnLamMoi      = btnS("Làm Mới",      new Color(108, 117, 125));
+        btnLuu         = btnS("Lưu Phiếu",    new Color(25, 135, 84));
 
+        pnlBtn.add(btnImport);
+        pnlBtn.add(btnSaveExcel);
+        pnlBtn.add(btnExport);
         pnlBtn.add(btnThemDong);
         pnlBtn.add(btnCapNhatDong);
         pnlBtn.add(btnXoaDong);
@@ -306,6 +338,34 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         btnLuu.addActionListener(e -> luuPhieu());
         btnHuyPhieu.addActionListener(e -> huyPhieu());
         btnLamMoi.addActionListener(e -> lamMoiPhieu());
+        
+        // Sự kiện các nút chức năng mới
+        btnRefresh.addActionListener(e -> {
+            lamMoiPhieu();
+            loadLichSu();
+        });
+
+        btnImport.addActionListener(e -> {
+            Utils.ExcelImporter.importExcelToTable(tblChiTiet, modelChiTiet);
+            capNhatTongTien(); // Cập nhật lại tổng tiền sau khi import
+        });
+
+        btnExport.addActionListener(e -> {
+            if (modelLichSu.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(this, "Không có dữ liệu Lịch Sử để xuất!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            Utils.ExcelExporter.exportTableToExcel(tblLichSu, "DanhSach_PhieuNhap");
+        });
+        
+        btnSaveExcel.addActionListener(e -> {
+            if (modelChiTiet.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(this, "Bảng Chi Tiết đang trống, vui lòng Import dữ liệu trước!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            // Gọi lại hàm lưu phiếu chính vì logic đã xử lý lưu DB ở đó
+            luuPhieu();
+        });
     }
 
     // ==========================================================
@@ -395,7 +455,7 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         modelChiTiet.setValueAt(maSach,  row, 0);
         modelChiTiet.setValueAt(tenSach, row, 1);
         modelChiTiet.setValueAt(soLuong, row, 2);
-        modelChiTiet.setValueAt(String.format("%,.0f", donGia),           row, 3);
+        modelChiTiet.setValueAt(String.format("%,.0f", donGia),            row, 3);
         modelChiTiet.setValueAt(String.format("%,.0f", soLuong * donGia), row, 4);
         capNhatTongTien();
         txtMaSachNhap.setText(""); txtTenSach.setText("");
@@ -603,16 +663,7 @@ public class AdminQuanLyNhapSachPanel extends JPanel {
         b.setFont(new Font(tenFont, Font.BOLD, 13));
         b.setBackground(bg); b.setForeground(Color.WHITE);
         b.setFocusPainted(false); b.setBorderPainted(false);
-        b.setPreferredSize(new Dimension(145, 38));
-        b.setCursor(new Cursor(Cursor.HAND_CURSOR)); return b;
-    }
-
-    private JButton btn(String text, Color bg) {
-        JButton b = new JButton(text);
-        b.setFont(new Font(tenFont, Font.BOLD, 14));
-        b.setBackground(bg); b.setForeground(Color.WHITE);
-        b.setFocusPainted(false); b.setBorderPainted(false);
-        b.setPreferredSize(new Dimension(170, 40));
+        b.setPreferredSize(new Dimension(105, 38)); // Thu nhỏ nút lại tí cho đỡ chật
         b.setCursor(new Cursor(Cursor.HAND_CURSOR)); return b;
     }
 

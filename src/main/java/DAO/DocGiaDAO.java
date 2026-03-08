@@ -47,7 +47,7 @@ public class DocGiaDAO {
                     lastMa = lastMa.trim(); // Xóa khoảng trắng thừa
                     // Cắt bỏ chữ "TTV" (3 ký tự đầu), lấy phần số cộng thêm 1
                     int num = Integer.parseInt(lastMa.substring(3)) + 1;
-                    return String.format("TTV%07d", num);
+                    return String.format("TTV%02d", num);
                 }
             }
         } catch (Exception e) { 

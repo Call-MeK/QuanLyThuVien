@@ -19,7 +19,7 @@ public class DatabaseConnection {
             String URL = "jdbc:sqlserver://localhost:1433;databaseName=QuanLyThuVien;trustServerCertificate=true";
             String UserName = "sa";
          // Đã cập nhật mật khẩu của bạn
-            String Password = "sa"; // Đã cập nhật mật khẩu của bạn
+            String Password = "12345"; // Đã cập nhật mật khẩu của bạn
 
 
             // Kiểm tra nếu kết nối chưa tồn tại hoặc đã bị đóng thì tạo mới
