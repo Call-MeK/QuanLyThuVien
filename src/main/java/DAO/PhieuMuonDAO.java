@@ -192,11 +192,11 @@ public class PhieuMuonDAO {
             if (rs.next()) {
                 String lastMa = rs.getString("MaPM");
                 int num = Integer.parseInt(lastMa.substring(2)) + 1;
-                return String.format("PM%08d", num);
+                return String.format("PM%02d", num);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "PM00000001";
+        return "PM01";
     }
 }

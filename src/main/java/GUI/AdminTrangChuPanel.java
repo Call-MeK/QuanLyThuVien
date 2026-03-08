@@ -75,27 +75,7 @@ public class AdminTrangChuPanel extends JPanel {
         }
         pnlRight.add(lblImage, BorderLayout.NORTH);
 
-        JPanel pnlRecent = new JPanel(new BorderLayout(0, 15));
-        pnlRecent.setBackground(Color.WHITE);
-        pnlRecent.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(222, 226, 230), 1),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)));
-
-        JLabel lblRecentTitle = new JLabel("Hoạt Động Gần Đây Nhất");
-        lblRecentTitle.setFont(new Font(tenFont, Font.BOLD, 18));
-        lblRecentTitle.setForeground(new Color(33, 37, 41));
-        pnlRecent.add(lblRecentTitle, BorderLayout.NORTH);
-
-        JPanel listActivities = new JPanel(new GridLayout(4, 1, 0, 10));
-        listActivities.setBackground(Color.WHITE);
-
-        listActivities.add(createActivityRow("Độc giả Nguyễn Văn A vừa mượn 'Lập Trình Java'", "10 phút trước"));
-        listActivities.add(createActivityRow("Đã nhập thêm 50 cuốn 'Cấu trúc dữ liệu' vào kho", "1 giờ trước"));
-        listActivities.add(createActivityRow("Độc giả Lê Thị B đã trả sách trễ hạn (phạt 20.000đ)", "Hôm qua"));
-        listActivities.add(createActivityRow("Cập nhật thông tin thành viên Trần Văn C", "Hôm qua"));
-
-        pnlRecent.add(listActivities, BorderLayout.CENTER);
-        pnlRight.add(pnlRecent, BorderLayout.CENTER);
+        
         pnlCenter.add(pnlRight, BorderLayout.CENTER);
         add(pnlCenter, BorderLayout.CENTER);
 

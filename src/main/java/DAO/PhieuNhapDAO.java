@@ -88,7 +88,7 @@ public class PhieuNhapDAO {
                 try {
                     // Lấy phần số sau "PN", bất kể độ dài
                     int lastNum = Integer.parseInt(lastMa.substring(2).trim());
-                    return String.format("PN%08d", lastNum + 1);
+                    return String.format("PN%02d", lastNum + 1);
                 } catch (NumberFormatException e) {
                     // ignore
                 }

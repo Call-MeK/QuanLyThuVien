@@ -26,11 +26,11 @@ public class AdminQuanLySachPanel extends JPanel {
     private JButton btnThem, btnSua, btnXoa, btnLamMoi, btnSearch, btnResetSearch;
     private JButton btnRefresh, btnImport, btnExport, btnSave;
 
-    private SachBUS sachBUS         = new SachBUS();
-    private TheLoaiBUS theLoaiBUS   = new TheLoaiBUS();
-    private NhaXuatBanBUS nxbBUS    = new NhaXuatBanBUS();
+    private SachBUS sachBUS = new SachBUS();
+    private TheLoaiBUS theLoaiBUS = new TheLoaiBUS();
+    private NhaXuatBanBUS nxbBUS = new NhaXuatBanBUS();
 
-    private List<TheLoaiDTO>    listTheLoai;
+    private List<TheLoaiDTO> listTheLoai;
     private List<NhaXuatBanDTO> listNXB;
 
     public AdminQuanLySachPanel() {
@@ -104,41 +104,59 @@ public class AdminQuanLySachPanel extends JPanel {
         Font fontLabel = new Font(tenFont, Font.BOLD, 14);
         Font fontInput = new Font(tenFont, Font.PLAIN, 14);
 
-        txtMaSach = new JTextField(); txtMaSach.setFont(fontInput);
+        txtMaSach = new JTextField();
+        txtMaSach.setFont(fontInput);
         txtMaSach.setEditable(false);
         txtMaSach.setBackground(new Color(233, 236, 239));
 
-        txtTenSach  = new JTextField(); txtTenSach.setFont(fontInput);
-        txtNamXB    = new JTextField(); txtNamXB.setFont(fontInput);
-        txtNgonNgu  = new JTextField(); txtNgonNgu.setFont(fontInput);
-        txtGiaBia   = new JTextField("0"); txtGiaBia.setFont(fontInput);
-        txtMaTacGia = new JTextField(); txtMaTacGia.setFont(fontInput);
-        txtMaTacGia.setToolTipText("Nhập Mã Tác Giả (VD: TG00000001). Nhiều tác giả cách nhau bằng dấu phẩy.");
+        txtTenSach = new JTextField();
+        txtTenSach.setFont(fontInput);
+        txtNamXB = new JTextField();
+        txtNamXB.setFont(fontInput);
+        txtNgonNgu = new JTextField();
+        txtNgonNgu.setFont(fontInput);
+        txtGiaBia = new JTextField("0");
+        txtGiaBia.setFont(fontInput);
+        txtMaTacGia = new JTextField();
+        txtMaTacGia.setFont(fontInput);
+        txtMaTacGia.setToolTipText("Nhập Mã Tác Giả (VD: TG01). Nhiều tác giả cách nhau bằng dấu phẩy.");
 
-        cbTheLoai = new JComboBox<>(); cbTheLoai.setFont(fontInput);
-        cbNXB     = new JComboBox<>(); cbNXB.setFont(fontInput);
+        cbTheLoai = new JComboBox<>();
+        cbTheLoai.setFont(fontInput);
+        cbNXB = new JComboBox<>();
+        cbNXB.setFont(fontInput);
 
-        pnlInput.add(lbl("Mã sách:", fontLabel));       pnlInput.add(txtMaSach);
-        pnlInput.add(lbl("Tên sách:", fontLabel));       pnlInput.add(txtTenSach);
-        pnlInput.add(lbl("Thể loại:", fontLabel));       pnlInput.add(cbTheLoai);
-        pnlInput.add(lbl("Nhà xuất bản:", fontLabel));   pnlInput.add(cbNXB);
-        pnlInput.add(lbl("Năm xuất bản:", fontLabel));   pnlInput.add(txtNamXB);
-        pnlInput.add(lbl("Ngôn ngữ:", fontLabel));       pnlInput.add(txtNgonNgu);
-        pnlInput.add(lbl("Giá bìa (VNĐ):", fontLabel)); pnlInput.add(txtGiaBia);
-        pnlInput.add(lbl("Mã tác giả:", fontLabel));     pnlInput.add(txtMaTacGia);
+        pnlInput.add(lbl("Mã sách:", fontLabel));
+        pnlInput.add(txtMaSach);
+        pnlInput.add(lbl("Tên sách:", fontLabel));
+        pnlInput.add(txtTenSach);
+        pnlInput.add(lbl("Thể loại:", fontLabel));
+        pnlInput.add(cbTheLoai);
+        pnlInput.add(lbl("Nhà xuất bản:", fontLabel));
+        pnlInput.add(cbNXB);
+        pnlInput.add(lbl("Năm xuất bản:", fontLabel));
+        pnlInput.add(txtNamXB);
+        pnlInput.add(lbl("Ngôn ngữ:", fontLabel));
+        pnlInput.add(txtNgonNgu);
+        pnlInput.add(lbl("Giá bìa (VNĐ):", fontLabel));
+        pnlInput.add(txtGiaBia);
+        pnlInput.add(lbl("Mã tác giả:", fontLabel));
+        pnlInput.add(txtMaTacGia);
 
         JPanel pnlSearch = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         pnlSearch.setBackground(colorBackground);
         pnlSearch.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        txtSearch = new JTextField(20); txtSearch.setFont(fontInput);
+        txtSearch = new JTextField(20);
+        txtSearch.setFont(fontInput);
         txtSearch.setPreferredSize(new Dimension(0, 35));
 
-        cbSearchCriteria = new JComboBox<>(new String[]{"Tất cả", "Mã Sách", "Tên Sách", "Thể Loại", "Nhà Xuất Bản"});
+        cbSearchCriteria = new JComboBox<>(
+                new String[] { "Tất cả", "Mã Sách", "Tên Sách", "Thể Loại", "Nhà Xuất Bản" });
         cbSearchCriteria.setFont(fontInput);
         cbSearchCriteria.setPreferredSize(new Dimension(150, 35));
 
-        btnSearch      = actionBtn("Tìm Kiếm", new Color(13, 110, 253));
+        btnSearch = actionBtn("Tìm Kiếm", new Color(13, 110, 253));
         btnSearch.setPreferredSize(new Dimension(110, 35));
         btnResetSearch = actionBtn("Hủy Lọc", new Color(108, 117, 125));
         btnResetSearch.setPreferredSize(new Dimension(100, 35));
@@ -156,10 +174,13 @@ public class AdminQuanLySachPanel extends JPanel {
         pnlTopCenter.add(pnlSearch, BorderLayout.CENTER);
         pnlCenter.add(pnlTopCenter, BorderLayout.NORTH);
 
-        String[] cols = {"Mã Sách", "Tên Sách", "Thể Loại", "Nhà Xuất Bản",
-                         "Năm XB", "Ngôn Ngữ", "Giá Bìa", "Tác Giả", "Số Cuốn"};
+        String[] cols = { "Mã Sách", "Tên Sách", "Thể Loại", "Nhà Xuất Bản",
+                "Năm XB", "Ngôn Ngữ", "Giá Bìa", "Tác Giả", "Số Cuốn" };
         model = new DefaultTableModel(cols, 0) {
-            @Override public boolean isCellEditable(int r, int c) { return false; }
+            @Override
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
         };
         table = new JTable(model);
         setupTable(table);
@@ -172,12 +193,13 @@ public class AdminQuanLySachPanel extends JPanel {
         JPanel pnlButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         pnlButtons.setBackground(colorBackground);
 
-        btnThem   = actionBtn("Thêm Mới", new Color(25, 135, 84));
-        btnSua    = actionBtn("Cập Nhật", new Color(255, 193, 7)); btnSua.setForeground(Color.BLACK);
-        btnXoa    = actionBtn("Xóa Sách", new Color(220, 53, 69));
-        btnImport = actionBtn("Import",   new Color(33, 115, 70));
-        btnSave   = actionBtn("Save",     new Color(111, 66, 193));
-        btnExport = actionBtn("Export",   new Color(33, 115, 70));
+        btnThem = actionBtn("Thêm Mới", new Color(25, 135, 84));
+        btnSua = actionBtn("Cập Nhật", new Color(255, 193, 7));
+        btnSua.setForeground(Color.BLACK);
+        btnXoa = actionBtn("Xóa Sách", new Color(220, 53, 69));
+        btnImport = actionBtn("Import", new Color(33, 115, 70));
+        btnSave = actionBtn("Save", new Color(111, 66, 193));
+        btnExport = actionBtn("Export", new Color(33, 115, 70));
 
         pnlButtons.add(btnImport);
         pnlButtons.add(btnSave);
@@ -195,11 +217,15 @@ public class AdminQuanLySachPanel extends JPanel {
     private void loadComboBoxes() {
         cbTheLoai.removeAllItems();
         listTheLoai = theLoaiBUS.getAll();
-        if (listTheLoai != null) for (TheLoaiDTO tl : listTheLoai) cbTheLoai.addItem(tl.getTenTheLoai());
+        if (listTheLoai != null)
+            for (TheLoaiDTO tl : listTheLoai)
+                cbTheLoai.addItem(tl.getTenTheLoai());
 
         cbNXB.removeAllItems();
         listNXB = nxbBUS.getAll();
-        if (listNXB != null) for (NhaXuatBanDTO nxb : listNXB) cbNXB.addItem(nxb.getTenNXB());
+        if (listNXB != null)
+            for (NhaXuatBanDTO nxb : listNXB)
+                cbNXB.addItem(nxb.getTenNXB());
     }
 
     // =====================================================
@@ -211,28 +237,33 @@ public class AdminQuanLySachPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int row = table.getSelectedRow();
-                if (row < 0) return;
+                if (row < 0)
+                    return;
                 txtMaSach.setText(val(row, 0));
                 txtTenSach.setText(val(row, 1));
                 txtNamXB.setText(val(row, 4));
                 txtNgonNgu.setText(val(row, 5));
-                txtGiaBia.setText(val(row, 6).replace(".", "").replace(",", "").replace(" đ", "").replace("đ", "").trim());
+                txtGiaBia.setText(
+                        val(row, 6).replace(".", "").replace(",", "").replace(" đ", "").replace("đ", "").trim());
                 txtMaTacGia.setText("");
                 chonComboTheoTen(cbTheLoai, val(row, 2));
-                chonComboTheoTen(cbNXB,     val(row, 3));
+                chonComboTheoTen(cbNXB, val(row, 3));
             }
         });
 
         btnThem.addActionListener(e -> {
             SachDTO sach = layDuLieuForm();
-            if (sach == null) return;
+            if (sach == null)
+                return;
             String result = sachBUS.insert(sach);
             if (result.contains("thành công")) {
                 String maTG = txtMaTacGia.getText().trim();
                 if (!maTG.isEmpty())
-                    for (String mg : maTG.split(",")) sachBUS.insertSachTacGia(sach.getMaSach(), mg.trim());
+                    for (String mg : maTG.split(","))
+                        sachBUS.insertSachTacGia(sach.getMaSach(), mg.trim());
                 JOptionPane.showMessageDialog(this, result);
-                lamMoiForm(); loadDataToTable();
+                lamMoiForm();
+                loadDataToTable();
             } else {
                 JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
@@ -241,43 +272,51 @@ public class AdminQuanLySachPanel extends JPanel {
         btnSua.addActionListener(e -> {
             String maSach = txtMaSach.getText().trim();
             if (maSach.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 sách trong bảng trước!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 sách trong bảng trước!", "Cảnh báo",
+                        JOptionPane.WARNING_MESSAGE);
                 return;
             }
             SachDTO sach = layDuLieuForm();
-            if (sach == null) return;
+            if (sach == null)
+                return;
             int confirm = JOptionPane.showConfirmDialog(this,
                     "Cập nhật thông tin sách " + maSach + "?", "Xác nhận", JOptionPane.YES_NO_OPTION);
-            if (confirm != JOptionPane.YES_OPTION) return;
+            if (confirm != JOptionPane.YES_OPTION)
+                return;
             String result = sachBUS.update(sach);
             if (result.contains("thành công")) {
                 String maTG = txtMaTacGia.getText().trim();
                 if (!maTG.isEmpty()) {
                     sachBUS.deleteSachTacGia(maSach);
-                    for (String mg : maTG.split(",")) sachBUS.insertSachTacGia(maSach, mg.trim());
+                    for (String mg : maTG.split(","))
+                        sachBUS.insertSachTacGia(maSach, mg.trim());
                 }
                 JOptionPane.showMessageDialog(this, result);
-                lamMoiForm(); loadDataToTable();
+                lamMoiForm();
+                loadDataToTable();
             } else {
                 JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         });
 
         btnXoa.addActionListener(e -> {
-            String maSach  = txtMaSach.getText().trim();
+            String maSach = txtMaSach.getText().trim();
             String tenSach = txtTenSach.getText().trim();
             if (maSach.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 sách trong bảng trước!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn 1 sách trong bảng trước!", "Cảnh báo",
+                        JOptionPane.WARNING_MESSAGE);
                 return;
             }
             int confirm = JOptionPane.showConfirmDialog(this,
                     "Xóa sách: " + tenSach + " (" + maSach + ")?\nSách sẽ bị ẩn khỏi hệ thống.",
                     "Xác nhận xóa", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-            if (confirm != JOptionPane.YES_OPTION) return;
+            if (confirm != JOptionPane.YES_OPTION)
+                return;
             String result = sachBUS.delete(maSach);
             if (result.contains("thành công")) {
                 JOptionPane.showMessageDialog(this, result);
-                lamMoiForm(); loadDataToTable();
+                lamMoiForm();
+                loadDataToTable();
             } else {
                 JOptionPane.showMessageDialog(this, result, "Không thể xóa", JOptionPane.WARNING_MESSAGE);
             }
@@ -301,7 +340,8 @@ public class AdminQuanLySachPanel extends JPanel {
 
         btnExport.addActionListener(e -> {
             if (model.getRowCount() == 0) {
-                JOptionPane.showMessageDialog(this, "Không có dữ liệu để xuất!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Không có dữ liệu để xuất!", "Cảnh báo",
+                        JOptionPane.WARNING_MESSAGE);
                 return;
             }
             Utils.ExcelExporter.exportTableToExcel(table, "DanhSach_Sach");
@@ -310,14 +350,15 @@ public class AdminQuanLySachPanel extends JPanel {
         btnSave.addActionListener(e -> {
             int rowCount = table.getRowCount();
             if (rowCount == 0) {
-                JOptionPane.showMessageDialog(this, "Bảng đang trống, không có dữ liệu để lưu!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Bảng đang trống, không có dữ liệu để lưu!", "Cảnh báo",
+                        JOptionPane.WARNING_MESSAGE);
                 return;
             }
             int confirm = JOptionPane.showConfirmDialog(this,
                     "Lưu toàn bộ " + rowCount + " dòng trên bảng vào Database?",
                     "Xác nhận", JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
-                int successCount = 0, failCount = 0;
+                int insertCount = 0, updateCount = 0, failCount = 0;
                 for (int i = 0; i < rowCount; i++) {
                     try {
                         SachDTO sach = new SachDTO();
@@ -328,14 +369,32 @@ public class AdminQuanLySachPanel extends JPanel {
                         String namXBStr = model.getValueAt(i, 4).toString().trim();
                         sach.setNamXB(Integer.parseInt(namXBStr.isEmpty() ? "0" : namXBStr));
                         sach.setNgonNgu(model.getValueAt(i, 5).toString().trim());
-                        sach.setGiaBia(Float.valueOf(0f));
+                        // Parse giá bìa từ bảng (loại bỏ dấu phân cách và ký tự "đ")
+                        String giaStr = model.getValueAt(i, 6).toString()
+                                .replace(".", "").replace(",", "").replace(" đ", "").replace("đ", "").trim();
+                        sach.setGiaBia(giaStr.isEmpty() ? 0f : Float.parseFloat(giaStr));
                         sach.setIsDeleted(Boolean.FALSE);
+                        // Upsert: thử insert trước, nếu đã tồn tại thì update
                         String result = sachBUS.insert(sach);
-                        if (result.equals("Thêm sách thành công!")) successCount++; else failCount++;
-                    } catch (Exception ex) { failCount++; }
+                        if (result.contains("thành công")) {
+                            insertCount++;
+                        } else if (result.contains("đã tồn tại")) {
+                            // Sách đã có → cập nhật thay vì bỏ qua
+                            String updateResult = sachBUS.update(sach);
+                            if (updateResult.contains("thành công"))
+                                updateCount++;
+                            else
+                                failCount++;
+                        } else {
+                            failCount++;
+                        }
+                    } catch (Exception ex) {
+                        failCount++;
+                    }
                 }
                 JOptionPane.showMessageDialog(this,
-                        "Lưu hoàn tất!\n- Thành công: " + successCount + " cuốn\n- Bỏ qua (Trùng mã/Lỗi): " + failCount + " cuốn",
+                        "Lưu hoàn tất!\n- Thêm mới: " + insertCount + " cuốn\n- Cập nhật: " + updateCount
+                                + " cuốn\n- Lỗi: " + failCount + " cuốn",
                         "Thông báo", JOptionPane.INFORMATION_MESSAGE);
                 loadDataToTable();
             }
@@ -348,45 +407,65 @@ public class AdminQuanLySachPanel extends JPanel {
     private void loadDataToTable() {
         model.setRowCount(0);
         try {
-            for (Object[] row : sachBUS.getDanhSachDayDu()) model.addRow(row);
-        } catch (Exception ex) { ex.printStackTrace(); }
+            for (Object[] row : sachBUS.getDanhSachDayDu())
+                model.addRow(row);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void timKiem() {
-        String kw       = txtSearch.getText().trim().toLowerCase();
+        String kw = txtSearch.getText().trim().toLowerCase();
         String criteria = (String) cbSearchCriteria.getSelectedItem();
         model.setRowCount(0);
         try {
             for (Object[] row : sachBUS.getDanhSachDayDu()) {
                 boolean match;
                 switch (criteria) {
-                    case "Mã Sách":      match = row[0] != null && row[0].toString().toLowerCase().contains(kw); break;
-                    case "Tên Sách":     match = row[1] != null && row[1].toString().toLowerCase().contains(kw); break;
-                    case "Thể Loại":     match = row[2] != null && row[2].toString().toLowerCase().contains(kw); break;
-                    case "Nhà Xuất Bản": match = row[3] != null && row[3].toString().toLowerCase().contains(kw); break;
-                    default:             match = true; break;
+                    case "Mã Sách":
+                        match = row[0] != null && row[0].toString().toLowerCase().contains(kw);
+                        break;
+                    case "Tên Sách":
+                        match = row[1] != null && row[1].toString().toLowerCase().contains(kw);
+                        break;
+                    case "Thể Loại":
+                        match = row[2] != null && row[2].toString().toLowerCase().contains(kw);
+                        break;
+                    case "Nhà Xuất Bản":
+                        match = row[3] != null && row[3].toString().toLowerCase().contains(kw);
+                        break;
+                    default:
+                        match = true;
+                        break;
                 }
-                if (match) model.addRow(row);
+                if (match)
+                    model.addRow(row);
             }
-        } catch (Exception ex) { ex.printStackTrace(); }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private SachDTO layDuLieuForm() {
         String tenSach = txtTenSach.getText().trim();
         String ngonNgu = txtNgonNgu.getText().trim();
         if (tenSach.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Tên sách không được để trống!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Tên sách không được để trống!", "Cảnh báo",
+                    JOptionPane.WARNING_MESSAGE);
             return null;
         }
         int namXB = 0;
-        try { namXB = Integer.parseInt(txtNamXB.getText().trim()); }
-        catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Năm xuất bản phải là số nguyên!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+        try {
+            namXB = Integer.parseInt(txtNamXB.getText().trim());
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Năm xuất bản phải là số nguyên!", "Cảnh báo",
+                    JOptionPane.WARNING_MESSAGE);
             return null;
         }
         float giaBia = 0;
-        try { giaBia = Float.parseFloat(txtGiaBia.getText().trim()); }
-        catch (NumberFormatException ex) {
+        try {
+            giaBia = Float.parseFloat(txtGiaBia.getText().trim());
+        } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Giá bìa phải là số!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return null;
         }
@@ -403,33 +482,52 @@ public class AdminQuanLySachPanel extends JPanel {
 
     public void lamMoiForm() {
         txtMaSach.setText(sachBUS.generateMaSach());
-        txtTenSach.setText(""); txtNamXB.setText("");
-        txtNgonNgu.setText(""); txtGiaBia.setText("0"); txtMaTacGia.setText("");
-        if (cbTheLoai.getItemCount() > 0) cbTheLoai.setSelectedIndex(0);
-        if (cbNXB.getItemCount() > 0) cbNXB.setSelectedIndex(0);
+        txtTenSach.setText("");
+        txtNamXB.setText("");
+        txtNgonNgu.setText("");
+        txtGiaBia.setText("0");
+        txtMaTacGia.setText("");
+        if (cbTheLoai.getItemCount() > 0)
+            cbTheLoai.setSelectedIndex(0);
+        if (cbNXB.getItemCount() > 0)
+            cbNXB.setSelectedIndex(0);
         table.clearSelection();
     }
 
     private String getMaTheLoai(String tenTheLoai) {
-        if (listTheLoai != null) for (TheLoaiDTO tl : listTheLoai) if (tl.getTenTheLoai().equals(tenTheLoai)) return tl.getMaTheLoai();
+        if (listTheLoai != null)
+            for (TheLoaiDTO tl : listTheLoai)
+                if (tl.getTenTheLoai().equals(tenTheLoai))
+                    return tl.getMaTheLoai();
         return "";
     }
 
     private String getMaNXB(String tenNXB) {
-        if (listNXB != null) for (NhaXuatBanDTO nxb : listNXB) if (nxb.getTenNXB().equals(tenNXB)) return nxb.getMaNXB();
+        if (listNXB != null)
+            for (NhaXuatBanDTO nxb : listNXB)
+                if (nxb.getTenNXB().equals(tenNXB))
+                    return nxb.getMaNXB();
         return "";
     }
 
     private void chonComboTheoTen(JComboBox<String> cb, String ten) {
-        for (int i = 0; i < cb.getItemCount(); i++) if (cb.getItemAt(i).equals(ten)) { cb.setSelectedIndex(i); return; }
+        for (int i = 0; i < cb.getItemCount(); i++)
+            if (cb.getItemAt(i).equals(ten)) {
+                cb.setSelectedIndex(i);
+                return;
+            }
     }
 
     private String val(int row, int col) {
-        Object v = model.getValueAt(row, col); return v != null ? v.toString() : "";
+        Object v = model.getValueAt(row, col);
+        return v != null ? v.toString() : "";
     }
 
     private JLabel lbl(String text, Font font) {
-        JLabel l = new JLabel(text); l.setFont(font); l.setForeground(new Color(73, 80, 87)); return l;
+        JLabel l = new JLabel(text);
+        l.setFont(font);
+        l.setForeground(new Color(73, 80, 87));
+        return l;
     }
 
     private void setupTable(JTable t) {
@@ -463,16 +561,19 @@ public class AdminQuanLySachPanel extends JPanel {
                                 c.setForeground(new Color(25, 135, 84));
                                 ((JLabel) c).setFont(new Font(tenFont, Font.BOLD, 14));
                             }
-                        } catch (Exception ignored) {}
+                        } catch (Exception ignored) {
+                        }
                     }
                 }
-                if (col == 4 || col == 8) ((JLabel) c).setHorizontalAlignment(SwingConstants.CENTER);
-                if (col == 6) ((JLabel) c).setHorizontalAlignment(SwingConstants.RIGHT);
+                if (col == 4 || col == 8)
+                    ((JLabel) c).setHorizontalAlignment(SwingConstants.CENTER);
+                if (col == 6)
+                    ((JLabel) c).setHorizontalAlignment(SwingConstants.RIGHT);
                 return c;
             }
         });
 
-        int[] widths = {95, 210, 130, 130, 65, 80, 100, 150, 75};
+        int[] widths = { 95, 210, 130, 130, 65, 80, 100, 150, 75 };
         for (int i = 0; i < widths.length; i++)
             t.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
     }
@@ -480,17 +581,33 @@ public class AdminQuanLySachPanel extends JPanel {
     private JButton actionBtn(String text, Color bg) {
         JButton btn = new JButton(text);
         btn.setFont(new Font(tenFont, Font.BOLD, 14));
-        btn.setForeground(Color.WHITE); btn.setBackground(bg);
-        btn.setBorderPainted(false); btn.setFocusPainted(false);
+        btn.setForeground(Color.WHITE);
+        btn.setBackground(bg);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
         btn.setPreferredSize(new Dimension(140, 40));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setOpaque(true);
         return btn;
     }
 
-    public JTable getTable()            { return table; }
-    public DefaultTableModel getModel() { return model; }
-    public JButton getBtnThem()         { return btnThem; }
-    public JButton getBtnSua()          { return btnSua; }
-    public JButton getBtnXoa()          { return btnXoa; }
+    public JTable getTable() {
+        return table;
+    }
+
+    public DefaultTableModel getModel() {
+        return model;
+    }
+
+    public JButton getBtnThem() {
+        return btnThem;
+    }
+
+    public JButton getBtnSua() {
+        return btnSua;
+    }
+
+    public JButton getBtnXoa() {
+        return btnXoa;
+    }
 }

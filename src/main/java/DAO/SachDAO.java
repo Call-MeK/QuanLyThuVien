@@ -224,9 +224,9 @@ public class SachDAO {
              ResultSet rs = st.executeQuery(sql)) {
             if (rs.next() && rs.getString(1) != null) {
                 int num = Integer.parseInt(rs.getString(1).trim().substring(1)) + 1;
-                return String.format("S%09d", num);
+                return String.format("S%02d", num);
             }
         } catch (Exception e) { e.printStackTrace(); }
-        return "S000000001";
+        return "S01";
     }
 }
