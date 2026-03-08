@@ -93,7 +93,7 @@ public class SachDAO {
                 "       (SELECT COUNT(*) FROM SACHCOPY sc " +
                 "        WHERE RTRIM(sc.MaSach) = RTRIM(s.MaSach) " +
                 "        AND sc.IsDeleted = 0 " +
-                "        AND sc.TinhTrang = N'Tốt' " +
+                "        AND sc.TinhTrang != N'Hỏng' " +
                 "        AND NOT EXISTS (" +
                 "            SELECT 1 " +
                 "            FROM CHITIETPHIEUMUON ct " +

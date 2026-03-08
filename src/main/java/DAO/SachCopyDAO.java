@@ -135,7 +135,7 @@ public class SachCopyDAO {
         List<SachCopyDTO> list = new ArrayList<>();
         String sql = "SELECT * FROM SACHCOPY " +
                 "WHERE RTRIM(MaSach) = ? " +
-                "AND TinhTrang = N'Tốt' " +
+                "AND TinhTrang != N'Hỏng' " +
                 "AND IsDeleted = 0 " +
                 "AND RTRIM(MaVach) NOT IN (" +
                 "  SELECT RTRIM(ct.MaCuonSach) " +

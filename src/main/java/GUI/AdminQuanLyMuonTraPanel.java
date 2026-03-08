@@ -29,7 +29,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
     private DefaultTableModel model;
 
     private JButton btnThem, btnTra, btnLamMoi, btnSearch, btnResetSearch, btnLookupSach;
-    private JButton  btnExport, btnSave;
+    private JButton btnExport, btnSave;
 
     private PhieuMuonBUS phieuMuonBUS = new PhieuMuonBUS();
     private TheThuVienBUS theThuVienBUS = new TheThuVienBUS();
@@ -68,7 +68,8 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
             Image img = icon.getImage().getScaledInstance(28, 28, Image.SCALE_SMOOTH);
             btnLamMoi.setIcon(new ImageIcon(img));
             btnLamMoi.setText("");
-        } catch (Exception e) { }
+        } catch (Exception e) {
+        }
         pnlHeader.add(btnLamMoi, BorderLayout.EAST);
         add(pnlHeader, BorderLayout.NORTH);
 
@@ -95,7 +96,7 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         txtTrangThai = roField(fontInput);
         txtTrangThai.setBackground(new Color(227, 242, 253));
         txtTrangThai.setForeground(new Color(13, 71, 161));
-  
+
         txtMaNQL = roField(fontInput);
         txtMaNQL.setBackground(new Color(233, 236, 239));
         txtTenSach = roField(fontInput);
@@ -120,22 +121,22 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
         pnlInput.add(txtMaPhieu);
         pnlInput.add(lbl("Mã độc giả:", fontLabel));
         pnlInput.add(txtMaDG);
-        
+
         pnlInput.add(lbl("Mã thẻ (tự tìm):", fontLabel));
         pnlInput.add(txtMaThe);
         pnlInput.add(lbl("Ngày mượn:", fontLabel));
         pnlInput.add(txtNgayMuon);
-       
+
         pnlInput.add(lbl("Hạn trả:", fontLabel));
         pnlInput.add(txtHanTra);
         pnlInput.add(lbl("Ngày trả thực:", fontLabel));
         pnlInput.add(txtNgayTra);
-       
+
         pnlInput.add(lbl("Trạng thái:", fontLabel));
         pnlInput.add(txtTrangThai);
         pnlInput.add(lbl("Mã NV lập phiếu:", fontLabel));
         pnlInput.add(txtMaNQL);
-       
+
         pnlInput.add(lbl("Tên sách đang mượn:", fontLabel));
         pnlInput.add(txtTenSach);
         pnlInput.add(lbl("Mã sách:", fontLabel));
@@ -517,14 +518,10 @@ public class AdminQuanLyMuonTraPanel extends JPanel {
     private void loadBanSao(String maSach) {
         cbBanSao.removeAllItems();
         dsBanSaoHienTai.clear();
-        List<SachCopyDTO> list = copyBUS.getAll();
+        List<SachCopyDTO> list = copyBUS.getAvailable(maSach);
         for (SachCopyDTO sc : list) {
-            if (maSach.equalsIgnoreCase(sc.getMaSach())
-                    && !Boolean.TRUE.equals(sc.getIsDeleted())
-                    && !"Hỏng".equals(sc.getTinhTrang())) {
-                dsBanSaoHienTai.add(sc);
-                cbBanSao.addItem(sc.getTenSachBanSao() + "  [" + sc.getTinhTrang() + "]");
-            }
+            dsBanSaoHienTai.add(sc);
+            cbBanSao.addItem(sc.getTenSachBanSao() + "  [" + sc.getTinhTrang() + "]");
         }
         if (dsBanSaoHienTai.isEmpty())
             JOptionPane.showMessageDialog(this, "Không có bản sao còn dùng được cho sách: " + maSach,
