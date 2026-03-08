@@ -467,7 +467,7 @@ public class AdminQuanLyDocGiaPanel extends JPanel {
         btn.setForeground(Color.WHITE);
         btn.setBackground(bgColor);
         btn.setBorderPainted(false); btn.setFocusPainted(false);
-        btn.setPreferredSize(new Dimension(130, 40));
+        btn.setPreferredSize(new Dimension(110, 40));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setOpaque(true); return btn;
     }

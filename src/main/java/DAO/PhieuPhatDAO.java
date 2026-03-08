@@ -185,12 +185,12 @@ public class PhieuPhatDAO {
             if (rs.next()) {
                 String lastMa = rs.getString("MaPP");
                 int num = Integer.parseInt(lastMa.substring(2)) + 1;
-                return String.format("PP%08d", num);
+                return String.format("PP%02d", num);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "PP00000001";
+        return "PP01";
     }
     
    // Lấy danh sách phiếu phạt HIỂN THỊ LÊN GUI dành riêng cho 1 Độc Giả (User)
