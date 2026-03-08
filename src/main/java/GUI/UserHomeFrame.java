@@ -131,9 +131,102 @@ public class UserHomeFrame extends JFrame {
                                 + "Vui lòng đến thư viện để được hỗ trợ mở khóa trước khi mượn sách.",
                         "Không thể mượn sách", JOptionPane.WARNING_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(UserHomeFrame.this,
-                        "Sách hiện đang có sẵn. Vui lòng mang thẻ độc giả đến quầy thư viện để làm thủ tục mượn!",
-                        "Hướng dẫn mượn sách", JOptionPane.INFORMATION_MESSAGE);
+                String maSach = panelChiTietSach.getCurrentMaSach();
+                if (maSach == null || maSach.isEmpty()) {
+                    JOptionPane.showMessageDialog(UserHomeFrame.this,
+                            "Không xác định được mã sách!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                BUS.SachCopyBUS copyBUS = new BUS.SachCopyBUS();
+                java.util.List<DTO.SachCopyDTO> dsAvailable = copyBUS.getAvailable(maSach);
+                if (dsAvailable == null || dsAvailable.isEmpty()) {
+                    JOptionPane.showMessageDialog(UserHomeFrame.this,
+                            "Hiện tại sách này đã hết! Vui lòng quay lại sau.",
+                            "Hết sách", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                BUS.NguoiQuanLyBUS nqlBUS = new BUS.NguoiQuanLyBUS();
+                java.util.List<DTO.NguoiQuanLyDTO> dsNQL = nqlBUS.getAll();
+                java.util.Vector<String> nqlOptions = new java.util.Vector<>();
+                java.util.Map<String, String> nqlMap = new java.util.HashMap<>();
+                if (dsNQL != null) {
+                    for (DTO.NguoiQuanLyDTO nql : dsNQL) {
+                        if (nql.getIsDeleted() == null || !nql.getIsDeleted()) {
+                            String displayText = nql.getHoTen() + " (" + nql.getMaNQL().trim() + ")";
+                            nqlOptions.add(displayText);
+                            nqlMap.put(displayText, nql.getMaNQL());
+                        }
+                    }
+                }
+
+                if (nqlOptions.isEmpty()) {
+                    JOptionPane.showMessageDialog(UserHomeFrame.this,
+                            "Hệ thống chưa có người quản lý nào để tiếp nhận yêu cầu!", "Lỗi",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                JComboBox<String> cbAdmins = new JComboBox<>(nqlOptions);
+                cbAdmins.setFont(new Font(tenFont, Font.PLAIN, 14));
+                cbAdmins.setPreferredSize(new Dimension(250, 30));
+
+                Object[] msg = {
+                        "Bạn có muốn đăng ký mượn cuốn sách này không?\nSách sẽ được giữ cho bạn tại quầy thư viện.",
+                        "Vui lòng chọn thủ thư tiếp nhận:", cbAdmins
+                };
+
+                int confirm = JOptionPane.showConfirmDialog(UserHomeFrame.this, msg,
+                        "Xác nhận mượn sách", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+                if (confirm != JOptionPane.OK_OPTION)
+                    return;
+
+                String selectedNQLDisplay = (String) cbAdmins.getSelectedItem();
+                String maNQL = nqlMap.get(selectedNQLDisplay);
+
+                BUS.PhieuMuonBUS pmBUS = new BUS.PhieuMuonBUS();
+                BUS.ChiTietPhieuMuonBUS ctpmBUS = new BUS.ChiTietPhieuMuonBUS();
+                BUS.TheThuVienBUS theThuVienBUS = new BUS.TheThuVienBUS();
+
+                DTO.TheThuVienDTO theThuVien = theThuVienBUS.getByMaDocGia(maDocGiaDangNhap);
+                if (theThuVien == null) {
+                    JOptionPane.showMessageDialog(UserHomeFrame.this,
+                            "Không tìm thấy thẻ thư viện của bạn!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                String maThe = theThuVien.getMaThe();
+
+                String maPM = pmBUS.generateMaPM();
+                String today = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
+
+                java.util.Calendar cal = java.util.Calendar.getInstance();
+                cal.add(java.util.Calendar.DAY_OF_MONTH, 14);
+                String henTra = new java.text.SimpleDateFormat("yyyy-MM-dd").format(cal.getTime());
+
+                DTO.PhieuMuonDTO pm = new DTO.PhieuMuonDTO(
+                        maPM, today, null, henTra, "Đang mượn", maNQL, maThe);
+
+                String result = pmBUS.insert(pm);
+                if (result.contains("thành công")) {
+                    DTO.SachCopyDTO cuon = dsAvailable.get(0);
+                    DTO.ChiTietPhieuMuonDTO ct = new DTO.ChiTietPhieuMuonDTO(
+                            maPM, cuon.getMaVach(), "Tốt");
+                    ctpmBUS.add(ct);
+
+                    cuon.setTinhTrang("Đang mượn");
+                    copyBUS.update(cuon);
+
+                    JOptionPane.showMessageDialog(UserHomeFrame.this,
+                            "Đăng ký mượn sách thành công!\n"
+                                    + "Mã phiếu mượn: " + maPM + "\n"
+                                    + "Hạn trả: " + henTra + "\n"
+                                    + "Vui lòng đến quầy thư viện để nhận sách.",
+                            "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(UserHomeFrame.this,
+                            "Đăng ký mượn thất bại: " + result, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
@@ -343,6 +436,7 @@ public class UserHomeFrame extends JFrame {
 
         String finalTinhTrang = tinhTrang;
         String finalTheLoai = category;
+        String finalHinhAnh = sach.getHinhAnh();
         btn.addActionListener(e -> {
             panelChiTietSach.setThongTinSach(
                     title,
@@ -353,7 +447,9 @@ public class UserHomeFrame extends JFrame {
                     finalTinhTrang,
                     "Mã sách: " + sach.getMaSach()
                             + "\nGiá bìa: " + sach.getGiaBia() + " VNĐ"
-                            + "\nNgôn ngữ: " + sach.getNgonNgu());
+                            + "\nNgôn ngữ: " + sach.getNgonNgu(),
+                    finalHinhAnh,
+                    sach.getMaSach());
             cardLayout.show(mainContentPanel, "ChiTietSach");
         });
 

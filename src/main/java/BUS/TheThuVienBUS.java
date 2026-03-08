@@ -20,8 +20,10 @@ public class TheThuVienBUS {
 
     public TheThuVienDTO getById(String maThe) {
         if (listTheThuVien != null && !listTheThuVien.isEmpty()) {
+            if (maThe == null)
+                return null;
             for (TheThuVienDTO the : listTheThuVien) {
-                if (the.getMaThe() != null && the.getMaThe().equals(maThe)) {
+                if (the.getMaThe() != null && the.getMaThe().trim().equals(maThe.trim())) {
                     return the;
                 }
             }
@@ -33,12 +35,15 @@ public class TheThuVienBUS {
         if (listTheThuVien == null || listTheThuVien.isEmpty()) {
             getAll();
         }
+        if (maDocGia == null)
+            return null;
+
         for (TheThuVienDTO the : listTheThuVien) {
-            if (the.getMaDocGia() != null && the.getMaDocGia().equals(maDocGia)) {
+            if (the.getMaDocGia() != null && the.getMaDocGia().trim().equals(maDocGia.trim())) {
                 return the;
             }
         }
-        return null;
+        return theThuVienDAO.getByMaDocGia(maDocGia);
     }
 
     public String add(TheThuVienDTO the) {

@@ -185,13 +185,12 @@ public class PhieuMuonDAO {
     }
 
     public String generateMaPM() {
-        String sql = "SELECT MaPM FROM PHIEUMUON ORDER BY MaPM DESC";
+        String sql = "SELECT MAX(CAST(SUBSTRING(MaPM, 3, LEN(MaPM) - 2) AS INT)) AS MaxNum FROM PHIEUMUON";
         try (Connection conn = DatabaseConnection.getConnection();
                 Statement st = conn.createStatement();
                 ResultSet rs = st.executeQuery(sql)) {
-            if (rs.next()) {
-                String lastMa = rs.getString("MaPM");
-                int num = Integer.parseInt(lastMa.substring(2)) + 1;
+            if (rs.next() && rs.getObject("MaxNum") != null) {
+                int num = rs.getInt("MaxNum") + 1;
                 return String.format("PM%02d", num);
             }
         } catch (Exception e) {

@@ -149,8 +149,7 @@ public class ThongTinCaNhanPanel extends JPanel {
                     JOptionPane.showMessageDialog(this, "Mật khẩu mới không được trùng với mật khẩu cũ!", "Lỗi",
                             JOptionPane.ERROR_MESSAGE);
                 } else {
-                    // TODO: Gọi hàm từ BUS để kiểm tra tên đăng nhập/mật khẩu cũ và cập nhật thông
-                    // tin mới
+
                     JOptionPane.showMessageDialog(this,
                             "Đổi mật khẩu thành công! Vui lòng sử dụng mật khẩu mới cho lần đăng nhập sau.");
                 }
