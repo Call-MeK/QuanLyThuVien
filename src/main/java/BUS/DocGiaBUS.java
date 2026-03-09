@@ -127,7 +127,7 @@ public class DocGiaBUS {
 
         target.setIsDeleted(false);
         target.setNgayXoa("");
-        target.setTrangThai("Đang hoạt động");
+        target.setTrangThai("Hoạt động");
 
         if (docGiaDAO.update(target)) {
             return "Mở khóa thành công";
@@ -194,6 +194,12 @@ public class DocGiaBUS {
     public String updateThongTinLienHe(String maDocGia, String sdt, String email) {
         if (sdt.trim().isEmpty() || email.trim().isEmpty()) {
             return "Số điện thoại và Email không được để trống!";
+        }
+        if (checkDuplicatePhone(sdt, maDocGia)) {
+            return "Số điện thoại đã được đăng ký cho độc giả khác!";
+        }
+        if (checkDuplicateEmail(email, maDocGia)) {
+            return "Email đã được đăng ký cho độc giả khác!";
         }
         if (docGiaDAO.updateThongTinLienHe(maDocGia, sdt, email)) {
             for (DocGiaDTO dg : listdocGia) {

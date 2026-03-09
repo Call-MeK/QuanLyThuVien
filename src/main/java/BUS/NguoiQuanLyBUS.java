@@ -61,6 +61,14 @@ public class NguoiQuanLyBUS {
             return "Không tìm thấy Người quản lý cần cập nhật!";
         }
 
+        if (checkDuplicatePhone(nql.getSoDienThoai(), nql.getMaNQL())) {
+            return "Số điện thoại đã được sử dụng bởi người khác!";
+        }
+
+        if (checkDuplicateEmail(nql.getEmail(), nql.getMaNQL())) {
+            return "Email đã được sử dụng bởi người khác!";
+        }
+
         if (nqlDAO.update(nql)) {
             if (listNQL != null) {
                 for (int i = 0; i < listNQL.size(); i++) {
@@ -73,6 +81,32 @@ public class NguoiQuanLyBUS {
             return "Cập nhật thành công!";
         }
         return "Cập nhật thất bại!";
+    }
+
+    public boolean checkDuplicatePhone(String phone, String maNQL) {
+        if (phone == null || phone.trim().isEmpty())
+            return false;
+        if (listNQL == null || listNQL.isEmpty())
+            getAll();
+        for (NguoiQuanLyDTO nql : listNQL) {
+            if (phone.equals(nql.getSoDienThoai()) && !nql.getMaNQL().equals(maNQL)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkDuplicateEmail(String email, String maNQL) {
+        if (email == null || email.trim().isEmpty())
+            return false;
+        if (listNQL == null || listNQL.isEmpty())
+            getAll();
+        for (NguoiQuanLyDTO nql : listNQL) {
+            if (email.equalsIgnoreCase(nql.getEmail()) && !nql.getMaNQL().equals(maNQL)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String softDelete(String MaNQL) {
